@@ -46,13 +46,13 @@ class Arena(QFrame):
 
     def initArena(self):
         # create an arena layout with a matrix filled at the start only with "normal" tiles
-        self.ArenaLayout = [[TileTypes.Normal for j in range(Arena.ArenaWidth)] for i in range(Arena.ArenaHeight)]
+        self.ArenaLayout = [[random.randint(0,5) for j in range(Arena.ArenaWidth)] for i in range(Arena.ArenaHeight)]
 
     # generates a random layout by filling the matrix ArenaLayout with random integers which represent the diffrent tiles
-    def setRandomLayout(self):
-        for i in range(Arena.ArenaHeight):
-            for j in range(Arena.ArenaWidth):
-                self.ArenaLayout[i][j] = random.randint(0,5)
+    #def setRandomLayout(self):
+    #    for i in range(Arena.ArenaHeight):
+    #        for j in range(Arena.ArenaWidth):
+    #            self.ArenaLayout[i][j] = random.randint(0,5)
 
     # paint all tiles of the arena
     def paintEvent(self, event):
