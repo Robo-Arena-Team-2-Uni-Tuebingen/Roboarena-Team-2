@@ -1,8 +1,9 @@
 import random
 import numpy as np
 import sys
+from robot import Robot
 
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
@@ -43,16 +44,11 @@ class Arena(QFrame):
         super().__init__(parent)
 
         self.initArena()
+        self.pawn = Robot(500, 700, -np.pi/2)
 
     def initArena(self):
         # create an arena layout with a matrix filled at the start only with "normal" tiles
         self.ArenaLayout = [[random.randint(0,5) for j in range(Arena.ArenaWidth)] for i in range(Arena.ArenaHeight)]
-
-    # generates a random layout by filling the matrix ArenaLayout with random integers which represent the diffrent tiles
-    #def setRandomLayout(self):
-    #    for i in range(Arena.ArenaHeight):
-    #        for j in range(Arena.ArenaWidth):
-    #            self.ArenaLayout[i][j] = random.randint(0,5)
 
     # paint all tiles of the arena
     def paintEvent(self, event):
@@ -69,6 +65,8 @@ class Arena(QFrame):
                 self.drawTile(painter,
                               rect.left() + j * Arena.TileWidth, 
                               arenaTop + i * Arena.TileHeight, tile)
+        
+        self.drawRobot(painter, self.pawn)
 
 
     # paint a single tile
@@ -81,6 +79,13 @@ class Arena(QFrame):
         color = QColor(colorTable[tile])
         painter.fillRect(x, y, Arena.TileWidth,
                          Arena.TileHeight, color)
+        
+    def drawRobot(self, painter, robot):
+        centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
+        painter.setBrush(QColor(0xFFA500))
+        painter.drawEllipse(centerRobot, robot.radius, robot.radius)
+        painter.drawLine(centerRobot, direction)
 
 # class TileTypes contains the names of all possible tiles 
 class TileTypes(object):
