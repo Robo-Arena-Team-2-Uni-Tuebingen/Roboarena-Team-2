@@ -79,9 +79,12 @@ class Arena(QFrame):
         color = QColor(colorTable[tile])
         painter.fillRect(x, y, Arena.TileWidth,
                          Arena.TileHeight, color)
-        
+    
+    #this method is responsible for painting the robot in the window
     def drawRobot(self, painter, robot):
+        #corrects the position of the robot to the upper left corner where the drawing is positioned
         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        #calculates the point indicated by the angle on the circle of the robot
         direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
         painter.setBrush(QColor(0xFFA500))
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
