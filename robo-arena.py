@@ -49,6 +49,7 @@ class Arena(QFrame):
         # create an arena layout with a matrix filled at the start only with "normal" tiles
          self.ArenaLayout = [[self.randomTile() for j in range(self.ArenaWidth)] for i in range(self.ArenaHeight)]
     
+    #method that returns a random tile
     def randomTile(self):
         h = random.randint(0,5)
         if h == 0:
