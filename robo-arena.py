@@ -1,9 +1,10 @@
 import random
 import numpy as np
 import sys
+from robot import Robot
 import tiles
 
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
@@ -44,6 +45,7 @@ class Arena(QFrame):
         super().__init__(parent)
 
         self.initArena()
+        self.pawn = Robot(500, 700, -np.pi/2)
 
     def initArena(self):
         # create an arena layout with a matrix filled at the start only with "normal" tiles
@@ -81,11 +83,23 @@ class Arena(QFrame):
                 self.drawTile(painter,
                               rect.left() + j * Arena.TileWidth, 
                               arenaTop + i * Arena.TileHeight, tile)
+        
+        self.drawRobot(painter, self.pawn)
 
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
         painter.fillRect(x, y, tile.width, tile.height, tile.color)
+    
+    #this method is responsible for painting the robot in the window
+    def drawRobot(self, painter, robot):
+        #corrects the position of the robot to the upper left corner where the drawing is positioned
+        centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        #calculates the point indicated by the angle on the circle of the robot
+        direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
+        painter.setBrush(QColor(0xFFA500))
+        painter.drawEllipse(centerRobot, robot.radius, robot.radius)
+        painter.drawLine(centerRobot, direction)
 
 
 def main():
