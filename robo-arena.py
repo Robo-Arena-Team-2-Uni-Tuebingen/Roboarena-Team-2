@@ -47,6 +47,11 @@ class Arena(QFrame):
         self.initArena()
         self.pawn = Robot(500, 700, -np.pi/2)
 
+        # Create a timer to control the robot movement
+        self.timer = QBasicTimer()
+        self.timer.start(500, self)  # Timer interval and object to call
+
+
     def initArena(self):
         # create an arena layout with a matrix filled at the start only with "normal" tiles
          self.ArenaLayout = [[self.randomTile() for j in range(self.ArenaWidth)] for i in range(self.ArenaHeight)]
@@ -100,6 +105,21 @@ class Arena(QFrame):
         painter.setBrush(QColor(0xFFA500))
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
         painter.drawLine(centerRobot, direction)
+
+        def timerEvent(self, event):
+        # Move the robot randomly
+        direction = random.choice(["up", "down", "left", "right"])
+        if  direction  == "up" and self.pawn.ypos > 0:
+            self.pawn.ypos -= Arena.TileHeight
+        elif direction == "down" and self.pawn.ypos < self.height() - Arena.TileHeight:
+            self.pawn.ypos += Arena.TileHeight
+        elif direction == "left" and self.pawn.xpos > 0:
+            self.pawn.xpos -= Arena.TileWidth
+        elif direction == "right" and self.pawn.xpos < self.width() - Arena.TileWidth:
+            self.pawn.xpos += Arena.TileWidth
+
+        self.update()  # Redraw the widget
+
 
 
 def main():
