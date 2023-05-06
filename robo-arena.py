@@ -106,7 +106,7 @@ class Arena(QFrame):
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
         painter.drawLine(centerRobot, direction)
 
-        def timerEvent(self, event):
+    def timerEvent(self, event):
         # Move the robot randomly
         direction = random.choice(["up", "down", "left", "right"])
         if  direction  == "up" and self.pawn.ypos > 0:
