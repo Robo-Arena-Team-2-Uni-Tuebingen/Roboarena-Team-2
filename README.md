@@ -7,6 +7,11 @@
 - Created and tested the first programms and pushed them to the repository. All passed the Flake8 test
 
 ### Sprint 2 (26.04. - 09.05.2023)
+
+#### Repository update
+- changed repository to organization repo to give equal admin rights
+- setting up Kanban for future sprints
+
 #### Wireframe
 ![wireframe](https://user-images.githubusercontent.com/83218599/236781331-fe7f95dc-c2bc-4c22-b083-839dffdfba7d.png)
 
@@ -59,3 +64,15 @@
 
 ![grafik](https://user-images.githubusercontent.com/67464857/236786215-f5586590-0c8e-4e42-89b9-f123d0026a9f.png)
 - result of `drawRobot`
+
+#### Movement (by Tom Kuehnle)
+ - Creating timer using 'QBasicTimer'
+ - Setting time interval for movement ticks
+<img width="627" alt="Bildschirmfoto 2023-05-08 um 10 41 35" src="https://user-images.githubusercontent.com/104011823/236791094-2d23c1c6-08fa-4b71-b69b-3700b3a2495b.png">
+
+ - Creating timerevent
+ - Center of the robot moves on tiles
+ - random selection of the directions up/down/left/right
+ - using 'TileLength' 'TileWidth' and size of the arena to determine new robot position
+<img width="634" alt="Bildschirmfoto 2023-05-08 um 10 41 44" src="https://user-images.githubusercontent.com/104011823/236791247-d3db714b-108c-49e9-8f9e-d4b31e21d7aa.png">
+
