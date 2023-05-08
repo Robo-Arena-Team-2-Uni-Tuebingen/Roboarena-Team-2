@@ -10,12 +10,12 @@
 ### Sprint 2 (26.04. - 09.05.2023)
 
 
-####Arena Refactor
+#### Arena Refactor
   - implemented ability to manipulate single tiles
   - implemented ability to assign more attributes to tiles
   - reason for this was mostly to lay a foundation for longterm considerations
 
-####Robot
+#### Robot
   - implemented all the required attributes (x,y,r,alpha)
   - minor problems with the alpha attribute, currently it doesn't correctly respond to a input in degrees and requires an input as a fraction of pi instead, fix for that will come with the next sprint
   - minor problems with the flipped y-axis of the drawing, took a while to figure out
