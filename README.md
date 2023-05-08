@@ -2,7 +2,7 @@
 ## Sprints
 ### Sprint 1 (04.04. - 24.04.2023)
 - Created the Roboarena-Team-2 repository
-- Set up the  GitHup.io page https://tommachtunizeug.github.io/Roboarena-Team-2/
+- Set up the [GitHup.io page](https://robo-arena-team-2-uni-tuebingen.github.io/Roboarena-Team-2/)
 - Added a workflow with a Flake8 test which checks the syntax of uploaded Python code
 - Created and tested the first programms and pushed them to the repository. All passed the Flake8 test
 
@@ -27,3 +27,17 @@
 
 ![random-arena](https://user-images.githubusercontent.com/83218599/236785494-0a48e9a5-9df2-439c-81fb-60163cee000c.png)
 - result of a random arena layout
+
+Arena Refactor (by Julian Häberle)
+
+- implemented ability to manipulate single tiles
+- implemented ability to assign more attributes to tiles
+- reason for this was mostly to lay a foundation for longterm considerations
+
+Robot (by Julian Häberle)
+
+- implemented all the required attributes (x, y, radius, alpha)
+- minor problems with the alpha attribute, currently it doesn’t correctly respond to a input in degrees and requires an input as a fraction of pi instead, fix for that will come with the next sprint
+-  minor problems with the flipped y-axis of the drawing, took a while to figure out
+- implemented a getAlpha method that is supposed to calculate the angle (relative to the x-axis) to any given point in preparation for a possible mouse-control scheme, currently untested though
+- ![grafik](https://user-images.githubusercontent.com/67464857/236786215-f5586590-0c8e-4e42-89b9-f123d0026a9f.png)
