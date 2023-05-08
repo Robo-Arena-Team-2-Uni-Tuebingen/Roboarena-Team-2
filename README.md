@@ -74,5 +74,6 @@
  - Center of the robot moves on tiles
  - random selection of the directions up/down/left/right
  - using `TileLength` `TileWidth` and size of the arena to determine new robot position
-<img width="634" alt="Bildschirmfoto 2023-05-08 um 10 41 44" src="https://user-images.githubusercontent.com/104011823/236791247-d3db714b-108c-49e9-8f9e-d4b31e21d7aa.png">
+<img width="634" alt="Bildsch![Bildschirmaufnahme-2023-05-08-um-21 54 13](https://user-images.githubusercontent.com/104011823/236922141-d89ba080-5dad-4975-909e-fbba158eb0bc.gif)
+irmfoto 2023-05-08 um 10 41 44" src="https://user-images.githubusercontent.com/104011823/236791247-d3db714b-108c-49e9-8f9e-d4b31e21d7aa.png">
 
