@@ -33,11 +33,29 @@
 - implemented ability to manipulate single tiles
 - implemented ability to assign more attributes to tiles
 - reason for this was mostly to lay a foundation for longterm considerations
+- 
+![grafik](https://user-images.githubusercontent.com/67464857/236786951-a1109422-72d1-4d12-86dc-e6f7375b466d.png)
+- refactored `initArena`
+
+![grafik](https://user-images.githubusercontent.com/67464857/236787104-4b581091-6326-45cd-9f74-acc15093371f.png)
+- refactored `paintEvent` + `drawTile`
+
+![grafik](https://user-images.githubusercontent.com/67464857/236787439-1d5b2065-1105-4737-862a-ed426ed09a99.png)
+- new tiles class, which consists of a tile superclass and six tile subclasses
 
 #### Robot (by Julian Häberle)
 
+![grafik](https://user-images.githubusercontent.com/67464857/236787607-9fd22dec-1424-468d-88fe-359871806ce0.png)
+- newly added `robot` class
 - implemented all the required attributes (x, y, radius, alpha)
 - minor problems with the alpha attribute, currently it doesn’t correctly respond to a input in degrees and requires an input as a fraction of pi instead, fix for that will come with the next sprint
--  minor problems with the flipped y-axis of the drawing, took a while to figure out
 - implemented a getAlpha method that is supposed to calculate the angle (relative to the x-axis) to any given point in preparation for a possible mouse-control scheme, currently untested though
-- ![grafik](https://user-images.githubusercontent.com/67464857/236786215-f5586590-0c8e-4e42-89b9-f123d0026a9f.png)
+
+![grafik](https://user-images.githubusercontent.com/67464857/236787884-939f4066-282c-4cdc-90a1-aa2ec010bda1.png)
+- newly added method `drawRobot`, which is called from `paintEvent`
+- calculates the point indicated by the angle and radius and then draws a line between it and the center of the robot
+- minor problems with the flipped y-axis of the drawing, took a while to figure out, the solution was to flip the y-component of the calculation
+- color orange to differentiate a bit from the tiles
+
+![grafik](https://user-images.githubusercontent.com/67464857/236786215-f5586590-0c8e-4e42-89b9-f123d0026a9f.png)
+- result of `drawRobot`
