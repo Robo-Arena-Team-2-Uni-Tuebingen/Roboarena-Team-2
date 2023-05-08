@@ -28,13 +28,13 @@
 ![random-arena](https://user-images.githubusercontent.com/83218599/236785494-0a48e9a5-9df2-439c-81fb-60163cee000c.png)
 - result of a random arena layout
 
-Arena Refactor (by Julian Häberle)
+#### Arena Refactor (by Julian Häberle)
 
 - implemented ability to manipulate single tiles
 - implemented ability to assign more attributes to tiles
 - reason for this was mostly to lay a foundation for longterm considerations
 
-Robot (by Julian Häberle)
+#### Robot (by Julian Häberle)
 
 - implemented all the required attributes (x, y, radius, alpha)
 - minor problems with the alpha attribute, currently it doesn’t correctly respond to a input in degrees and requires an input as a fraction of pi instead, fix for that will come with the next sprint
