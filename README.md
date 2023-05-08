@@ -33,7 +33,7 @@
 - implemented ability to manipulate single tiles
 - implemented ability to assign more attributes to tiles
 - reason for this was mostly to lay a foundation for longterm considerations
-- 
+
 ![grafik](https://user-images.githubusercontent.com/67464857/236786951-a1109422-72d1-4d12-86dc-e6f7375b466d.png)
 - refactored `initArena`
 
