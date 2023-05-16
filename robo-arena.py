@@ -3,7 +3,8 @@ import numpy as np
 import sys
 from robot import Robot
 import tiles
-from ascii_layout import textToTiles 
+import mapgenerator
+from ascii_layout import textToTiles, translateAscii
 
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor
@@ -55,7 +56,8 @@ class Arena(QFrame):
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
-         self.ArenaLayout = textToTiles("layout1.txt")
+        #self.ArenaLayout = textToTiles("layout1.txt")
+        self.ArenaLayout = mapgenerator.generateMap(self.ArenaHeight, self.ArenaWidth)
     
     #method that returns a random tile
     def randomTile(self):
