@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from robot import Robot
 import tiles
-from ascii_layout import textToTiles 
+from ascii_layout import textToTiles, translateAscii
 
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor
@@ -35,12 +35,12 @@ class RoboArena(QMainWindow):
 class Arena(QFrame):
 
     # Size of tiles in pixels
-    TileWidth  = 10
-    TileHeight = 10
+    TileWidth  = tiles.tileWidth
+    TileHeight = tiles.tileHeight
 
     # Size of the arena in tiles
-    ArenaWidth = 100
-    ArenaHeight = 100
+    ArenaWidth = 60
+    ArenaHeight = 60
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -95,7 +95,7 @@ class Arena(QFrame):
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
-        painter.fillRect(x, y, tile.width, tile.height, tile.color)
+        painter.drawImage(x, y, tile.texture)
     
     #this method is responsible for painting the robot in the window
     def drawRobot(self, painter, robot):
