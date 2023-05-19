@@ -10,20 +10,28 @@ def textToTiles(tf):
 # textToTiles put the single characters of a .txt file into a matrix
 def textToMatrix(tf):
     with open(tf, "rt") as infile:
-        m =  np.matrix([list(line.strip()) for line in infile.readlines()])
+        m = np.matrix([list(line.strip()) for line in infile.readlines()])
         return m
 
 # translate characters into it's corresponding tile type
 def translateAscii(c):
-    if c == "X":
+    if c == tiles.WallTile.str:
         return tiles.WallTile()
-    elif c == "f":
-        return tiles.FireTile()
-    elif c == "i":
-        return tiles.IceTile()
-    elif c == "w":
-            return tiles.WaterTile()
-    elif c == "s":
+    elif c == tiles.FieldTile.str:
+        return tiles.FieldTile()
+    elif c == tiles.SnowTile.str:
+        return tiles.SnowTile()
+    elif c == tiles.WaterTile.str:
+        return tiles.WaterTile()
+    elif c == tiles.SandTile.str:
         return tiles.SandTile()
-    else:
-        return tiles.NormalTile()
+    elif c == tiles.GrassTile.str:
+        return tiles.GrassTile()
+    elif c == tiles.SlimeTile.str:
+        return tiles.SlimeTile()
+    elif c == tiles.HighGrassTile.str:
+        return tiles.HighGrassTile()
+    elif c == tiles.CobbleStone.str:
+        return tiles.CobbleStone()
+    elif c == tiles.DirtTile.str:
+        return tiles.DirtTile()

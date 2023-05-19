@@ -55,24 +55,31 @@ class Arena(QFrame):
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
-         self.ArenaLayout = textToTiles("layout1.txt")
-    
+        self.ArenaLayout = textToTiles("testlayout.txt")
+        for x in range(self.ArenaWidth):
+            for y in range(self.ArenaHeight):
+                if y - 1 > 0:
+                    left = self.ArenaLayout[x, y - 1]
+                else:
+                    left = tiles.Tile()
+                if y + 1 < self.ArenaHeight:
+                    right = self.ArenaLayout[x, y + 1]
+                else:
+                    right = tiles.Tile()
+                if x - 1 > 0:
+                    up = self.ArenaLayout[x - 1, y]
+                else:
+                    up = tiles.Tile()
+                if x + 1 < self.ArenaWidth:
+                    down = self.ArenaLayout[x + 1, y]
+                else:
+                    down = tiles.Tile()
+                context = [up, down, left, right]
+                self.ArenaLayout[x, y].chooseTexture(context)
+
     #method that returns a random tile
     def randomTile(self):
-        h = random.randint(0,5)
-        if h == 0:
-            tile = tiles.NormalTile()
-        elif h == 1:
-            tile = tiles.WallTile()
-        elif h == 2:
-            tile = tiles.FireTile()
-        elif h == 3:
-            tile = tiles.IceTile()
-        elif h == 4:
-            tile = tiles.WaterTile()
-        elif h == 5:
-            tile = tiles.SandTile()
-        return tile
+        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStone, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
 
     # paint all tiles of the arena
     def paintEvent(self, event):
