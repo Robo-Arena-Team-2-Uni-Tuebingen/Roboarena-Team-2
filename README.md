@@ -130,7 +130,7 @@ Changes to the tile super class:
 - this is a bit of a codesmell, but was done in case the function is later expanded to include all 8 context tiles
 - the function then compares which of the tiles in the context is a tile of the same type
 - based on that information, the appropriate tile is cut out from the big tile (which is the current texture) and assigned as the new texture of the tile
-- if the tile does not confirm to the transition, 
+- if the tile does not match to a transition in the big tile, the standard tile is chosen
 - this poses a bit of a limitation in a map design aspect as it currently requires all patches (save for patches without transitions) to be at least 2x2 (with some more limitations)
 
 Example:
