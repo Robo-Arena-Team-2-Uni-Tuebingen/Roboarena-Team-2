@@ -46,8 +46,8 @@ class Arena(QFrame):
         super().__init__(parent)
 
         self.initArena()
-        self.pawn = Robot(500, 700, -np.pi/2)
-
+        self.pawns = np.array([Robot(800, 1000, -np.pi/2, QColor(0xFFA500)), Robot(800, 400, -np.pi/2, QColor(0x8A2BE2)), 
+                              Robot(200, 1000, -np.pi/2, QColor(0x00FFFF)), Robot(200, 400, -np.pi/2, QColor(0xFF0000))])
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
@@ -97,7 +97,10 @@ class Arena(QFrame):
                               rect.left() + j * Arena.TileWidth, 
                               arenaTop + i * Arena.TileHeight, tile)
         
-        self.drawRobot(painter, self.pawn)
+        self.drawRobot(painter, self.pawns[0])
+        self.drawRobot(painter, self.pawns[1])
+        self.drawRobot(painter, self.pawns[2])
+        self.drawRobot(painter, self.pawns[3])
 
 
     # paint a single tile
@@ -110,21 +113,21 @@ class Arena(QFrame):
         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
         #calculates the point indicated by the angle on the circle of the robot
         direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
-        painter.setBrush(QColor(0xFFA500))
+        painter.setBrush(robot.color)
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
         painter.drawLine(centerRobot, direction)
 
     def timerEvent(self, event):
         # Move the robot randomly
         direction = random.choice(["up", "down", "left", "right"])
-        if  direction  == "up" and self.pawn.ypos > 0:
-            self.pawn.ypos -= Arena.TileHeight
-        elif direction == "down" and self.pawn.ypos < self.height() - Arena.TileHeight:
-            self.pawn.ypos += Arena.TileHeight
-        elif direction == "left" and self.pawn.xpos > 0:
-            self.pawn.xpos -= Arena.TileWidth
-        elif direction == "right" and self.pawn.xpos < self.width() - Arena.TileWidth:
-            self.pawn.xpos += Arena.TileWidth
+        if  direction  == "up" and self.pawns[0].ypos > 0:
+            self.pawns[0].ypos -= Arena.TileHeight
+        elif direction == "down" and self.pawns[0].ypos < self.height() - Arena.TileHeight:
+            self.pawns[0].ypos += Arena.TileHeight
+        elif direction == "left" and self.pawns[0].xpos > 0:
+            self.pawns[0].xpos -= Arena.TileWidth
+        elif direction == "right" and self.pawns[0].xpos < self.width() - Arena.TileWidth:
+            self.pawns[0].xpos += Arena.TileWidth
 
         self.update()  # Redraw the widget
 
