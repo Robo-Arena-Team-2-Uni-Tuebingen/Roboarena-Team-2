@@ -9,7 +9,7 @@ class Robot():
     a_alpha     = 0
     A_max       = 100
     A_alpha_max = 100
-    v           = 0
+    v           = 2
     v_alpha     = 0
 
     def __init__(self, xpos, ypos, alpha, color):
