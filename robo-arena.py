@@ -79,7 +79,7 @@ class Arena(QFrame):
 
     #method that returns a random tile
     def randomTile(self):
-        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStone, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
+        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStoneTile, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
 
     # paint all tiles of the arena
     def paintEvent(self, event):

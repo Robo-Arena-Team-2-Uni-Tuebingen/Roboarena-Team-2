@@ -31,7 +31,7 @@ def translateAscii(c):
         return tiles.SlimeTile()
     elif c == tiles.HighGrassTile.str:
         return tiles.HighGrassTile()
-    elif c == tiles.CobbleStone.str:
-        return tiles.CobbleStone()
+    elif c == tiles.CobbleStoneTile.str:
+        return tiles.CobbleStoneTile()
     elif c == tiles.DirtTile.str:
         return tiles.DirtTile()

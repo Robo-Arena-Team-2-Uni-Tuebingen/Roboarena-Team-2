@@ -142,8 +142,8 @@ class FieldTile(Tile):
         self.str = FieldTile.str
         self.texture = textureFieldTile
 
-class CobbleStone(Tile):
+class CobbleStoneTile(Tile):
     str = 'c'
     def __init__(self):
-        self.str = CobbleStone.str
+        self.str = CobbleStoneTile.str
         self.texture = textureCobbleStoneTile
