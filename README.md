@@ -93,6 +93,7 @@
 - random factors to shift and scale the area of interest on the noisemap
 
 Example of a generated map (with old tileset):
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/125645e1-7724-4c3b-a60a-c620e3f6be46)
 
 
@@ -102,12 +103,14 @@ Example of a generated map (with old tileset):
 - this was done to implement smoother transitions and make the map look cleaner
 - to accomodate for the increased tile size (16x16 vs 10x10) the size of the arena has been decreased from 100x100 to 60x60 tiles
 
-The three mainfiles of the Open RPG Fantasy Tileset
+The three mainfiles of the Open RPG Fantasy Tileset:
+
 ![dungeon](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/7950e1b6-d208-4c10-868a-346f213bfa9f)
 ![exterior](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/801c9fe1-9851-40a4-96ec-72393077386b)
 ![interior](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/af8540c2-cd2e-4538-b879-97095a522487)
 
-Initializing and new helper functions
+Initializing and new helper functions:
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b0c5c7ec-e92d-48ca-8b62-19a0d9a6b139)
 - Images are loaded into dungeon, exterior and interior
 - `getTileRect` cuts a single tile out of the bigger images
@@ -115,7 +118,8 @@ Initializing and new helper functions
 - tiles that do not implement a transition atm (Wall, Water, Grass (Grass is the default tile that every other tile transitions to)) only cut out a single tile
 - tiles that do implement a transition cut out a big tile
 
-Changes to the tile super class
+Changes to the tile super class:
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/5ea6af45-0287-4bcf-a97e-f625d3a817e3)
 - added an attribute `str` that contains the ascii character for the specific tile
 - this was done to avoid typechecking in various situations
@@ -130,11 +134,13 @@ Changes to the tile super class
 - this poses a bit of a limitation in a map design aspect as it currently requires all patches (save for patches without transitions) to be at least 2x2 (with some more limitations)
 
 Example:
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/f45eaec9-866b-4057-84bf-f424e8f7d9e1)
 - the blue marked area is the big cutout for the DirtTile
 - the red cutout would be the chosen tile if the tile to the left and above would be of a different type
 
 Tiles without implemented transition:
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/a7752a5e-8631-4c4c-bd00-906e72c80676)
 - tiles without transition override the `chooseTexture` function to just return their current texture
 
@@ -144,6 +150,7 @@ Tiles without implemented transition:
 - some minor changes to `robo-arena` as well as some minor changes to `ascii_layout`, but nothing noteworthy
 
 Test map:
+
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b9c821db-5828-4fac-b0c6-3a4656015b2a)
 
 
