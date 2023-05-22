@@ -110,6 +110,7 @@ Example of a generated map (with old tileset):
 - `translateAscii`gets vectorized to apply it to every entry of the matrix
 
 Example Map:
+
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0cefb76f-a642-46b1-ab60-410745133d6c)
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/83507485-580b-4913-8799-dfddbd1370de)
 - a problem with this solution is that the the text file must already have the correct dimensions of the arena
@@ -171,7 +172,7 @@ Test map:
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b9c821db-5828-4fac-b0c6-3a4656015b2a)
 
 #### Extend the robot class (by Niklas Wolf)
-![image](=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/6ce8da41-99bf-4831-a527-cc9984d99008)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/6ce8da41-99bf-4831-a527-cc9984d99008)
 - added variables that store information about the current velocity and acceleration
 - at the beginning velocity and acceleration are 0 at the beginning and change with the actions of the player
 - the maximum accelerations are arbitrary so far and we have to test which values make sense
@@ -184,6 +185,7 @@ Test map:
 - problem: we are not sure yet how some values should processed
   - negative velocity = robot moves backwards?
   - maximum velocity?  
+
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/334d0797-8fa7-48d9-b86b-3e2c30a274a7)
 - stored four robots in an array so it's easier to change the number of used robots between 1 and 4
 - added the parameter color to the constructor so every robot has its indivdual color
