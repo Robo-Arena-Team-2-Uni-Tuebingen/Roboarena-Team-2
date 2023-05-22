@@ -97,25 +97,21 @@ Example of a generated map (with old tileset):
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/125645e1-7724-4c3b-a60a-c620e3f6be46)
 
 #### Load map from ASCII text file (by Niklas Wolf)
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae30cc9c-4638-4fe7-9ee8-2f15499946fe width=60% height=60%>
-
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae30cc9c-4638-4fe7-9ee8-2f15499946fe width=60% height=60%)
 - `textToMatrix` converts a text file into a matrix of the single characters
 - every line of the text file is a row in the matrix
 
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0535e3ae-ee79-445c-9ac7-d807257f3421 width= height=60%>
-
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0535e3ae-ee79-445c-9ac7-d807257f3421)
 - `translateAscii` compares a given character with the diffrent cases and returns the corresponding tile type
 - the dafault for undefined characters is `NormalTile`
 
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/87cc52f6-3c91-40ca-b103-0426b9504a46 width=60% height=60%>
-
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/87cc52f6-3c91-40ca-b103-0426b9504a46)
 - `textToTiles` converts a given text file to a matrix of tiles
 - `translateAscii`gets vectorized to apply it to every entry of the matrix
 
 Example Map:
-<center><table><tr><td><img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0cefb76f-a642-46b1-ab60-410745133d6c width=300 height=400></td>
-  <td><img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/83507485-580b-4913-8799-dfddbd1370de width=400 height=400></td></tr></table>
-  
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0cefb76f-a642-46b1-ab60-410745133d6c)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/83507485-580b-4913-8799-dfddbd1370de)
 - a problem with this solution is that the the text file must already have the correct dimensions of the arena
 
 #### Graphical Tilesets and changes to the existing tileset (by Julian Häberle)
@@ -175,14 +171,12 @@ Test map:
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b9c821db-5828-4fac-b0c6-3a4656015b2a)
 
 #### Extend the robot class (by Niklas Wolf)
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/6ce8da41-99bf-4831-a527-cc9984d99008 width=25% height=25%>
-  
+![image](=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/6ce8da41-99bf-4831-a527-cc9984d99008)
 - added variables that store information about the current velocity and acceleration
 - at the beginning velocity and acceleration are 0 at the beginning and change with the actions of the player
 - the maximum accelerations are arbitrary so far and we have to test which values make sense
   
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/477cac12-b822-4afe-8c04-eb0ab34d017e width=45% height=45%>
-  
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/477cac12-b822-4afe-8c04-eb0ab34d017e)
 - extended the `update` function to also change the speed parameters
 - new accelerations get added to the old values 
 - if they exceed the maximum acceleration, the maximum is taken as the acceleration value
@@ -190,14 +184,11 @@ Test map:
 - problem: we are not sure yet how some values should processed
   - negative velocity = robot moves backwards?
   - maximum velocity?  
-
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/334d0797-8fa7-48d9-b86b-3e2c30a274a7 width=90% height=90%>
-  
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/334d0797-8fa7-48d9-b86b-3e2c30a274a7)
 - stored four robots in an array so it's easier to change the number of used robots between 1 and 4
 - added the parameter color to the constructor so every robot has its indivdual color
   
-<img src=https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/20294529-31dc-48a3-a23d-00511f3cd5f3 width=50% height=50%>
-  
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/20294529-31dc-48a3-a23d-00511f3cd5f3)
 - placed four robots on the playing field
 
 
