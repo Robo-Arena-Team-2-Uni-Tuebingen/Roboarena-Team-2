@@ -195,17 +195,17 @@ Test map:
 
 #### Create (Q)Threads to move Robots 
 
-- initialisig threads in the arena class
+- initializig threads in the arena class
 - open a thread for each robot given and start them
 - update(redraw) the widget with new robot positions
 <img width="992" alt="Bildschirmfoto 2023-05-23 um 07 00 48" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/732957fa-cfbe-4455-a9dc-c1a6ca217a45">
  
- -> We still redraw the whole widget, but for optimization wen want to try to only redraw the robots
+ -> We still redraw the whole widget, but for optimization we want to try to only redraw the robots
     or a smaller part of the widget where the robot(s) is located.
 
 Creating new class RobotThread
  - track the current position of the assigned robot
- - initialise all the robot values needed for calculations
+ - initialize all the robot values needed for calculations
  - constant loop to move the robot updating every 50 ms (still to be modified)
  - (random) movement function put in the thread so each robot movement can be
    calculated independent
@@ -221,7 +221,7 @@ Reworked the movement function and smoothend the movement
 
 <img width="633" alt="Bildschirmfoto 2023-05-22 um 15 58 49" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/f6d279d8-2612-4e46-a70f-f81dfbf75f26">
 
-- New target position is calculeted using only the tiles around current position
+- New target position is calculeted using only the tiles around current position (also diagonal neighbours)
 - Checking for Arena borders
 
 <img width="698" alt="Bildschirmfoto 2023-05-22 um 15 58 41" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/d6515b88-a108-4188-9e8b-734656b90c71">
@@ -235,7 +235,7 @@ But nothing is implemented yet since there were some unsolved issues,
 as well as acceleration logic either for normal or rotational movement.
 
 -> Until appropriate acceleration and tile logic is implemented we initilized
-   a deafault movement speed of 2 so the random movement function can move them
+   a deafault movement speed of 2 so the random movement function can move the robot
    
 <img width="282" alt="Bildschirmfoto 2023-05-23 um 06 55 15" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/28ffb43f-10c8-481b-9c5c-c57606cf1d72">
    
