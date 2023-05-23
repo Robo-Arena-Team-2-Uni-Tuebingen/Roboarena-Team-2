@@ -97,7 +97,7 @@ Example of a generated map (with old tileset):
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/125645e1-7724-4c3b-a60a-c620e3f6be46)
 
 #### Load map from ASCII text file (by Niklas Wolf)
-![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae30cc9c-4638-4fe7-9ee8-2f15499946fe width=60% height=60%)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae30cc9c-4638-4fe7-9ee8-2f15499946fe)
 - `textToMatrix` converts a text file into a matrix of the single characters
 - every line of the text file is a row in the matrix
 
