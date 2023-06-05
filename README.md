@@ -256,3 +256,5 @@ as well as acceleration logic either for normal or rotational movement.
 - general optimization of drawing and calculating as we see fit (parts with the potential for optimization will crystalize out during development)
 
 Some of these tasks depend on each other (for example the main menu and pause menu need to be implemented before you can implement a basic game loop)
+
+![RoboPlan](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/4af46799-7017-464b-8209-6875cfa55d2c)
