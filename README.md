@@ -239,3 +239,20 @@ as well as acceleration logic either for normal or rotational movement.
    
 <img width="282" alt="Bildschirmfoto 2023-05-23 um 06 55 15" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/28ffb43f-10c8-481b-9c5c-c57606cf1d72">
    
+### Sprint 4 (23.05.2023 - 06.06.2023)
+
+#### Necessary tasks to reach our minimum viable product: (by Niklas Wolf, Tom Kuehnle, Julian Häberle)
+- implement a control scheme (currently planned to be WASD & Mouse controls for a single robot)
+- implement a basic game loop and game logic (setting up the game, resetting the game, victory and lose conditions, what happens when an enemy or the player dies, what happens when an enemy or the player spawns, etc.)
+- main menu, for choosing a map and a difficulty (amount of enemies)
+- pause menu, for pausing or quitting the game (to desktop or to main menu) (ESC-Key)
+- several maps (+ a map editor tool, maybe)
+- multiple kinds of enemies and their corresponding behaviour
+- a damage model that applies to enemies and player
+- tile logic (what effect has a tile, does the effect apply to enemies and/or player, etc)
+- movement logic (where can enemies and the player move, how fast can they move there)
+- implementation of several weapons
+- implementation of a better robot model (for enemies as well)
+- general optimization of drawing and calculating as we see fit (parts with the potential for optimization will crystalize out during development)
+
+Some of these tasks depend on each other (for example the main menu and pause menu need to be implemented before you can implement a basic game loop)
