@@ -4,68 +4,12 @@ import sys
 from robot import Robot
 import tiles
 from ascii_layout import textToTiles, translateAscii
+import threads
 
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF, QThread
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
-class RobotThread(QThread):
-    positionChanged = pyqtSignal(float, float)
-
-    def __init__(self, robot):
-        super().__init__()
-        self.robot          = robot                 # robot class
-        self.target_x       = robot.xpos            # x position
-        self.target_y       = robot.ypos            # y position    
-        self.speed          = robot.v               # speed
-        self.turning_speed  = robot.v_alpha         # turning speed
-        self.acceleration   = robot.a               # acceleration
-        self.t_acceleration = robot.a_alpha         # turning acceleration
-        self.acc_max        = robot.A_max           # maximum acceleration
-        self.t_acc_max      = robot.A_alpha_max     # maximum turning acceleration
-
-    def run(self):
-        while True:
-            self.moveRobotSmoothly()
-            self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
-            self.msleep(50)  # Sleep for 50 milliseconds
-
-    def moveRobotSmoothly(self):
-        if self.robot.xpos != self.target_x:
-            # Move towards the target X position
-            if self.robot.xpos < self.target_x:
-                self.robot.xpos += self.speed
-            else:
-                self.robot.xpos -= self.speed
-
-        if self.robot.ypos != self.target_y:
-            # Move towards the target Y position
-            if self.robot.ypos < self.target_y:
-                self.robot.ypos += self.speed
-            else:
-                self.robot.ypos -= self.speed
-
-        # Check if the robot has reached the target position
-        if self.robot.xpos == self.target_x and self.robot.ypos == self.target_y:
-            self.generateNewTargetPosition()
-
-    
-    def generateNewTargetPosition(self):
-        # Get the current tile indices of the robot
-        current_tile_x = int(self.robot.xpos // Arena.TileWidth)
-        current_tile_y = int(self.robot.ypos // Arena.TileHeight)
-
-        # Generate random offsets to determine the neighboring tile
-        offset_x = random.randint(-1, 1)
-        offset_y = random.randint(-1, 1)
-
-        # Calculate the new target tile indices, ensuring they are within the arena bounds
-        new_tile_x = max(0, min(current_tile_x + offset_x, Arena.ArenaWidth - 1))
-        new_tile_y = max(0, min(current_tile_y + offset_y, Arena.ArenaHeight - 1))
-
-        # Calculate the target position based on the new tile indices
-        self.target_x = new_tile_x * Arena.TileWidth + Arena.TileWidth // 2
-        self.target_y = new_tile_y * Arena.TileHeight + Arena.TileHeight // 2
 
 class RoboArena(QMainWindow):
 
@@ -114,7 +58,7 @@ class Arena(QFrame):
 
     def createRobotThreads(self):
         for robot in self.pawns:
-            thread = RobotThread(robot)
+            thread = threads.RobotThread(robot, self)
             thread.positionChanged.connect(self.updateRobotPosition)
             self.robotThreads.append(thread)
             thread.start()
@@ -194,6 +138,7 @@ def main():
 
     app = QApplication(sys.argv)
     ra = RoboArena() 
+
     sys.exit(app.exec_())
 
 
