@@ -5,9 +5,10 @@ from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF, QThread
 class RobotThread(QThread):
     positionChanged = pyqtSignal(float, float)
 
-    def __init__(self, robot, arena):
+    def __init__(self, robot, arena, is_player):
         super().__init__()
         self.robot          = robot                 # robot class
+        self.is_player      = is_player             # check if robot is player to determine movement
         self.target_x       = robot.xpos            # x position
         self.target_y       = robot.ypos            # y position    
         self.speed          = robot.v               # speed
@@ -27,7 +28,35 @@ class RobotThread(QThread):
         while True:
             self.moveRobotSmoothly()
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
-            self.msleep(50)  # Sleep for 50 milliseconds
+            self.msleep(50)
+
+    def processKeyEvent(self, event):
+        if self.is_player:
+            self.movewithkeys(event)
+
+    def movewithkeys(self, event):
+        if event.key() == Qt.Key_W:
+            self.target_y -= self.tile_height
+
+        elif event.key() == Qt.Key_S:
+            self.target_y += self.tile_height
+
+        elif event.key() == Qt.Key_A:
+            self.target_x -= self.tile_width
+
+        elif event.key() == Qt.Key_D:
+            self.target_x += self.tile_width
+
+        self.target_x = max(0, min(self.target_x, self.arena_width - 1))
+        self.target_y = max(0, min(self.target_y, self.arena_height - 1))
+
+
+    # also insert a pause of the movement of all robots in you press esc
+    # sice we also want to open the pause menu with the same keybinding
+    #def pausemovement(event):
+    #    if event.key() == Qt.Key_Escape:
+    #    break
+
 
     def moveRobotSmoothly(self):
         if self.robot.xpos != self.target_x:

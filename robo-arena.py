@@ -7,7 +7,7 @@ from ascii_layout import textToTiles, translateAscii
 import threads
 
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtGui import QPainter, QColor, QKeyEvent
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
 
@@ -34,6 +34,7 @@ class RoboArena(QMainWindow):
         self.move(int((screen.width() - size.width()) / 2),
                   int((screen.height() - size.height()) / 2))
 
+
 class Arena(QFrame):
 
     # Size of tiles in pixels
@@ -49,8 +50,11 @@ class Arena(QFrame):
 
         self.initArena()
         self.robotThreads = []
-        self.pawns = np.array([Robot(800, 1000, -np.pi/2, QColor(0xFFA500)), Robot(800, 400, -np.pi/2, QColor(0x8A2BE2)), 
-                              Robot(200, 1000, -np.pi/2, QColor(0x00FFFF)), Robot(200, 400, -np.pi/2, QColor(0xFF0000))])
+        self.pawns = np.array([Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
+                               Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
+                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False),
+                               Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True)])  #is_play flags the robots which should be controlled manually
+
         self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
@@ -58,10 +62,12 @@ class Arena(QFrame):
 
     def createRobotThreads(self):
         for robot in self.pawns:
-            thread = threads.RobotThread(robot, self)
+            is_player = robot.is_player
+            thread = threads.RobotThread(robot, self, is_player)
             thread.positionChanged.connect(self.updateRobotPosition)
             self.robotThreads.append(thread)
             thread.start()
+
 
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
@@ -112,11 +118,8 @@ class Arena(QFrame):
                               rect.left() + j * Arena.TileWidth, 
                               arenaTop + i * Arena.TileHeight, tile)
         
-        self.drawRobot(painter, self.pawns[0])
-        self.drawRobot(painter, self.pawns[1])
-        self.drawRobot(painter, self.pawns[2])
-        self.drawRobot(painter, self.pawns[3])
-
+        for robot in self.pawns:
+            self.drawRobot(painter, robot)
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
@@ -132,6 +135,9 @@ class Arena(QFrame):
          painter.drawEllipse(centerRobot, robot.radius, robot.radius)
          painter.drawLine(centerRobot, direction)
 
+    def keyPressEvent(self, event):  #pass key press to the threads
+        for thread in self.robotThreads:
+            thread.processKeyEvent(event)
 
 
 def main():

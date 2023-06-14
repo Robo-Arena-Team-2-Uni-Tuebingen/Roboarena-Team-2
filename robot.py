@@ -12,13 +12,14 @@ class Robot():
     v           = 2
     v_alpha     = 0
 
-    def __init__(self, xpos, ypos, alpha, color):
-        
-        self.xpos = xpos
-        self.ypos = ypos
+    def __init__(self, xpos, ypos, alpha, color, is_player):
+
+        self.is_player  = is_player
+        self.xpos       = xpos
+        self.ypos       = ypos
         #angle the robot in degrees
-        self.alpha = alpha - 180
-        self.color = color 
+        self.alpha      = alpha - 180
+        self.color      = color 
 
     #updates the position of the robot
     def update(self, newxpos, newypos, new_a, new_a_alpha, t):
