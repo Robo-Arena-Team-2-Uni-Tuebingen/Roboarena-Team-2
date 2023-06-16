@@ -33,6 +33,9 @@ class RoboArena(QMainWindow):
         size = self.geometry()
         self.move(int((screen.width() - size.width()) / 2),
                   int((screen.height() - size.height()) / 2))
+        
+    def keyPressEvent(self, event):  #get key press to the threads
+        self.rarena.passKeyPressEvent(event)
 
 
 class Arena(QFrame):
@@ -135,7 +138,7 @@ class Arena(QFrame):
          painter.drawEllipse(centerRobot, robot.radius, robot.radius)
          painter.drawLine(centerRobot, direction)
 
-    def keyPressEvent(self, event):  #pass key press to the threads
+    def passKeyPressEvent(self, event):  #pass key press to the threads
         for thread in self.robotThreads:
             thread.processKeyEvent(event)
 

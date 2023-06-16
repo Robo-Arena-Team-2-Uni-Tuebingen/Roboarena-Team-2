@@ -47,9 +47,8 @@ class RobotThread(QThread):
         elif event.key() == Qt.Key_D:
             self.target_x += self.tile_width
 
-        self.target_x = max(0, min(self.target_x, self.arena_width - 1))
-        self.target_y = max(0, min(self.target_y, self.arena_height - 1))
-
+        self.target_x = max(0, min(self.target_x, self.arena_width*self.tile_width - 1))
+        self.target_y = max(0, min(self.target_y, self.arena_height*self.tile_height - 1))
 
     # also insert a pause of the movement of all robots in you press esc
     # sice we also want to open the pause menu with the same keybinding
@@ -74,7 +73,7 @@ class RobotThread(QThread):
                 self.robot.ypos -= self.speed
 
         # Check if the robot has reached the target position
-        if self.robot.xpos == self.target_x and self.robot.ypos == self.target_y:
+        if self.robot.xpos == self.target_x and self.robot.ypos == self.target_y and not self.is_player:
             self.generateNewTargetPosition()
 
     
