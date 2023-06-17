@@ -137,6 +137,8 @@ class Arena(QFrame):
          painter.setBrush(robot.color)
          painter.drawEllipse(centerRobot, robot.radius, robot.radius)
          painter.drawLine(centerRobot, direction)
+         painter.setBrush(robot.targetColor)
+         painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
 
     def passKeyPressEvent(self, event):  #pass key press to the threads
         for thread in self.robotThreads:

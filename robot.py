@@ -1,16 +1,22 @@
 import numpy as np
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QColor
 
 class Robot():
 
     #the size of the robot in px
     radius = 30
     #maximum accelerations
-    a           = 0
-    a_alpha     = 0
-    A_max       = 100
-    A_alpha_max = 100
-    v           = 2
-    v_alpha     = 0
+    a           = 2     #acceleration
+    a_alpha     = 0     #turning acceleration
+    A_max       = 10   #Max Speed
+    A_alpha_max = 100   #Max Turning Speed
+    v           = 2     #Speed
+    v_alpha     = 0     #Turning speed
+    #temporary
+    target_x = 0
+    target_y = 0
+    targetColor = QColor(0xFFFFFF)
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -21,23 +27,20 @@ class Robot():
         self.alpha      = alpha - 180
         self.color      = color 
 
-    #updates the position of the robot
-    def update(self, newxpos, newypos, new_a, new_a_alpha, t):
-        self.xpos = newxpos
-        self.ypos = newypos
-        self.a     = self.a + new_a
-
-        if self.a >= self.A_max:
-            self.a = self.A_max
-
-        self.a_alpha = self.a_alpha + new_a_alpha
-
-        if self.a_alpha >= self.A_alpha_max:
-            self.a_alpha = self.A_alpha_max
-            
-        self.v       = self.v + self.a * t
-        self.v_alpha = self.v_alpha + self.a_alpha * t
-
     #this function is supposed to get the angle from the robot to a specific point relative to the x-axis
     def getAlpha(self, x, y):
         alpha = np.arctan(x - self.xpos, y - self.ypos) * 180 / np.pi
+
+    def accelerate(self):
+        if self.v + self.a <= self.A_max:
+            self.v += self.a
+
+    def deccelerate(self):
+        if self.v - self.a >= 0:
+            self.v -= self.a
+
+    def setCanAccelerateToTrue(self):
+        self.canAccelerate = True
+
+    def setCanDeccelerateToTrue(self):
+        self.canDeccelerate = True
