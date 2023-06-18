@@ -7,8 +7,9 @@ import tiles
 from ascii_layout import textToTiles, translateAscii
 import threads
 
+import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
-from PyQt5.QtGui import QPainter, QColor, QKeyEvent
+from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
 
@@ -16,12 +17,12 @@ class RoboArena(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
         self.rarena = Arena(self)
         self.setCentralWidget(self.rarena)
+        self.rarena.setMouseTracking(True)
 
         self.resize(1200, 1200)
         self.center()
@@ -40,6 +41,15 @@ class RoboArena(QMainWindow):
 
     def keyReleaseEvent(self, event):
         self.rarena.logKeyReleaseEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
+    
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
+    
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
 
 class Arena(QFrame):
 
@@ -61,8 +71,15 @@ class Arena(QFrame):
         Qt.Key_Escape: False
     }
 
+    pressedMouseButtons = {
+        Qt.MouseButton.LeftButton: False,
+        Qt.MouseButton.RightButton: False
+    }
+
     def __init__(self, parent):
         super().__init__(parent)
+        parent.setMouseTracking(True)
+        self.setMouseTracking(True)
 
         self.initArena()
         self.robotThreads = []
@@ -165,7 +182,12 @@ class Arena(QFrame):
             self.passKeyEvents(self.PressedKeys)
 
     def passKeyEvents(self, eventDict):
-            self.robotThreads[0].processKeyEvent(eventDict)
+        self.robotThreads[0].processKeyEvent(eventDict)
+
+    def passMouseEvents(self, event: QMouseEvent):
+        for key in self.pressedMouseButtons.keys():
+            self.pressedMouseButtons[key] = event.buttons() & key
+        self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
 
 def main():
 

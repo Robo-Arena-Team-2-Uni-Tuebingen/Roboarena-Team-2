@@ -32,7 +32,10 @@ class Robot():
 
     #this function is supposed to get the angle from the robot to a specific point relative to the x-axis
     def getAlpha(self, x, y):
-        alpha = np.arctan(x - self.xpos, y - self.ypos) * 180 / np.pi
+        c_x = self.xpos-self.radius
+        c_y = self.ypos-self.radius
+        self.alpha = -np.arctan2(y - c_y, x - c_x) 
+        print(self.alpha)
 
     def accelerate(self):
         if self.v + self.a <= self.A_max:

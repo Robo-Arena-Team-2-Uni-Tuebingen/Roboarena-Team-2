@@ -19,13 +19,14 @@ class RobotThread(QThread):
         # size of the arena
         self.arena_width    = arena.ArenaWidth
         self.arena_height   = arena.ArenaHeight
-        self.oldTargetVector = np.array([0, 0])
-
+        self.Mouse_x = robot.xpos
+        self.Mouse_y = robot.ypos
        
     
     def run(self):
         while True:
             self.moveRobotSmoothly()
+            self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
 
@@ -53,6 +54,10 @@ class RobotThread(QThread):
         self.target_y = max(240, min(self.target_y, self.arena_height*self.tile_height - 1 + 240))
         self.robot.target_x = self.target_x
         self.robot.target_y = self.target_y
+
+    def processMouseEvent(self, x, y, pressedMouseButtons):
+        self.Mouse_x = x
+        self.Mouse_y = y
 
     def moveRobotSmoothly(self):
         cPos = np.array([self.robot.xpos - self.robot.radius, self.robot.ypos - self.robot.radius])
