@@ -9,7 +9,7 @@ class Robot():
     #maximum accelerations
     a           = 2     #acceleration
     a_alpha     = 0     #turning acceleration
-    A_max       = 10   #Max Speed
+    A_max       = 10    #Max Speed
     A_alpha_max = 100   #Max Turning Speed
     v           = 2     #Speed
     v_alpha     = 0     #Turning speed
@@ -17,6 +17,9 @@ class Robot():
     target_x = 0
     target_y = 0
     targetColor = QColor(0xFFFFFF)
+
+    canAccelerate = True
+    canDeccelerate = True
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -34,10 +37,14 @@ class Robot():
     def accelerate(self):
         if self.v + self.a <= self.A_max:
             self.v += self.a
+            self.canAccelerate = False
+            QTimer.singleShot(1000, self.setCanAccelerateToTrue)
 
     def deccelerate(self):
         if self.v - self.a >= 0:
             self.v -= self.a
+            self.canDeccelerate = False
+            QTimer.singleShot(1000, self.setCanDeccelerateToTrue)
 
     def setCanAccelerateToTrue(self):
         self.canAccelerate = True

@@ -20,36 +20,34 @@ class RobotThread(QThread):
         self.arena_width    = arena.ArenaWidth
         self.arena_height   = arena.ArenaHeight
         self.oldTargetVector = np.array([0, 0])
-        
 
+       
+    
     def run(self):
         while True:
             self.moveRobotSmoothly()
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
-            self.msleep(50)
+            self.msleep(30)
 
-    def processKeyEvent(self, event):
+    def processKeyEvent(self, eventDict):
         if self.is_player:
-            self.movewithkeys(event)
+            if eventDict[Qt.Key_W]:
+                self.target_y -= self.tile_height
 
-    def movewithkeys(self, event):
-        if event.key() == Qt.Key_W:
-            self.target_y -= self.tile_height
+            if eventDict[Qt.Key_S]:
+                self.target_y += self.tile_height
 
-        elif event.key() == Qt.Key_S:
-            self.target_y += self.tile_height
+            if eventDict[Qt.Key_A]:
+                self.target_x -= self.tile_width
 
-        elif event.key() == Qt.Key_A:
-            self.target_x -= self.tile_width
+            if eventDict[Qt.Key_D]:
+                self.target_x += self.tile_width
 
-        elif event.key() == Qt.Key_D:
-            self.target_x += self.tile_width
-
-        elif event.key() == Qt.Key_E:
-            self.robot.accelerate()
+            if eventDict[Qt.Key_E]:
+                self.robot.accelerate()
         
-        elif event.key() == Qt.Key_Q:
-            self.robot.deccelerate()
+            if eventDict[Qt.Key_Q]:
+                self.robot.deccelerate()
 
         self.target_x = max(0, min(self.target_x, self.arena_width*self.tile_width - 1))
         self.target_y = max(240, min(self.target_y, self.arena_height*self.tile_height - 1 + 240))

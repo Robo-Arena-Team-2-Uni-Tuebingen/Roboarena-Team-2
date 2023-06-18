@@ -1,4 +1,5 @@
 import random
+from PyQt5 import QtGui
 import numpy as np
 import sys
 from robot import Robot
@@ -35,8 +36,10 @@ class RoboArena(QMainWindow):
                   int((screen.height() - size.height()) / 2))
         
     def keyPressEvent(self, event):  #get key press to the threads
-        self.rarena.passKeyPressEvent(event)
+        self.rarena.logKeyPressEvent(event)
 
+    def keyReleaseEvent(self, event):
+        self.rarena.logKeyReleaseEvent(event)
 
 class Arena(QFrame):
 
@@ -48,15 +51,25 @@ class Arena(QFrame):
     ArenaWidth = 60
     ArenaHeight = 60
 
+    PressedKeys = {
+        Qt.Key_W: False,
+        Qt.Key_A: False,
+        Qt.Key_S: False,
+        Qt.Key_D: False,
+        Qt.Key_E: False,
+        Qt.Key_Q: False,
+        Qt.Key_Escape: False
+    }
+
     def __init__(self, parent):
         super().__init__(parent)
 
         self.initArena()
         self.robotThreads = []
-        self.pawns = np.array([Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
+        self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
+                               Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
                                Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False),
-                               Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True)])  #is_play flags the robots which should be controlled manually
+                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
 
         self.createRobotThreads()
         # Create a timer to control the robot movement
@@ -140,10 +153,19 @@ class Arena(QFrame):
          painter.setBrush(robot.targetColor)
          painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
 
-    def passKeyPressEvent(self, event):  #pass key press to the threads
-        for thread in self.robotThreads:
-            thread.processKeyEvent(event)
+    def logKeyPressEvent(self, event):
+        if self.PressedKeys.__contains__(event.key()):
+            self.PressedKeys[event.key()] = True
+            self.passKeyEvents(self.PressedKeys)
+            
+        
+    def logKeyReleaseEvent(self, event):
+        if self.PressedKeys.__contains__(event.key()):
+            self.PressedKeys[event.key()] = False
+            self.passKeyEvents(self.PressedKeys)
 
+    def passKeyEvents(self, eventDict):
+            self.robotThreads[0].processKeyEvent(eventDict)
 
 def main():
 
