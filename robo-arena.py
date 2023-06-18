@@ -1,4 +1,5 @@
 import random
+from PyQt5 import QtGui
 import numpy as np
 import sys
 from robot import Robot
@@ -6,8 +7,9 @@ import tiles
 from ascii_layout import textToTiles, translateAscii
 import threads
 
+import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent
 from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
 
 
@@ -15,12 +17,12 @@ class RoboArena(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
         self.rarena = Arena(self)
         self.setCentralWidget(self.rarena)
+        self.rarena.setMouseTracking(True)
 
         self.resize(1200, 1200)
         self.center()
@@ -33,6 +35,21 @@ class RoboArena(QMainWindow):
         size = self.geometry()
         self.move(int((screen.width() - size.width()) / 2),
                   int((screen.height() - size.height()) / 2))
+        
+    def keyPressEvent(self, event):  #get key press to the threads
+        self.rarena.logKeyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        self.rarena.logKeyReleaseEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
+    
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
+    
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        self.rarena.passMouseEvents(event)
 
 class Arena(QFrame):
 
@@ -44,13 +61,33 @@ class Arena(QFrame):
     ArenaWidth = 60
     ArenaHeight = 60
 
+    PressedKeys = {
+        Qt.Key_W: False,
+        Qt.Key_A: False,
+        Qt.Key_S: False,
+        Qt.Key_D: False,
+        Qt.Key_E: False,
+        Qt.Key_Q: False,
+        Qt.Key_Escape: False
+    }
+
+    pressedMouseButtons = {
+        Qt.MouseButton.LeftButton: False,
+        Qt.MouseButton.RightButton: False
+    }
+
     def __init__(self, parent):
         super().__init__(parent)
+        parent.setMouseTracking(True)
+        self.setMouseTracking(True)
 
         self.initArena()
         self.robotThreads = []
-        self.pawns = np.array([Robot(800, 1000, -np.pi/2, QColor(0xFFA500)), Robot(800, 400, -np.pi/2, QColor(0x8A2BE2)), 
-                              Robot(200, 1000, -np.pi/2, QColor(0x00FFFF)), Robot(200, 400, -np.pi/2, QColor(0xFF0000))])
+        self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
+                               Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
+                               Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
+                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
+
         self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
@@ -58,10 +95,12 @@ class Arena(QFrame):
 
     def createRobotThreads(self):
         for robot in self.pawns:
-            thread = threads.RobotThread(robot, self)
+            is_player = robot.is_player
+            thread = threads.RobotThread(robot, self, is_player)
             thread.positionChanged.connect(self.updateRobotPosition)
             self.robotThreads.append(thread)
             thread.start()
+
 
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
@@ -112,11 +151,8 @@ class Arena(QFrame):
                               rect.left() + j * Arena.TileWidth, 
                               arenaTop + i * Arena.TileHeight, tile)
         
-        self.drawRobot(painter, self.pawns[0])
-        self.drawRobot(painter, self.pawns[1])
-        self.drawRobot(painter, self.pawns[2])
-        self.drawRobot(painter, self.pawns[3])
-
+        for robot in self.pawns:
+            self.drawRobot(painter, robot)
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
@@ -131,8 +167,27 @@ class Arena(QFrame):
          painter.setBrush(robot.color)
          painter.drawEllipse(centerRobot, robot.radius, robot.radius)
          painter.drawLine(centerRobot, direction)
+         painter.setBrush(robot.targetColor)
+         painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
 
+    def logKeyPressEvent(self, event):
+        if self.PressedKeys.__contains__(event.key()):
+            self.PressedKeys[event.key()] = True
+            self.passKeyEvents(self.PressedKeys)
+            
+        
+    def logKeyReleaseEvent(self, event):
+        if self.PressedKeys.__contains__(event.key()):
+            self.PressedKeys[event.key()] = False
+            self.passKeyEvents(self.PressedKeys)
 
+    def passKeyEvents(self, eventDict):
+        self.robotThreads[0].processKeyEvent(eventDict)
+
+    def passMouseEvents(self, event: QMouseEvent):
+        for key in self.pressedMouseButtons.keys():
+            self.pressedMouseButtons[key] = event.buttons() & key
+        self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
 
 def main():
 
