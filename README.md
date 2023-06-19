@@ -284,7 +284,7 @@ using `is_player` in thread creation
 
 - updating threads to check for the new flag and deciede on the right movement method
 
-![creating threads](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/794a2437-094c-46ef-9f46-6a448427aee2)
+![completethread](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/e81acb22-bd47-4a42-a6e7-0db41c34912a)
 
 -> Attempted to base the WASD movement on the movement in my moverobotsmoothly fuinction, so that the robot calculates a target positions based on my 
 keypresses which was meant to enable diagonal movement if there are two simultanious keypresses, but this turned out to be very complicated and did not work properly, e
