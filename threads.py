@@ -25,11 +25,12 @@ class RobotThread(QThread):
        
     
     def run(self):
-        while not self.is_paused:
-            self.moveRobotSmoothly()
-            self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
-            self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
-            self.msleep(30)
+        while True:
+            if not self.is_paused:
+                self.moveRobotSmoothly()
+                self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+                self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
+                self.msleep(30)
 
 
     def processKeyEvent(self, eventDict):
@@ -93,11 +94,9 @@ class RobotThread(QThread):
 
     def unpauseRobots(self):
         self.is_paused = False
-        self.msleep(1000)
 
     def pauseRobots(self):
         self.is_paused = True
-        self.msleep(1000)
     
     def generateNewTargetPosition(self):
         # Get the current tile indices of the robot

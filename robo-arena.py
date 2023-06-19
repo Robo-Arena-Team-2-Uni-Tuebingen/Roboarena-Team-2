@@ -30,14 +30,14 @@ class RoboArena(QMainWindow):
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.rarena)
         main_layout.addWidget(self.pause)
-        main_layout.setContentsMargins(10, 10, 10, 10)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
         self.pause.hide()
-        self.resize(2000, 1200)
+        self.resize(1940, 1200)
         self.center()
         self.setWindowTitle('RoboArena')
         self.show()
@@ -151,7 +151,6 @@ class Arena(QFrame):
             self.robotThreads.append(thread)
             thread.start()
 
-
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
         self.update()
@@ -207,7 +206,8 @@ class Arena(QFrame):
             self.passKeyEvents(self.PressedKeys)
 
     def passKeyEvents(self, eventDict):
-        self.robotThreads[0].processKeyEvent(eventDict)
+        for thread in self.robotThreads:
+            thread.processKeyEvent(eventDict)
 
     def passMouseEvents(self, event: QMouseEvent):
         for key in self.pressedMouseButtons.keys():
