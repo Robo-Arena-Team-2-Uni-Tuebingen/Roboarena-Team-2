@@ -289,11 +289,11 @@ Dein Part hierher, Tom :D
 
 #### Implementation of Mousehandling (by Julian Häberle)
 - The Mouse is supposed to control the weapons through the buttons and direction of view through the general position of the robot later
-- To allow for simultaneous input the Mouse it also uses a dictionary to track Click and Release events
+- To allow for simultaneous input the Mouse also uses a dictionary to track Click and Release events
 - Due to setting the `setMouseTracking` property of the QWidget to true, a mouseevent triggers on every movement of the mouse, as opposed to every click
 
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/fed07785-7e4f-4b5e-86d6-8cb871185f9b)
-- Due to the possibility of simultaneous pressed buttons in a single event, the logic looks a bit different than it does for the keyEvents
+- Due to the possibility of simultaneously pressed buttons in a single event, the logic looks a bit different than it does for the keyEvents
 - the `event.buttons()` function returns an 8-bit sequence that is then compared to the bit sequence of the key of the dictionary with a bitwise And, the result of this comparison indicates whether the button in question was clicked or not
 
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/febab1d3-e938-40a1-a078-50f7a5513406)
@@ -320,7 +320,7 @@ Dein Part hierher, Tom :D
 - SpeedUp raises maximum Speed and provides a slight acceleration buff
 - each effect has an intensity, the more stacks of an effect an enemy or player gets the more it'll be influenced by it
 - some times have the same effect but apply them with a different intensity
-- it's possible to have multiple effects of different intensity on one entity
+- it's possible to have multiple effects of different intensities on one entity
 - effects decay naturally over time
 - after an effect is applied there's an immunity period for a certain amount of time until the next effect can be applied
 - not yet decided whether the effect comes from the tile the center of the robot is on or whether the effect stems from all tiles the robot touches
@@ -336,3 +336,41 @@ Dein Part hierher, Tom :D
 
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/310a6cf1-c7f4-4dfd-b4d2-a28e587be873)
 - examples for the added attributes to the tile class
+
+#### Pausing the Game (by Niklas Wolf)
+For stopping the robots:
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/797eefdf-71fd-426f-9eaf-d139d2e0a27a)
+- key events have now to be handed over to every thread to give them the signal to pause
+- added an `is_paused` flag to the threads to overview the status
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/110dde88-62c6-4a14-9bd4-d1ffb4cfb837)
+- if the `is_paused` flag is `True` the positions of the robots don't get changed unless it's `False` again
+- first tried to break the `while`-loop and call `run()` later to reactivate the robots but that didn't work
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/06162cca-8d91-46de-a7d4-3f8de46bb108)
+- the robot of the player only accepts key events if the game isn't paused so you can't move your target during the pause
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/69cd3b0f-cfde-48e2-a646-2d0a4319dde8)
+- every robot processes the input of `Esc` which just swaps the value of the `is_paused` flag for now
+
+Show the pause menu:
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/534191bd-18b4-4687-88df-8b68406a8f6f)
+- implemented the `PauseMenu` class which contains the widget pause menu
+- the pause widget has:
+  - a `Resume` button that resumes the game and hides the menu again
+  - a `Quit` button that closes the game for now. When we implemented a main menu it brings you back to it
+  - a slider that will adjust the volume if we add in-game sounds
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae483e5c-65dc-43df-a8a2-1f49d4c87f13)
+- the `Resume` button emulates pressing the `Esc` key to resume the game
+- so you can resume the game with the `Esc` key also
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/1803f939-e392-4940-8471-44ae097b5350)
+- added the pause-menu-widget to the main window
+- for now, the pause get shown just beside the arena, we'll discuss the overall layout of the game later
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/aa026c7c-441a-4e53-94c8-70149f7763d0)
+
+- a problem is that it takes a little time to show the pause menu when you pause the game the first time
