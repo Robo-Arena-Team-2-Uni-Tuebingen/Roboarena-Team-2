@@ -11,6 +11,7 @@ class RobotThread(QThread):
         super().__init__()
         self.robot: Robot          = robot                 # robot class
         self.is_player      = is_player             # check if robot is player to determine movement
+        self.is_paused      = False
         self.target_x       = robot.xpos           # x position
         self.target_y       = robot.ypos           # y position    
         # size of the tiles
@@ -25,13 +26,15 @@ class RobotThread(QThread):
     
     def run(self):
         while True:
-            self.moveRobotSmoothly()
-            self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
-            self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
-            self.msleep(30)
+            if not self.is_paused:
+                self.moveRobotSmoothly()
+                self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+                self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
+                self.msleep(30)
+
 
     def processKeyEvent(self, eventDict):
-        if self.is_player:
+        if self.is_player and (not self.is_paused):
             if eventDict[Qt.Key_W]:
                 self.target_y -= self.tile_height
 
@@ -50,6 +53,16 @@ class RobotThread(QThread):
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
 
+        if eventDict[Qt.Key_Escape]:
+            
+            if self.is_paused:
+                self.unpauseRobots()
+
+            else: 
+                self.pauseRobots()
+
+            
+        
         self.target_x = max(0, min(self.target_x, self.arena_width*self.tile_width - 1))
         self.target_y = max(240, min(self.target_y, self.arena_height*self.tile_height - 1 + 240))
         self.robot.target_x = self.target_x
@@ -79,6 +92,11 @@ class RobotThread(QThread):
             self.robot.target_x = self.target_x
             self.robot.target_y = self.target_y
 
+    def unpauseRobots(self):
+        self.is_paused = False
+
+    def pauseRobots(self):
+        self.is_paused = True
     
     def generateNewTargetPosition(self):
         # Get the current tile indices of the robot
