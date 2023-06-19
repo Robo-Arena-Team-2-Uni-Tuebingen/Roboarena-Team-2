@@ -263,7 +263,29 @@ Some of these tasks depend on each other (for example the main menu and pause me
 
 #### Movementlogic (by Tom Kuehnle)
 
-Dein Part hierher, Tom :D
+- Created simple WASD movement logic for player controlled robot
+- Created keypress event to pass to the robot thread(s)
+![keypressEVENT](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/440bd4ad-ae79-419f-86a6-0c70bc32aa46)
+ -> didnt work initially since the keypress event was located in the wrong class,
+    but Julian resolved the issue
+- Creating `is_player` flag for robots which will additionaly be passed for thread creation,
+  for assigning the right movement method to the robot threads
+![robott_isplayer](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/a27db33e-d1f1-427c-8c59-b29187949314)
+adding `is_player` to robot class
+![playerflag](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/99a844a9-a107-4b2c-b9fe-23b2072f6e0b)
+using `is_player` in thread creation
+
+- updating threads to check for the new flag and deciede on the right movement method
+![creating threads](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/794a2437-094c-46ef-9f46-6a448427aee2)
+
+-> Attempted to base the WASD movement on the movement in my moverobotsmoothly fuinction, so that the robot calculates a target positions based on my 
+keypresses which was meant to enable diagonal movement if there are two simultanious keypresses, but this turned out to be very complicated and did not work properly, e
+ven in non diagonal attempts - no screenshots unfortunately -> will document more precisely next time
+
+- Started to work on some concepts for bullet shooting (e.g. a bullet class and collision detecting)
+- Started to work on some concepts for lifebars / health game logic
+    -> both are still very undefined concepts but I will document my progress to present next week
+
 
 #### Refinement of Movementlogic (by Julian Häberle)
 - Two main reasons for refinement are to allow simultaneous input and to enable smoother movement by changing the existing logic to a vector based logic
