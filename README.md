@@ -258,3 +258,81 @@ as well as acceleration logic either for normal or rotational movement.
 Some of these tasks depend on each other (for example the main menu and pause menu need to be implemented before you can implement a basic game loop)
 
 ![RoboPlan](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/1a38c19b-90e7-41b9-a716-fd7902163954)
+
+### Sprint 5 (06.06.2023 - 20.06.2023)
+
+#### Movementlogic (by Tom Kuehnle)
+
+Dein Part hierher, Tom :D
+
+#### Refinement of Movementlogic (by Julian Häberle)
+- Two main reasons for refinement are to allow simultaneous input and to enable smoother movement by changing the existing logic to a vector based logic
+- Simultaneous input is handled by a dictionary that tracks which keys are pressed and released through the KeyPress and KeyRelease events
+- also added the keys Q and E to the existing WASD Keybind to control Decceleration and Acceleration
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/3a88321c-36f4-493c-a05b-8bd97b027f89)
+- The initial dictionary
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/93f34587-903b-48de-8677-32b25daa25e6)
+- logic in the `robo-arena` class which handles the inputs and passes them to the thread in question
+- currently the playerthread is always on position 0 in the array, this is intentional but has to be kept in mind should that change later
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/20fa24e9-d106-467f-8684-b853495d0adb)
+- in the `thread` class the target is then changed according to the input in the dictionary, the resulting target is passed to the robot, to provide necessary information that the paintEvent needs to draw the target indicator
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b522e55a-9aea-4bac-8f02-f4d73bc3124d)
+- the new `moveRobotSmoothly` function, then calculates a vector to the target and moves the robot according to its current speed along it
+- I have experimented with automatic acceleration and deceleration based on a comparison between old and new target vector but couldn't get it to work and opted for a manual control of acceleration and decceleration
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/3ed2f9f7-2cfe-467f-a3d5-8ffde9fb9005)
+- the `accelerate` and `decelerate` functions merely add/subtract the acceleration from the current speed and then enter a one second long cooldown
+
+#### Implementation of Mousehandling (by Julian Häberle)
+- The Mouse is supposed to control the weapons through the buttons and direction of view through the general position of the robot later
+- To allow for simultaneous input the Mouse it also uses a dictionary to track Click and Release events
+- Due to setting the `setMouseTracking` property of the QWidget to true, a mouseevent triggers on every movement of the mouse, as opposed to every click
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/fed07785-7e4f-4b5e-86d6-8cb871185f9b)
+- Due to the possibility of simultaneous pressed buttons in a single event, the logic looks a bit different than it does for the keyEvents
+- the `event.buttons()` function returns an 8-bit sequence that is then compared to the bit sequence of the key of the dictionary with a bitwise And, the result of this comparison indicates whether the button in question was clicked or not
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/febab1d3-e938-40a1-a078-50f7a5513406)
+- the coordinates of the mouseevent and the dictionary are then passed on to the relevant thread
+- currently only the coordinates are used to calculate the direction of view of the robot
+- the coordinates are then saved in a property of the thread and passed to the robot in the `run` function of the thread
+- this is to make sure that the robot is always directed at the mouse, even if the mouse is not moving
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/c2cbf704-cad5-4b19-a348-88c2598e526b)
+- in the `run` function the coordinates get passed into the `getAlpha` function of the robot class
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/398c32e3-6e88-404d-84c7-ade99b2de411)
+- the `getAlpha` function then calculates the respective angle to the x-Axis
+- this needs to be inverted since the y-axis of the coordinates is inverted
+
+#### Tile and Effect Logic (by Julian Häberle)
+- the tile logic handles whether a tile is impassable or has an effect
+- this requires further modifications to the movement that I didn't get around to yet
+- effect logic handles how an effect applies, how it is removed and how it influences the entity it is applied to
+- currently there are five effects: Slow, Freeze, Corrosion, Collateral and Speedup
+- Slow reduces acceleration and maximum Speed
+- Freeze reduces accuracy and enemies inflict more damage
+- Corrosion makes enemies inflict significantly more damage
+- Collateral is WIP, currently undecided what it does
+- SpeedUp raises maximum Speed and provides a slight acceleration buff
+- each effect has an intensity, the more stacks of an effect an enemy or player gets the more it'll be influenced by it
+- some times have the same effect but apply them with a different intensity
+- it's possible to have multiple effects of different intensity on one entity
+- effects decay naturally over time
+- after an effect is applied there's an immunity period for a certain amount of time until the next effect can be applied
+- not yet decided whether the effect comes from the tile the center of the robot is on or whether the effect stems from all tiles the robot touches
+- There's already some code for it but it's still WIP and not merged, since it misses crucial functionality, which will be added during the next sprint
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/a006315b-a23a-46e7-b77b-4352ed56e5ec)
+- effects are tracked in a dictionary, the apply/remove cooldowns are tracked in their own booleans to make use of a singleshot timer
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/f82f3a93-0bff-41e7-81f7-bcce06728cf1)
+- implementation of `applyEffect` and `removeEffect`
+- effects come as a tuple of str, int#
+- originally I intended to give them their own objects with an internal cooldown and so on, but this turned out to be easier
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/310a6cf1-c7f4-4dfd-b4d2-a28e587be873)
+- examples for the added attributes to the tile class
