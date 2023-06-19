@@ -34,6 +34,7 @@ class RoboArena(QMainWindow):
 
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
+        central_widget.setMouseTracking(True)
         self.setCentralWidget(central_widget)
 
         self.pause.hide()
