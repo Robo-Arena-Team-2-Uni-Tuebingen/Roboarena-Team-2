@@ -34,8 +34,7 @@ class Robot():
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
-        self.alpha = -np.arctan2(y - c_y, x - c_x) 
-        print(self.alpha)
+        self.alpha = -np.arctan2(y - c_y, x - c_x)
 
     def accelerate(self):
         if self.v + self.a <= self.A_max:
