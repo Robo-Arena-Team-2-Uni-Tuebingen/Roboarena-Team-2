@@ -81,3 +81,4 @@ class Robot():
         if self.v - self.a >= 0 and time.time() > self.cdDeccelerate:
             self.v -= self.a
             self.cdDeccelerate = time.time() + self.delayDeccelerate
+

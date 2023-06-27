@@ -6,11 +6,12 @@ from robot import Robot
 import tiles
 from ascii_layout import textToTiles, translateAscii
 import threads
+from pause_menu import PauseMenu
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QMainWindow, QFrame, QDesktopWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout
 
 
 class RoboArena(QMainWindow):
@@ -21,10 +22,23 @@ class RoboArena(QMainWindow):
 
     def initUI(self):
         self.rarena = Arena(self)
-        self.setCentralWidget(self.rarena)
         self.rarena.setMouseTracking(True)
+        
+        self.pause         = PauseMenu(self)
+        self.pause_visible = False
+        
+        main_layout = QHBoxLayout()
+        main_layout.addWidget(self.rarena)
+        main_layout.addWidget(self.pause)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.resize(1200, 1200)
+        central_widget = QWidget()
+        central_widget.setLayout(main_layout)
+        central_widget.setMouseTracking(True)
+        self.setCentralWidget(central_widget)
+
+        self.pause.hide()
+        self.resize(1940, 1200)
         self.center()
         self.setWindowTitle('RoboArena')
         self.show()
@@ -39,6 +53,9 @@ class RoboArena(QMainWindow):
     def keyPressEvent(self, event):  #get key press to the threads
         self.rarena.logKeyPressEvent(event)
 
+        if event.key() == Qt.Key_Escape:
+            self.toggle_pause()
+
     def keyReleaseEvent(self, event):
         self.rarena.logKeyReleaseEvent(event)
 
@@ -50,6 +67,16 @@ class RoboArena(QMainWindow):
     
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         self.rarena.passMouseEvents(event)
+
+    def toggle_pause(self):
+
+        if self.pause_visible:
+            self.pause.hide()
+        else:
+            self.pause.show()
+        
+        self.pause_visible = not self.pause_visible
+
 
 class Arena(QFrame):
 
@@ -93,20 +120,6 @@ class Arena(QFrame):
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
 
-    def createRobotThreads(self):
-        for robot in self.pawns:
-            is_player = robot.is_player
-            thread = threads.RobotThread(robot, self, is_player)
-            thread.positionChanged.connect(self.updateRobotPosition)
-            self.robotThreads.append(thread)
-            thread.start()
-
-
-    def updateRobotPosition(self):
-        #redraw the widget with updated robot positions
-        self.update()
-
-
     def initArena(self):
         # set default arena saved in .txt file "layout1"
         self.ArenaLayout = textToTiles("testlayout.txt")
@@ -130,6 +143,18 @@ class Arena(QFrame):
                     down = tiles.Tile()
                 context = [up, down, left, right]
                 self.ArenaLayout[x, y].chooseTexture(context)
+
+    def createRobotThreads(self):
+        for robot in self.pawns:
+            is_player = robot.is_player
+            thread = threads.RobotThread(robot, self, is_player)
+            thread.positionChanged.connect(self.updateRobotPosition)
+            self.robotThreads.append(thread)
+            thread.start()
+
+    def updateRobotPosition(self):
+        #redraw the widget with updated robot positions
+        self.update()
 
     #method that returns a random tile
     def randomTile(self):
@@ -182,7 +207,8 @@ class Arena(QFrame):
             self.passKeyEvents(self.PressedKeys)
 
     def passKeyEvents(self, eventDict):
-        self.robotThreads[0].processKeyEvent(eventDict)
+        for thread in self.robotThreads:
+            thread.processKeyEvent(eventDict)
 
     def passMouseEvents(self, event: QMouseEvent):
         for key in self.pressedMouseButtons.keys():
@@ -198,8 +224,8 @@ class Arena(QFrame):
 def main():
 
     app = QApplication(sys.argv)
-    ra = RoboArena() 
-
+    roboArena = RoboArena() 
+    roboArena.show()
     sys.exit(app.exec_())
 
 

@@ -258,3 +258,149 @@ as well as acceleration logic either for normal or rotational movement.
 Some of these tasks depend on each other (for example the main menu and pause menu need to be implemented before you can implement a basic game loop)
 
 ![RoboPlan](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/1a38c19b-90e7-41b9-a716-fd7902163954)
+
+### Sprint 5 (06.06.2023 - 20.06.2023)
+
+#### Movementlogic (by Tom Kuehnle)
+
+- Created simple WASD movement logic for player controlled robot
+- Created keypress event to pass to the robot thread(s)
+
+![keypressEVENT](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/440bd4ad-ae79-419f-86a6-0c70bc32aa46)
+
+ -> didnt work initially since the keypress event was located in the wrong class,
+    but Julian resolved the issue
+
+- Creating `is_player` flag for robots which will additionaly be passed for thread creation,
+  for assigning the right movement method to the robot threads
+
+![robott_isplayer](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/a27db33e-d1f1-427c-8c59-b29187949314)
+
+adding `is_player` to robot class
+
+![playerflag](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/99a844a9-a107-4b2c-b9fe-23b2072f6e0b)
+
+using `is_player` in thread creation
+
+- updating threads to check for the new flag and deciede on the right movement method
+
+![completethread](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/e81acb22-bd47-4a42-a6e7-0db41c34912a)
+
+-> Attempted to base the WASD movement on the movement in my moverobotsmoothly fuinction, so that the robot calculates a target positions based on my 
+keypresses which was meant to enable diagonal movement if there are two simultanious keypresses, but this turned out to be very complicated and did not work properly, e
+ven in non diagonal attempts - no screenshots unfortunately -> will document more precisely next time
+
+- Started to work on some concepts for bullet shooting (e.g. a bullet class and collision detecting)
+- Started to work on some concepts for lifebars / health game logic
+    -> both are still very undefined concepts but I will document my progress to present next week
+
+
+#### Refinement of Movementlogic (by Julian Häberle)
+- Two main reasons for refinement are to allow simultaneous input and to enable smoother movement by changing the existing logic to a vector based logic
+- Simultaneous input is handled by a dictionary that tracks which keys are pressed and released through the KeyPress and KeyRelease events
+- also added the keys Q and E to the existing WASD Keybind to control Decceleration and Acceleration
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/3a88321c-36f4-493c-a05b-8bd97b027f89)
+- The initial dictionary
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/93f34587-903b-48de-8677-32b25daa25e6)
+- logic in the `robo-arena` class which handles the inputs and passes them to the thread in question
+- currently the playerthread is always on position 0 in the array, this is intentional but has to be kept in mind should that change later
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/20fa24e9-d106-467f-8684-b853495d0adb)
+- in the `thread` class the target is then changed according to the input in the dictionary, the resulting target is passed to the robot, to provide necessary information that the paintEvent needs to draw the target indicator
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b522e55a-9aea-4bac-8f02-f4d73bc3124d)
+- the new `moveRobotSmoothly` function, then calculates a vector to the target and moves the robot according to its current speed along it
+- I have experimented with automatic acceleration and deceleration based on a comparison between old and new target vector but couldn't get it to work and opted for a manual control of acceleration and decceleration
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/3ed2f9f7-2cfe-467f-a3d5-8ffde9fb9005)
+- the `accelerate` and `decelerate` functions merely add/subtract the acceleration from the current speed and then enter a one second long cooldown
+
+#### Implementation of Mousehandling (by Julian Häberle)
+- The Mouse is supposed to control the weapons through the buttons and direction of view through the general position of the robot later
+- To allow for simultaneous input the Mouse also uses a dictionary to track Click and Release events
+- Due to setting the `setMouseTracking` property of the QWidget to true, a mouseevent triggers on every movement of the mouse, as opposed to every click
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/fed07785-7e4f-4b5e-86d6-8cb871185f9b)
+- Due to the possibility of simultaneously pressed buttons in a single event, the logic looks a bit different than it does for the keyEvents
+- the `event.buttons()` function returns an 8-bit sequence that is then compared to the bit sequence of the key of the dictionary with a bitwise And, the result of this comparison indicates whether the button in question was clicked or not
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/febab1d3-e938-40a1-a078-50f7a5513406)
+- the coordinates of the mouseevent and the dictionary are then passed on to the relevant thread
+- currently only the coordinates are used to calculate the direction of view of the robot
+- the coordinates are then saved in a property of the thread and passed to the robot in the `run` function of the thread
+- this is to make sure that the robot is always directed at the mouse, even if the mouse is not moving
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/c2cbf704-cad5-4b19-a348-88c2598e526b)
+- in the `run` function the coordinates get passed into the `getAlpha` function of the robot class
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/398c32e3-6e88-404d-84c7-ade99b2de411)
+- the `getAlpha` function then calculates the respective angle to the x-Axis
+- this needs to be inverted since the y-axis of the coordinates is inverted
+
+#### Tile and Effect Logic (by Julian Häberle)
+- the tile logic handles whether a tile is impassable or has an effect
+- this requires further modifications to the movement that I didn't get around to yet
+- effect logic handles how an effect applies, how it is removed and how it influences the entity it is applied to
+- currently there are five effects: Slow, Freeze, Corrosion, Collateral and Speedup
+- Slow reduces acceleration and maximum Speed
+- Freeze reduces accuracy and enemies inflict more damage
+- Corrosion makes enemies inflict significantly more damage
+- Collateral is WIP, currently undecided what it does
+- SpeedUp raises maximum Speed and provides a slight acceleration buff
+- each effect has an intensity, the more stacks of an effect an enemy or player gets the more it'll be influenced by it
+- some times have the same effect but apply them with a different intensity
+- it's possible to have multiple effects of different intensities on one entity
+- effects decay naturally over time
+- after an effect is applied there's an immunity period for a certain amount of time until the next effect can be applied
+- not yet decided whether the effect comes from the tile the center of the robot is on or whether the effect stems from all tiles the robot touches
+- There's already some code for it but it's still WIP and not merged, since it misses crucial functionality, which will be added during the next sprint
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/a006315b-a23a-46e7-b77b-4352ed56e5ec)
+- effects are tracked in a dictionary, the apply/remove cooldowns are tracked in their own booleans to make use of a singleshot timer
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/f82f3a93-0bff-41e7-81f7-bcce06728cf1)
+- implementation of `applyEffect` and `removeEffect`
+- effects come as a tuple of str, int#
+- originally I intended to give them their own objects with an internal cooldown and so on, but this turned out to be easier
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/310a6cf1-c7f4-4dfd-b4d2-a28e587be873)
+- examples for the added attributes to the tile class
+
+#### Pausing the Game (by Niklas Wolf)
+For stopping the robots:
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/797eefdf-71fd-426f-9eaf-d139d2e0a27a)
+- key events have now to be handed over to every thread to give them the signal to pause
+- added an `is_paused` flag to the threads to overview the status
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/110dde88-62c6-4a14-9bd4-d1ffb4cfb837)
+- if the `is_paused` flag is `True` the positions of the robots don't get changed unless it's `False` again
+- first tried to break the `while`-loop and call `run()` later to reactivate the robots but that didn't work
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/06162cca-8d91-46de-a7d4-3f8de46bb108)
+- the robot of the player only accepts key events if the game isn't paused so you can't move your target during the pause
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/69cd3b0f-cfde-48e2-a646-2d0a4319dde8)
+- every robot processes the input of `Esc` which just swaps the value of the `is_paused` flag for now
+
+Show the pause menu:
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/534191bd-18b4-4687-88df-8b68406a8f6f)
+- implemented the `PauseMenu` class which contains the widget pause menu
+- the pause widget has:
+  - a `Resume` button that resumes the game and hides the menu again
+  - a `Quit` button that closes the game for now. When we implemented a main menu it brings you back to it
+  - a slider that will adjust the volume if we add in-game sounds
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/ae483e5c-65dc-43df-a8a2-1f49d4c87f13)
+- the `Resume` button emulates pressing the `Esc` key to resume the game
+- so you can resume the game with the `Esc` key also
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/1803f939-e392-4940-8471-44ae097b5350)
+- added the pause-menu-widget to the main window
+- for now, the pause get shown just beside the arena, we'll discuss the overall layout of the game later
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/aa026c7c-441a-4e53-94c8-70149f7763d0)
+
+- a problem is that it takes a little time to show the pause menu when you pause the game the first time
