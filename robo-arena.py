@@ -188,6 +188,12 @@ class Arena(QFrame):
         for key in self.pressedMouseButtons.keys():
             self.pressedMouseButtons[key] = event.buttons() & key
         self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
+    
+    def getTileAtPos(self, x, y):
+        x = (x/Arena.TileWidth) % Arena.ArenaWidth
+        y = ((y - 240)/Arena.TileHeight) % Arena.ArenaHeight
+        return self.ArenaLayout[int(y) - 2, int(x) - 2] # absolutely clueless, why the result is shifted by 2 tiles in both directions
+
 
 def main():
 

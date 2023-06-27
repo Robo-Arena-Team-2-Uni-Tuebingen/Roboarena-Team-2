@@ -25,24 +25,6 @@ textureSlimeTile = exterior.copy(getBigTileRect(9, 1))
 textureFieldTile = exterior.copy(getBigTileRect(6, 5))
 textureCobbleStoneTile = exterior.copy(getBigTileRect(9, 5))
 
-#super class for tile effects
-class TileEffect():
-    duration = 0
-    isActive = False
-    effect = ('', 0)
-
-    def __init__(self, duration, effect):
-        self.duration = duration
-        self.effect = effect
-        QTimer.singleShot(duration, self.endEffect)
-        self.isActive = True
-    
-    def returnEffect(self):
-        return self.effect
-        
-    def endEffect(self):
-        self.isActive = False
-
 #super class for tiles
 class Tile():
     str = ''

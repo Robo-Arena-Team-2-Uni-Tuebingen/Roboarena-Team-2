@@ -7,13 +7,14 @@ from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF, QThread
 class RobotThread(QThread):
     positionChanged = pyqtSignal(float, float)
 
-    def __init__(self, robot, arena, is_player):
+    def __init__(self, robot: Robot, arena, is_player):
         super().__init__()
         self.robot: Robot          = robot                 # robot class
         self.is_player      = is_player             # check if robot is player to determine movement
-        self.target_x       = robot.xpos           # x position
-        self.target_y       = robot.ypos           # y position    
+        self.target_x       = robot.xpos + 8          # x position + 0.5*tile
+        self.target_y       = robot.ypos + 8           # y position + 0.5*tile
         # size of the tiles
+        self.arena = arena
         self.tile_width     = arena.TileWidth
         self.tile_height    = arena.TileHeight
         # size of the arena
@@ -27,6 +28,14 @@ class RobotThread(QThread):
         while True:
             self.moveRobotSmoothly()
             self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+            currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
+            #if self.is_player:
+                #print(currentTile.str)
+                #print(self.robot.xpos)
+                #print(self.robot.ypos)
+            if currentTile.hasEffect:
+                self.robot.applyEffect(currentTile.effect)
+            self.robot.tickDownEffects()
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
 
@@ -50,8 +59,8 @@ class RobotThread(QThread):
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
 
-        self.target_x = max(0, min(self.target_x, self.arena_width*self.tile_width - 1))
-        self.target_y = max(240, min(self.target_y, self.arena_height*self.tile_height - 1 + 240))
+        self.target_x = max(8, min(self.target_x, self.arena_width*self.tile_width - 9))
+        self.target_y = max(240 + 8, min(self.target_y, self.arena_height*self.tile_height - 9 + 240))
         self.robot.target_x = self.target_x
         self.robot.target_y = self.target_y
 
