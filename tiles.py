@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QColor, QPixmap, QImage
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, QTimer
 
 tileWidth = 16
 tileHeight = 16
@@ -32,6 +32,9 @@ class Tile():
         self.str = Tile.str
         self.width = tileWidth
         self.height = tileHeight
+        self.effect = ('', 0)
+        self.isImpassable = False
+        self.hasEffect = False
 
     def compare(self, contextTile):
         if contextTile.str == self.str:
@@ -39,7 +42,8 @@ class Tile():
         else:
             return False
 
-    #this function is supposed to determine whether the tile needs to be a tile with a transition, and if yes, choose which transition is necessary
+    #this function is supposed to determine whether the tile needs to be a tile with a transition,
+    #and if yes, choose which transition is necessary
     #watertiles not yet included
     #more special tiles have not been implemented for this
     def chooseTexture(self, context):
@@ -84,6 +88,8 @@ class WallTile(Tile):
     def __init__(self):
         self.str = WallTile.str
         self.texture = textureWallTile
+        self.isImpassable = True
+        self.hasEffect = False
     
     def chooseTexture(self, context):
         return self.texture
@@ -93,6 +99,9 @@ class WaterTile(Tile):
     def __init__(self):
         self.str = WaterTile.str
         self.texture = textureWaterTile
+        self.isImpassable = False
+        self.effect = ('Slow', 50)
+        self.hasEffect = True
     
     def chooseTexture(self, context):
         return self.texture
@@ -102,6 +111,9 @@ class GrassTile(Tile):
     def __init__(self):
         self.str = GrassTile.str
         self.texture = textureGrassTile
+        self.isImpassable = False
+        self.effect = ('Slow', 10)
+        self.hasEffect = True
     
     def chooseTexture(self, context):
         return self.texture
@@ -111,39 +123,60 @@ class HighGrassTile(Tile):
     def __init__(self):
         self.str = HighGrassTile.str
         self.texture = textureHighGrassTile
+        self.isImpassable = False
+        self.effect = ('Slow', 30)
+        self.hasEffect = True
 
 class DirtTile(Tile):
     str = 'd'
     def __init__(self):
         self.str = DirtTile.str
         self.texture = textureDirtTile
+        self.isImpassable = False
+        self.hasEffect = False
+
 
 class SandTile(Tile):
     str = 's'
     def __init__(self):
         self.str = SandTile.str
         self.texture = textureSandTile
+        self.isImpassable = False
+        self.effect = ('Slow', 5)
+        self.hasEffect = True
 
 class SnowTile(Tile):
     str = 'i'
     def __init__(self):
         self.str = SnowTile.str
         self.texture = textureSnowTile
+        self.isImpassable = False
+        self.effect = ('Freeze', 20)
+        self.hasEffect = True
 
 class SlimeTile(Tile):
     str = 'v'
     def __init__(self):
         self.str = SlimeTile.str
         self.texture = textureSlimeTile
+        self.isImpassable = False
+        self.effect = ('Corrosion', 50)
+        self.hasEffect = True
 
 class FieldTile(Tile):
     str = 'f'
     def __init__(self):
         self.str = FieldTile.str
         self.texture = textureFieldTile
+        self.isImpassable = False
+        self.effect = ('Collateral', 50)
+        self.hasEffect = True
 
 class CobbleStoneTile(Tile):
     str = 'c'
     def __init__(self):
         self.str = CobbleStoneTile.str
         self.texture = textureCobbleStoneTile
+        self.isImpassable = False
+        self.effect = ('Speedup', 50)
+        self.hasEffect = True
