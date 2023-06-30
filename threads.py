@@ -40,23 +40,27 @@ class RobotThread(QThread):
 
     def processKeyEvent(self, eventDict):
         if self.is_player and (not self.is_paused):
+            deltaTargetx = 0
+            deltaTargety = 0
             if eventDict[Qt.Key_W]:
-                self.target_y -= self.tile_height
+                deltaTargety -= self.tile_height
 
             if eventDict[Qt.Key_S]:
-                self.target_y += self.tile_height
+                deltaTargety += self.tile_height
 
             if eventDict[Qt.Key_A]:
-                self.target_x -= self.tile_width
+                deltaTargetx -= self.tile_width
 
             if eventDict[Qt.Key_D]:
-                self.target_x += self.tile_width
+                deltaTargetx += self.tile_width
 
             if eventDict[Qt.Key_E]:
                 self.robot.accelerate()
         
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
+            
+            self.setTarget(deltaTargetx, deltaTargety)
 
         if eventDict[Qt.Key_Escape]:
             
@@ -66,13 +70,8 @@ class RobotThread(QThread):
             else: 
                 self.pauseRobots()
 
-            
         
-        self.target_x = max(8, min(self.target_x, self.arena_width*self.tile_width - 9))
-        self.target_y = max(240 + 8, min(self.target_y, self.arena_height*self.tile_height - 9 + 240))
-
-        self.robot.target_x = self.target_x
-        self.robot.target_y = self.target_y
+        
 
     def processMouseEvent(self, x, y, pressedMouseButtons):
         self.Mouse_x = x
@@ -84,13 +83,20 @@ class RobotThread(QThread):
         target_vector = np.subtract(target, cPos)
         norm = np.linalg.norm(target_vector)
         if norm > 0:
-            target_vector = self.robot.v*(target_vector/norm)
+            target_vector = self.robot.getV()*(target_vector/norm)
         if np.linalg.norm(np.subtract(target, cPos)) < np.linalg.norm(target_vector):
             cPos = target
         else:
             cPos = cPos + target_vector
-        self.robot.xpos = cPos[0] + self.robot.radius
-        self.robot.ypos = cPos[1] + self.robot.radius
+        
+        if not self.robot.is_player:
+            self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
+
+        if not self.detectCollision():
+            self.robot.xpos = cPos[0] + self.robot.radius
+            self.robot.ypos = cPos[1] + self.robot.radius
+        elif self.detectCollision and not self.robot.is_player:
+            self.generateNewTargetPosition()
 
         # Check if the robot has reached the target position
         if cPos[0] - self.target_x < 1 and cPos[1] - self.target_y < 1 and not self.is_player:
@@ -98,6 +104,40 @@ class RobotThread(QThread):
             self.robot.target_x = self.target_x
             self.robot.target_y = self.target_y
 
+    #returns true if there's an impassable tile ahead
+    def detectCollision(self):
+        radius = self.robot.radius
+        alpha = self.robot.alpha
+        c_x = self.robot.xpos - radius
+        c_y = self.robot.ypos - radius
+        for i in range(-6, 7):
+            x = int(radius*np.cos(-alpha + i*np.pi/12) + c_x)
+            y = int(radius*np.sin(-alpha + i*np.pi/12) + c_y)
+            if self.isTileAtPosImpassable(x, y):
+                return True
+        return False
+
+    def setTarget(self, x, y):
+        newTargetx = self.target_x + x
+        newTargety = self.target_y + y
+
+        if not self.isTileAtPosImpassable(newTargetx, newTargety):
+            self.target_x = max(8, min(newTargetx, self.arena_width*self.tile_width - 9))
+            self.target_y = max(240 + 8, min(newTargety, self.arena_height*self.tile_height - 9 + 240))
+
+            self.robot.target_x = self.target_x
+            self.robot.target_y = self.target_y
+
+            return True
+
+        return False
+            
+    def isTileAtPosImpassable(self, x, y):
+        tile = self.arena.getTileAtPos(x, y)        
+        return tile.isImpassable
+
+
+    
     def unpauseRobots(self):
         self.is_paused = False
 
@@ -105,18 +145,17 @@ class RobotThread(QThread):
         self.is_paused = True
     
     def generateNewTargetPosition(self):
-        # Get the current tile indices of the robot
-        current_tile_x = int(self.robot.xpos // self.tile_width)
-        current_tile_y = int(self.robot.ypos // self.tile_height)
-
+        # temporary until better behaviour for robots is implemented
         # Generate random offsets to determine the neighboring tile
         offset_x = random.randint(0, 60)
         offset_y = random.randint(0, 60)
 
-        # Calculate the new target tile indices, ensuring they are within the arena bounds
-        #new_tile_x = max(0, min(current_tile_x + offset_x, self.arena_width - 1))
-        #new_tile_y = max(0, min(current_tile_y + offset_y, self.arena_height - 1))
-
         # Calculate the target position based on the new tile indices
-        self.target_x = offset_x * self.tile_width + self.tile_width // 2
-        self.target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
+        target_x = offset_x * self.tile_width + self.tile_width // 2
+        target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
+
+        #while not self.setTarget(target_x, target_y):
+            #offset_x = random.randint(0, 60)
+            #offset_y = random.randint(0, 60)
+            #target_x = offset_x * self.tile_width + self.tile_width // 2
+            #target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
