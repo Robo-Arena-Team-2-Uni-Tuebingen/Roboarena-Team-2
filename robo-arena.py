@@ -122,7 +122,7 @@ class Arena(QFrame):
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
-        self.ArenaLayout = textToTiles("testlayout.txt")
+        self.ArenaLayout = textToTiles("castlelayout.txt")
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 > 0:
