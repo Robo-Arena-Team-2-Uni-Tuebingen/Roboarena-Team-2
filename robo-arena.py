@@ -111,9 +111,9 @@ class Arena(QFrame):
         self.initArena()
         self.robotThreads = []
         self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
-                               Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
+                               Robot(600, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
                                Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
+                               Robot(400, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
 
         self.createRobotThreads()
         # Create a timer to control the robot movement

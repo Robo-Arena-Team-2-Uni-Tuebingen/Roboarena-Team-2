@@ -95,8 +95,9 @@ class RobotThread(QThread):
         if not self.detectCollision():
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
-        elif self.detectCollision and not self.robot.is_player:
+        elif self.detectCollision() and not self.robot.is_player:
             self.generateNewTargetPosition()
+            self.robot.getAlpha(self.target_x, self.target_y)
 
         # Check if the robot has reached the target position
         if cPos[0] - self.target_x < 1 and cPos[1] - self.target_y < 1 and not self.is_player:
@@ -147,8 +148,12 @@ class RobotThread(QThread):
     def generateNewTargetPosition(self):
         # temporary until better behaviour for robots is implemented
         # Generate random offsets to determine the neighboring tile
-        offset_x = random.randint(0, 60)
-        offset_y = random.randint(0, 60)
+        valid_tile = False
+        while not valid_tile:
+            offset_x = random.randint(0, 59)
+            offset_y = random.randint(0, 59)
+            if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
+                valid_tile = True
 
         # Calculate the target position based on the new tile indices
         target_x = offset_x * self.tile_width + self.tile_width // 2
