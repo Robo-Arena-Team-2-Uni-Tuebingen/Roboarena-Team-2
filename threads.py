@@ -154,8 +154,8 @@ class RobotThread(QThread):
         target_x = offset_x * self.tile_width + self.tile_width // 2
         target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
 
-        #while not self.setTarget(target_x, target_y):
-            #offset_x = random.randint(0, 60)
-            #offset_y = random.randint(0, 60)
-            #target_x = offset_x * self.tile_width + self.tile_width // 2
-            #target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
+        self.target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
+        self.target_y = max(240 + 8, min(target_y, self.arena_height*self.tile_height - 9 + 240))
+
+        self.robot.target_x = self.target_x
+        self.robot.target_y = self.target_y

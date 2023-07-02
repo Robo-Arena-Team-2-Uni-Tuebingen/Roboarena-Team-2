@@ -82,6 +82,6 @@ class Robot():
             self.v -= self.a
             self.cdDeccelerate = time.time() + self.delayDeccelerate
 
-    #applies up to 50% Slow based on the stack count of "Slow"
+    #applies up to 50% Slow/Speedup based on the stack count of "Slow"
     def getV(self):
         return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
