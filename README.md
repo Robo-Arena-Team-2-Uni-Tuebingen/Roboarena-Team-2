@@ -458,3 +458,54 @@ Show the pause menu:
 - basic cooldowns on healing and damage, work after the cooldown principle established by the status effects
 - `applyDamage` implements the status effect Corrosion, which increases damage by 50% at full stacks
 - might be expanded later on, if necessary
+
+#### Adding Life-Bars (by Tom Kühnle)
+- drawing Life-Bars for every robot centered over them
+- life bars cannot have less than zero health, otherwise the lifebars start growing negatively
+- the color green shows the remaining life, grey parts show the missing life
+- adding a black outline to the Life-Bars
+<img width="740" alt="Bildschirmfoto 2023-07-03 um 18 40 15" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/633be935-0baf-4fe7-9e68-fce1472b3530">
+
+- adding Life-Bars to the `paintEvent` 
+<img width="586" alt="Bildschirmfoto 2023-07-03 um 18 00 35" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/a5415b69-d332-40b2-9821-3e60ea50e80a">
+
+example for full life:
+<img width="171" alt="Bildschirmfoto 2023-07-03 um 15 20 13" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/951d668c-5bb2-4ce7-b4c2-05cf3eb8fcf0">
+
+example at 70% health:
+<img width="227" alt="Bildschirmfoto 2023-07-03 um 15 20 45" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/591f1b18-ec0a-4a4d-bbb0-ede865ee30aa">
+
+#### Bullet Shooting and Bullet Collision (by Tom Kühnle)
+- creating bullet class with movement logic
+<img width="425" alt="Bildschirmfoto 2023-07-03 um 20 24 37" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/402f4e8f-9b03-4be5-9d02-be6b8fb0f5f0">
+
+- creating a bullet list to store existing bullets
+- setting timer intervall to 30ms for bullet drawing
+<img width="556" alt="Bildschirmfoto 2023-07-03 um 20 26 08" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/b6775421-a9a5-46b4-80f6-3a3c021079ac">
+<img width="683" alt="Bildschirmfoto 2023-07-03 um 18 00 56" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/9dd4fc31-6a28-48b7-8b7a-3ef436c30f30">
+
+- setting the key to shoot bullets to spacebar
+   -> left mousbutton did not work with touchpad, maybe implement diffrent
+      options for shooting bullets later
+<img width="341" alt="Bildschirmfoto 2023-07-03 um 21 26 46" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/bd0db08c-2c2e-41fd-808c-4d0acd49f001">
+
+- implementing logic for shooting the bullet and draw it at the right position
+   -> did the math wrong for drawing the bullet at the right spot since
+      the axes are inverted and I had to use -alpha , Thank you Julian :)
+  <img width="677" alt="Bildschirmfoto 2023-07-03 um 20 18 08" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/7efaeb74-c9f7-4f8c-8c11-8744508b99e6">
+
+- adding `timerEvent` to move the bullets and check for collision
+- keep updating a list which stores bulltes to remove, if they:
+    - are out of the arena boarders
+    - did hit an enemy robot (collision check)
+- If the collision check is true, the robot which got hit loses 10HP
+<img width="936" alt="Bildschirmfoto 2023-07-03 um 20 18 20" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/41e63386-400f-41c5-b25e-f0d3e6437155">
+
+Example for shooting bullets:
+https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/cf970938-3564-42f2-8389-fe16559ca2c1
+
+Still undefined:
+ - bullets can hurt the robot which shooted them
+ - logic for dead robots is still to be implemented
+ - bullet shooting needs to be restricted by a cooldown, otherwise a new bullet can
+   be drawn every 30ms (redrawing rate of the bullets)
