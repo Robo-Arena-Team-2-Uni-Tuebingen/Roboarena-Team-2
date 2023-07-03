@@ -39,6 +39,10 @@ class Robot():
     #health
     maxHealth = 100
     health = 100
+    delayDamage = 1
+    delayHealing = 1
+    cdDamage = 0
+    cdHealing = 0
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -54,7 +58,7 @@ class Robot():
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
-        self.alpha = -np.arctan2(y - c_y, x - c_x)
+        self.alpha = -np.arctan2(y - c_y, x - c_x) 
 
     def applyEffect(self, effect: tuple[str, int]):
         if self.appliedEffects[effect[0]] < 100 and time.time() > self.cdApplyEffect:
@@ -90,10 +94,14 @@ class Robot():
         return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
     def applyDamage(self, damage):
-        self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+        if time.time() > self.cdDamage:
+            self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+            self.cdDamage = time.time() + self.delayDamage
 
     def applyHealing(self, healing):
-        if self.health + healing <= 100:
-            self.health = self.health + healing
-        else:
-            self.health = 100
+        if time.time() > self.cdHealing:
+            if self.health + healing <= 100:
+                self.health = self.health + healing
+            else:
+               self.health = 100
+            self.cdHealing = time.time() + self.delayHealing

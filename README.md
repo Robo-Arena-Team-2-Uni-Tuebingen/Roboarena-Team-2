@@ -404,3 +404,57 @@ Show the pause menu:
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/aa026c7c-441a-4e53-94c8-70149f7763d0)
 
 - a problem is that it takes a little time to show the pause menu when you pause the game the first time
+
+### Sprint 6 (20.06.2023 - 04.07.2023)
+
+#### New Maps
+- implemented a new map
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/c5da42d7-623f-4a11-b1d9-68f16b5dba17)
+- left and upper side indicate a bug in the map creation/drawing process, didn't get around to looking for that yet
+- noted it down as an issue (https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/issues/40)
+
+#### Finished Implementation of Status Effects (by Julian Häberle)
+- completely revamped the cooldown system, the old approach with the singleshot timers didn't work
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/1ee2c0ea-ce9d-4916-b47b-bb21db8b9c55)
+- new cooldown system uses `time.time()` and adds the cooldown on top. The next call of the method checks whether `time.time()` returns a larger value.
+- simpler than singleshot timers, more reliable, and doesn't need extra threading (since the singleshot timers themselves create an extra thread)
+
+- fixed flaws in the method that calculates the position of the tile in the ArenaLayout Array
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/0acf0e24-82a9-4961-b46e-abeb2019fe40)
+- main problem here were the edge cases which sometimes returned invalid indices, which in return caused the program to crash
+
+- added implementation for Slow and Speedup Statuseffects and tested them
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/403332b9-ccc8-4610-b5f3-cb7fba513508)
+- slow and speedup cancel each other respectively
+- both get added two 200 because they're supposed to give a 50% malus/bonus at 100 stacks
+
+#### Collision System for movement (by Julian Häberle)
+- biggest problem so far
+- in theory simple, in practice not so much
+- the original idea was to check the edges of the robot for a collision, then block movement in that particular direction by modifying the movement vector
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b881f92f-9b45-4a0e-a22c-dd6c63602235)
+
+- first iteration of this idea, function basically checks up to 90° to the left and right from the view direction for collisions
+- expanding this to a full circle check would completely block the robot everytime it hit a wall
+- this had a whole host of unintended consequences, from being able to move backwards into walls, over the currently non-player robots breaking completely, up to the robot getting permablocked in corners or on obstacles
+- tried additional iterations of this, but they got very complex very fast and demanded a lot of performance
+- abandoned this approach and began exploring in the opposite direction, with the simplest variant of collision detection
+- the new approach is basically just "Can I go where I go?", merely checks if the new position is impassable or not and blocks the movement if it is
+- implementation of this was trivial with the remainders of the original approach, but the result is much more reliable
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/1c03f6a9-495d-4af2-995d-21bc707d359e)
+- theoretically there exists an edge case where a robot at full speed could "jump" over an impassable tile, although I haven't managed to achieve this yet
+
+#### Basic Health System (by Julian Häberle)
+- very basic health system with health, maxHealth attributes and methods to manipulate those
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/cdbc236e-1912-4f6c-a1bb-92a367865e16)
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/9217e857-a8ac-4f40-9d18-f8694cd98bcc)
+- basic cooldowns on healing and damage, work after the cooldown principle established by the status effects
+- `applyDamage` implements the status effect Corrosion, which increases damage by 50% at full stacks
+- might be expanded later on, if necessary
