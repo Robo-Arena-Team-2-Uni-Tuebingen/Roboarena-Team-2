@@ -260,6 +260,14 @@ class Arena(QFrame):
     def getTileAtPos(self, x, y):
         x = (x//Arena.TileWidth)
         y = ((y - 240)//Arena.TileHeight)
+        if x < 0:
+            x = 0
+        if x >= Arena.ArenaWidth:
+            x = Arena.ArenaWidth - 1
+        if y < 0:
+            y = 0
+        if y >= Arena.ArenaHeight:
+            y = Arena.ArenaHeight - 1
         return self.ArenaLayout[int(y), int(x)]
 
 

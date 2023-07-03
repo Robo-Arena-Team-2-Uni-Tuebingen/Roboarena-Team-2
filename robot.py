@@ -39,7 +39,10 @@ class Robot():
     #health
     maxHealth = 100
     health = 100
-    minHealth = 1
+    delayDamage = 1
+    delayHealing = 1
+    cdDamage = 0
+    cdHealing = 0
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -96,11 +99,15 @@ class Robot():
 
 
     def applyDamage(self, damage):
-        self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+        if time.time() > self.cdDamage:
+            self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+            self.cdDamage = time.time() + self.delayDamage
 
 
     def applyHealing(self, healing):
-        if self.health + healing <= 100:
-            self.health = self.health + healing
-        else:
-            self.health = 100
+        if time.time() > self.cdHealing:
+            if self.health + healing <= 100:
+                self.health = self.health + healing
+            else:
+                self.health = 100
+            self.cdHealing = time.time() + self.delayHealing
