@@ -28,6 +28,8 @@ class RoboArena(QMainWindow):
 
     def initUI(self):
 
+        self.game_running = False
+
         self.game_menu = GameMenu()
         self.game_menu.play_button.clicked.connect(self.switchToGame)
 
@@ -45,13 +47,15 @@ class RoboArena(QMainWindow):
 
     def switchToGame(self):
         self.resize(1200, 960)
-        # Switch to the arena widget in the stacked widget
+        self.passSpinBoxValues()
         self.makeGameWidget()
+        self.game_running = True
         self.stacked_widget.setCurrentWidget(self.game_widget)
         self.center()
     
     def switchToMenu(self):
         self.resize(1200, 960)
+        self.game_running
         # Switch to the menu widget in the stacked widget
         self.stacked_widget.setCurrentWidget(self.game_menu)
         self.center()
@@ -64,31 +68,36 @@ class RoboArena(QMainWindow):
                   int((screen.height() - size.height()) / 2))
         
     def keyPressEvent(self, event):  #get key press to the threads
-        self.rarena.logKeyPressEvent(event)
+        if self.game_running:
+            self.rarena.logKeyPressEvent(event)
 
-        if event.key() == Qt.Key_Escape:
-            self.toggle_pause()
+            if event.key() == Qt.Key_Escape:
+                self.toggle_pause()
 
     def keyReleaseEvent(self, event):
-        self.rarena.logKeyReleaseEvent(event)
+        if self.game_running:
+            self.rarena.logKeyReleaseEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
     
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
 
     def toggle_pause(self):
-
-        if self.pause_visible:
-            self.pause.hide()
-        else:
-            self.pause.show()
-        
-        self.pause_visible = not self.pause_visible
+        if self.game_running:
+            if self.pause_visible:
+                self.pause.hide()
+            else:
+                self.pause.show()
+            
+            self.pause_visible = not self.pause_visible
 
     def makeGameWidget(self):
 
@@ -111,6 +120,10 @@ class RoboArena(QMainWindow):
 
         self.stacked_widget.addWidget(self.game_widget)
         self.stacked_widget.setMouseTracking(True)
+
+    def passSpinBoxValues(self):
+        self.player_numbers = self.game_menu.player_number.value()
+        self.arena_number = self.game_menu.arena_number.value()
 
 class Arena(QFrame):
 
@@ -142,21 +155,22 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.initArena()
-        self.robotThreads = []
         self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), is_player=True),
                                Robot(600, 800, -np.pi/2, QColor(0xFFA500), is_player=False),
                                Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
                                Robot(400, 800, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
-
+        self.player_numbers = parent.player_numbers
+        self.arena_number = parent.arena_number
+        self.chooseMap()
         self.createRobotThreads()
+        self.initArena()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
-        self.ArenaLayout = textToTiles("castlelayout.txt")
+        self.ArenaLayout = textToTiles(self.arena_map)
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 > 0:
@@ -179,6 +193,8 @@ class Arena(QFrame):
                 self.ArenaLayout[x, y].chooseTexture(context)
 
     def createRobotThreads(self):
+        self.robotThreads = []
+
         for robot in self.pawns:
             is_player = robot.is_player
             thread = threads.RobotThread(robot, self, is_player)
@@ -260,8 +276,14 @@ class Arena(QFrame):
             y = 0
         if y >= Arena.ArenaHeight:
             y = Arena.ArenaHeight - 1
-        return self.ArenaLayout[int(y), int(x)]
-    
+        return self.ArenaLayout[int(y), int(x)]        
+
+    def chooseMap(self):
+        if self.arena_number == 1:
+            self.arena_map = "castlelayout.txt"
+        else:
+            self.arena_map = "testlayout.txt"
+        
 
 def main():
 

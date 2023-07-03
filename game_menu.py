@@ -1,9 +1,10 @@
 import sys
 from PyQt5.QtGui import QFont, QCursor, QKeyEvent
-from PyQt5.QtCore import Qt, QRect, QEvent
+from PyQt5.QtCore import Qt, QRect, QEvent, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSpinBox, QSizePolicy
 
 class GameMenu(QWidget):
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -19,17 +20,17 @@ class GameMenu(QWidget):
         self.setAutoFillBackground(True)
         self.setWindowTitle("Game Menu")      
         
-        self.setup_background()
-        self.setup_player_number()
-        self.setup_player_label()
-        self.setup_arena_number()
-        self.setup_arena_label()
-        self.setup_quit_button()
-        self.setup_play_button()
-        self.setup_settings_button()
-        self.setup_logo_label()        
+        self.setupBackground()
+        self.setupLogoLabel() 
+        self.setupPlayerNumber()
+        self.setupPlayerLabel()
+        self.setupArenaNumber()
+        self.setupArenaLabel()
+        self.setupQuitButton()
+        self.setupPlayButton()
+        self.setupSettingsButton()       
         
-    def setup_background(self):
+    def setupBackground(self):
         self.background_label = QLabel(self)
         self.background_label.setGeometry(QRect(0, 0, self.width(), self.height()))
         self.background_label.setStyleSheet("background-image: url('backgrounds/scifi-arena.jpg'); background-repeat: no-repeat; background-position: center;")
@@ -38,7 +39,7 @@ class GameMenu(QWidget):
     def resizeEvent(self, event):
         self.background_label.setGeometry(QRect(0, 0, self.width(), self.height()))
 
-    def setup_logo_label(self):
+    def setupLogoLabel(self):
         self.logo_label = QLabel(self)
         self.logo_label.setGeometry(QRect(300, 100, 600, 80))
         font = QFont()
@@ -54,7 +55,7 @@ class GameMenu(QWidget):
         self.logo_label.setText("RoboArena")
         self.logo_label.setStyleSheet("color: #990000")
 
-    def setup_player_label(self):
+    def setupPlayerLabel(self):
         self.player_label = QLabel(self)
         self.player_label.setGeometry(QRect(320, 280, 120, 60))
         font = QFont()
@@ -64,7 +65,7 @@ class GameMenu(QWidget):
         self.player_label.setObjectName("player_label")
         self.player_label.setText("Player")
         
-    def setup_player_number(self):
+    def setupPlayerNumber(self):
         self.player_number = QSpinBox(self)
         self.player_number.setGeometry(QRect(440, 280, 80, 60))
         font = QFont()
@@ -79,7 +80,7 @@ class GameMenu(QWidget):
         self.player_number.setMaximum(2)
         self.player_number.setObjectName("player_number")
 
-    def setup_arena_label(self):
+    def setupArenaLabel(self):
         self.arena_label = QLabel(self)
         self.arena_label.setGeometry(QRect(680, 280, 120, 60))
         font = QFont()
@@ -89,7 +90,7 @@ class GameMenu(QWidget):
         self.arena_label.setObjectName("arena_label")
         self.arena_label.setText("Arena")
         
-    def setup_arena_number(self):
+    def setupArenaNumber(self):
         self.arena_number = QSpinBox(self)
         self.arena_number.setGeometry(QRect(800, 280, 80, 61))
         font = QFont()
@@ -104,7 +105,7 @@ class GameMenu(QWidget):
         self.arena_number.setMaximum(5)
         self.arena_number.setObjectName("arena_number")
         
-    def setup_play_button(self):
+    def setupPlayButton(self):
         self.play_button = QPushButton(self)
         self.play_button.setGeometry(QRect(460, 430, 280, 60))
         font = QFont()
@@ -114,7 +115,7 @@ class GameMenu(QWidget):
         self.play_button.setObjectName("play_button")
         self.play_button.setText("Play")
         
-    def setup_settings_button(self):
+    def setupSettingsButton(self):
         self.settings_button = QPushButton(self)
         self.settings_button.setGeometry(QRect(460, 555, 280, 60))
         font = QFont()
@@ -124,7 +125,7 @@ class GameMenu(QWidget):
         self.settings_button.setObjectName("settings_button")
         self.settings_button.setText("Settings")
         
-    def setup_quit_button(self):
+    def setupQuitButton(self):
         self.quit_button = QPushButton(self)
         self.quit_button.setGeometry(QRect(460, 680, 280, 60))
         font = QFont()
