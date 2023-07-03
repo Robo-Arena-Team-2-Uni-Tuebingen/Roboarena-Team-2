@@ -58,7 +58,7 @@ class Robot():
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
-        self.alpha = -np.arctan2(y - c_y, x - c_x)
+        self.alpha = -np.arctan2(y - c_y, x - c_x) 
 
     def applyEffect(self, effect: tuple[str, int]):
         if self.appliedEffects[effect[0]] < 100 and time.time() > self.cdApplyEffect:
@@ -103,11 +103,10 @@ class Robot():
             self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
             self.cdDamage = time.time() + self.delayDamage
 
-
     def applyHealing(self, healing):
         if time.time() > self.cdHealing:
             if self.health + healing <= 100:
                 self.health = self.health + healing
             else:
-                self.health = 100
+               self.health = 100
             self.cdHealing = time.time() + self.delayHealing
