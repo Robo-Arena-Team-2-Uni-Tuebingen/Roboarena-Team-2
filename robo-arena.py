@@ -122,7 +122,7 @@ class Arena(QFrame):
         self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
-        self.timer.start(500, self)  # Timer interval and object to call
+        self.timer.start(30, self)  # Timer interval and object to call
         self.bullets = []  # Create an empty list for bullets
 
     def initArena(self):
