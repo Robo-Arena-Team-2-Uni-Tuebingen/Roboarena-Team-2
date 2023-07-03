@@ -509,3 +509,46 @@ Still undefined:
  - logic for dead robots is still to be implemented
  - bullet shooting needs to be restricted by a cooldown, otherwise a new bullet can
    be drawn every 30ms (redrawing rate of the bullets)
+
+### Main Menu (by Niklas Wolf)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/bd7ab753-9f61-4ea9-9a4b-6fce5d4fb3f7)
+
+- added the new class GameMenu, which contains the widget of the Main Menu
+- You can choose the number of players(1-2) and the arena layout(1-5) with spin boxes
+  - for now, there are only two designs, more are following
+- "Play" starts a new game, "Settings" doesn't have a function yet because we don't have any settings yet and "Quit" ends the game
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/9909c12c-79f8-49d6-83a4-0249a7cd6f0c)
+
+- Then had to add the main menu to the `RoboArena`
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/9da75b72-c892-4822-b95d-479bf19bb48a)
+
+- made a stacked widget, so the widgets change at the same position
+- connected the "Play" button with the function `switchToGame`
+  - function adds a widget of the game to the stack and saves the current values of the spin boxes
+  - sets flag `game_running` to true, without the flag the program tries to pass the mouse and key events to the Arena widget, which doesn't exist at that moment
+    
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/f0dce541-228b-4813-b276-0108070a0ff4)
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/0892b148-8cbc-4d78-9ab3-d95968e6b7ea)
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/f3794061-5a43-44a4-a95e-cb0053c5f556)
+
+- The `Arena` takes the values of the spin boxes and starts a new game
+- changed the `is_player` parameter of the robots to `player_number` to check if the robot gets steered manually or randomly
+  - if the player number is lower or equal to the number of players then it's a  player else it's random
+- choosing is just comparing the given `arena_number` with its corresponding map
+  - more maps has to be designed later
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/779d783f-db5b-4f22-954f-099f61872e4d)
+
+- returning to the main menu to the game is now connected to the "Quit"-Button of the pause menu, so you can choose a different map without restarting the whole application
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/b83c1718-b654-4b08-8d0b-704c0ea53415)
+
+https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/323d2ada-af57-442f-8e51-217e6d9f607f
+
+
+
+
