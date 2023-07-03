@@ -10,7 +10,6 @@ class Robot():
     #the size of the robot in px
     radius = 30
     #maximum accelerations
-
     a           = 2
     a_alpha     = 2
     A_max       = 100
@@ -37,6 +36,9 @@ class Robot():
     cdRemoveEffect = 0
     cdAccelerate = 0
     cdDeccelerate = 0
+    #health
+    maxHealth = 100
+    health = 100
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -82,3 +84,8 @@ class Robot():
             self.v -= self.a
             self.cdDeccelerate = time.time() + self.delayDeccelerate
 
+    def applyDamage(self, damage):
+        self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+
+    def applyHealing(self, healing):
+        self.health = self.health + healing
