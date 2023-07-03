@@ -92,7 +92,8 @@ class RobotThread(QThread):
         if not self.robot.is_player:
             self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
 
-        collision = self.isTileAtPosImpassable(cPos[0], cPos[1])#self.detectCollision()
+        #check if next movement location is Impassable
+        collision = self.isTileAtPosImpassable(cPos[0], cPos[1])
 
         if not collision:
             self.robot.xpos = cPos[0] + self.robot.radius
@@ -106,21 +107,6 @@ class RobotThread(QThread):
             self.generateNewTargetPosition()
             self.robot.target_x = self.target_x
             self.robot.target_y = self.target_y
-
-    #returns true if there's an impassable tile ahead
-    '''def detectCollision(self):
-        radius = self.robot.radius
-        alpha = self.robot.alpha
-        c_x = self.robot.xpos - radius
-        c_y = self.robot.ypos - radius
-        for i in range(-12, 12):
-            adjusted_angle = -alpha + i*np.pi/12
-            x = int(radius*np.cos(adjusted_angle) + c_x)
-            y = int(radius*np.sin(adjusted_angle) + c_y)
-            if self.isTileAtPosImpassable(x, y):
-                return (adjusted_angle, True)
-        return (0, False)'''
-
 
     def setTarget(self, x, y):
         newTargetx = self.target_x + x
