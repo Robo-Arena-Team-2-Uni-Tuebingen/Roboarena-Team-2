@@ -93,6 +93,11 @@ class Robot():
     def getV(self):
         return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
+    def collidesWithBullet(self, bullet):
+        distance_squared = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
+        return distance_squared <= (self.radius + bullet.radius)**2
+
+
     def applyDamage(self, damage):
         if time.time() > self.cdDamage:
             self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)

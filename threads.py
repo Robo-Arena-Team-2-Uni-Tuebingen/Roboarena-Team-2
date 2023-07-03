@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from robot import Robot
+from bullets import Bullet
 
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF, QThread
 
@@ -59,7 +60,7 @@ class RobotThread(QThread):
         
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
-            
+
             self.setTarget(deltaTargetx, deltaTargety)
 
         if eventDict[Qt.Key_Escape]:
@@ -70,7 +71,6 @@ class RobotThread(QThread):
             else: 
                 self.pauseRobots()
 
-        
         
 
     def processMouseEvent(self, x, y, pressedMouseButtons):
@@ -127,13 +127,13 @@ class RobotThread(QThread):
         tile = self.arena.getTileAtPos(x, y)        
         return tile.isImpassable
 
-
-    
+ 
     def unpauseRobots(self):
         self.is_paused = False
 
     def pauseRobots(self):
         self.is_paused = True
+
     
     def generateNewTargetPosition(self):
         # temporary until better behaviour for robots is implemented
