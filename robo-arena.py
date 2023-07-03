@@ -267,8 +267,8 @@ class Arena(QFrame):
         robot = self.pawns[0]
         bullet_radius = 10
         bullet_speed = 5
-        bullet_x = robot.xpos - robot.radius * np.sin(robot.alpha) 
-        bullet_y = robot.ypos - robot.radius * np.cos(robot.alpha)
+        bullet_x = (robot.xpos - robot.radius) + robot.radius*np.cos(-robot.alpha) 
+        bullet_y = (robot.ypos - robot.radius) + robot.radius*np.sin(-robot.alpha)
         bullet = Bullet(bullet_x, bullet_y, robot.alpha, bullet_radius, bullet_speed)
         self.bullets.append(bullet)
 
