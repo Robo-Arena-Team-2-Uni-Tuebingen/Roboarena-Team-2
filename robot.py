@@ -18,11 +18,11 @@ class Robot():
     v_alpha     = 2
     #effects
     appliedEffects = {
-        'Slow': 0,
-        'Freeze': 0,
-        'Corrosion': 0,
-        'Collateral': 0,
-        'Speedup': 0
+        'Slow': 0, #slows the robot
+        'Freeze': 0, #makes shots more inaccurate
+        'Corrosion': 0, #increases taken damage
+        'Collateral': 0, #increases done damage
+        'Speedup': 0 #increases speed
     }
     #temporary
     target_x = 0
