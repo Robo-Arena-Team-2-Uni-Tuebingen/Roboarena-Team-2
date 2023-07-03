@@ -88,4 +88,7 @@ class Robot():
         self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
 
     def applyHealing(self, healing):
-        self.health = self.health + healing
+        if self.health + healing <= 100:
+            self.health = self.health + healing
+        else:
+            self.health = 100
