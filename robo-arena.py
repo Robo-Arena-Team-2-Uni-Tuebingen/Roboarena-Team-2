@@ -4,45 +4,58 @@ import numpy as np
 import sys
 from robot import Robot
 import tiles
-from ascii_layout import textToTiles, translateAscii
+from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
+from game_menu import GameMenu
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout, QStackedWidget
 
 
 class RoboArena(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.resize(1200, 960)
+        self.setWindowTitle('RoboArena')
+        self.setObjectName("RoboArena")
+
         self.initUI()
 
     def initUI(self):
-        self.rarena = Arena(self)
-        self.rarena.setMouseTracking(True)
-        
-        self.pause         = PauseMenu(self)
-        self.pause_visible = False
-        
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.rarena)
-        main_layout.addWidget(self.pause)
-        main_layout.setContentsMargins(0, 0, 0, 0)
 
-        central_widget = QWidget()
-        central_widget.setLayout(main_layout)
-        central_widget.setMouseTracking(True)
-        self.setCentralWidget(central_widget)
+        self.game_menu = GameMenu()
+        self.game_menu.play_button.clicked.connect(self.switchToGame)
 
-        self.pause.hide()
-        self.resize(1940, 1200)
+        self.stacked_widget = QStackedWidget(self)
+        self.stacked_widget.addWidget(self.game_menu)
+
+        self.setCentralWidget(self.stacked_widget)
         self.center()
-        self.setWindowTitle('RoboArena')
         self.show()
+        
+        # Set the stacked widget as the main layout of the RoboArena
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.stacked_widget)
+        self.setLayout(layout)
 
+    def switchToGame(self):
+        self.resize(1940, 1200)
+        # Switch to the arena widget in the stacked widget
+        self.makeGameWidget()
+        self.stacked_widget.setCurrentWidget(self.game_widget)
+        self.center()
+    
+    def switchToMenu(self):
+        self.resize(1200, 960)
+        # Switch to the menu widget in the stacked widget
+        self.stacked_widget.setCurrentWidget(self.game_menu)
+        self.center()
+         
     # centers the window on the screen
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -77,6 +90,27 @@ class RoboArena(QMainWindow):
         
         self.pause_visible = not self.pause_visible
 
+    def makeGameWidget(self):
+
+        self.rarena = Arena(self)
+        self.rarena.setMouseTracking(True)
+        
+        self.pause         = PauseMenu(self)
+        self.pause.hide()
+        self.pause_visible = False
+        self.pause.quit_button.clicked.connect(self.switchToMenu)
+        
+        main_layout = QHBoxLayout()
+        main_layout.addWidget(self.rarena)
+        main_layout.addWidget(self.pause)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.game_widget = QWidget()
+        self.game_widget.setLayout(main_layout)
+        self.game_widget.setMouseTracking(True)
+
+        self.stacked_widget.addWidget(self.game_widget)
+        self.stacked_widget.setMouseTracking(True)
 
 class Arena(QFrame):
 
@@ -228,7 +262,6 @@ class Arena(QFrame):
             y = Arena.ArenaHeight - 1
         return self.ArenaLayout[int(y), int(x)]
     
-
 
 def main():
 

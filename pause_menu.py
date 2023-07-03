@@ -1,4 +1,3 @@
-import sys
 from PyQt5.QtGui import QFont, QCursor, QKeyEvent
 from PyQt5.QtCore import Qt, QRect, QEvent, QCoreApplication
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider
@@ -43,7 +42,6 @@ class PauseMenu(QWidget):
         self.quit_button.setFont(font)
         self.quit_button.setObjectName("quit_button")
         self.quit_button.setText("Quit")
-        self.quit_button.clicked.connect(QApplication.instance().quit)
 
         # slider to adjust the volume when in-game sounds get added
         self.horizontalSlider = QSlider(self)

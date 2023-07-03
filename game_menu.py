@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtGui import QFont, QCursor, QKeyEvent, QPalette, QBrush, QImage
+from PyQt5.QtGui import QFont, QCursor, QKeyEvent
 from PyQt5.QtCore import Qt, QRect, QEvent
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSpinBox, QSizePolicy
 
@@ -8,7 +8,7 @@ class GameMenu(QWidget):
         super().__init__(parent)
 
         self.setObjectName("GameMenu")
-        self.resize(1200, 1000)
+        self.resize(1200, 960)
 
         self.setupUi()
 
@@ -51,7 +51,8 @@ class GameMenu(QWidget):
         self.logo_label.setTextFormat(Qt.AutoText)
         self.logo_label.setAlignment(Qt.AlignCenter)
         self.logo_label.setObjectName("logo_label")
-        self.logo_label.setText("Robo Arena")
+        self.logo_label.setText("RoboArena")
+        self.logo_label.setStyleSheet("color: #990000")
 
     def setup_player_label(self):
         self.player_label = QLabel(self)
