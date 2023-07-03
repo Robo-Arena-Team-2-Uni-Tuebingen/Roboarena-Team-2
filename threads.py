@@ -9,7 +9,7 @@ class RobotThread(QThread):
 
     def __init__(self, robot: Robot, arena, is_player):
         super().__init__()
-        self.robot: Robot          = robot                 # robot class
+        self.robot: Robot   = robot                 # robot class
         self.is_player      = is_player             # check if robot is player to determine movement
         self.is_paused      = False
         self.target_x       = robot.xpos + 8          # x position + 0.5*tile
@@ -89,7 +89,7 @@ class RobotThread(QThread):
         else:
             cPos = cPos + target_vector
         
-        if not self.robot.is_player:
+        if not self.is_player:
             self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
 
         #check if next movement location is Impassable
@@ -98,7 +98,7 @@ class RobotThread(QThread):
         if not collision:
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
-        elif collision and not self.robot.is_player:
+        elif collision and not self.is_player:
             self.generateNewTargetPosition()
             self.robot.getAlpha(self.target_x, self.target_y)
 

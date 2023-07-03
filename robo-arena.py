@@ -155,15 +155,15 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), is_player=True),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), is_player=False),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.chooseMap()
-        self.createRobotThreads()
         self.initArena()
+        self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
@@ -196,7 +196,7 @@ class Arena(QFrame):
         self.robotThreads = []
 
         for robot in self.pawns:
-            is_player = robot.is_player
+            is_player = robot.player_number <= self.player_numbers
             thread = threads.RobotThread(robot, self, is_player)
             thread.positionChanged.connect(self.updateRobotPosition)
             self.robotThreads.append(thread)
