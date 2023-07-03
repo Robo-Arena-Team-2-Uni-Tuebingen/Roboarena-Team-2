@@ -44,7 +44,7 @@ class RoboArena(QMainWindow):
         self.setLayout(layout)
 
     def switchToGame(self):
-        self.resize(1940, 1200)
+        self.resize(1200, 960)
         # Switch to the arena widget in the stacked widget
         self.makeGameWidget()
         self.stacked_widget.setCurrentWidget(self.game_widget)
@@ -144,10 +144,10 @@ class Arena(QFrame):
 
         self.initArena()
         self.robotThreads = []
-        self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
-                               Robot(600, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
-                               Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(400, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), is_player=True),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), is_player=False),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
 
         self.createRobotThreads()
         # Create a timer to control the robot movement
@@ -251,7 +251,7 @@ class Arena(QFrame):
     
     def getTileAtPos(self, x, y):
         x = (x//Arena.TileWidth)
-        y = ((y - 240)//Arena.TileHeight)
+        y = (y//Arena.TileHeight)
         if x < 0:
             x = 0
         if x >= Arena.ArenaWidth:
