@@ -39,6 +39,7 @@ class Robot():
     #health
     maxHealth = 100
     health = 100
+    minHealth = 1
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -89,8 +90,14 @@ class Robot():
     def getV(self):
         return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
+    def collidesWithBullet(self, bullet):
+        distance_squared = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
+        return distance_squared <= (self.radius + bullet.radius)**2
+
+
     def applyDamage(self, damage):
         self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+
 
     def applyHealing(self, healing):
         if self.health + healing <= 100:

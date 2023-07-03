@@ -3,6 +3,7 @@ from PyQt5 import QtGui
 import numpy as np
 import sys
 from robot import Robot
+from bullets import Bullet
 import tiles
 from ascii_layout import textToTiles, translateAscii
 import threads
@@ -10,7 +11,7 @@ from pause_menu import PauseMenu
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
-from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent
+from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent, QBrush
 from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout
 
 
@@ -55,6 +56,8 @@ class RoboArena(QMainWindow):
 
         if event.key() == Qt.Key_Escape:
             self.toggle_pause()
+        elif event.key() == Qt.Key_Space:
+            self.rarena.shootBullet()
 
     def keyReleaseEvent(self, event):
         self.rarena.logKeyReleaseEvent(event)
@@ -95,7 +98,8 @@ class Arena(QFrame):
         Qt.Key_D: False,
         Qt.Key_E: False,
         Qt.Key_Q: False,
-        Qt.Key_Escape: False
+        Qt.Key_Escape: False,
+        Qt.Key_Space: False
     }
 
     pressedMouseButtons = {
@@ -119,6 +123,7 @@ class Arena(QFrame):
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
+        self.bullets = []  # Create an empty list for bullets
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
@@ -143,6 +148,7 @@ class Arena(QFrame):
                     down = tiles.Tile()
                 context = [up, down, left, right]
                 self.ArenaLayout[x, y].chooseTexture(context)
+
 
     def createRobotThreads(self):
         for robot in self.pawns:
@@ -178,6 +184,13 @@ class Arena(QFrame):
         
         for robot in self.pawns:
             self.drawRobot(painter, robot)
+            self.drawHealthBars(painter, robot)
+
+        # Draw bullets
+        for bullet in self.bullets:
+            self.drawBullet(painter, bullet)
+
+
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
@@ -194,6 +207,35 @@ class Arena(QFrame):
         painter.drawLine(centerRobot, direction)
         painter.setBrush(robot.targetColor)
         painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
+
+    # draw the healthbars of the robots based on their current health    
+    def drawHealthBars(self, painter, robot):
+        barWidth  = 60
+        barHeight = 4
+        barMargin = 5
+       
+        x = int(robot.xpos - 60)
+        y = int(robot.ypos - barMargin - 60)
+
+        # Background
+        painter.setBrush(QBrush(Qt.lightGray))
+        painter.drawRect(x, y, barWidth, barHeight)
+
+        # Health
+        healthWidth = int(barWidth * max(0, robot.health / 100.0)) # health cannot go below 0
+        healthColor = QColor(0, 255, 0)  # Green
+        painter.setBrush(QBrush(healthColor))
+        painter.drawRect(x, y, healthWidth, barHeight)
+
+        # Border
+        painter.setPen(Qt.black)
+        painter.setBrush(Qt.NoBrush)
+        painter.drawRect(x, y, barWidth, barHeight)
+
+    def drawBullet(self, painter, bullet):
+        painter.setBrush(Qt.black)
+        painter.drawEllipse(QPointF(bullet.x, bullet.y), bullet.radius, bullet.radius)
+
 
     def logKeyPressEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
@@ -219,7 +261,53 @@ class Arena(QFrame):
         x = (x//Arena.TileWidth)
         y = ((y - 240)//Arena.TileHeight)
         return self.ArenaLayout[int(y), int(x)]
-    
+
+
+    def shootBullet(self):
+        robot = self.pawns[0]
+        bullet_radius = 10
+        bullet_speed = 5
+        bullet_x = robot.xpos + robot.radius * np.sin(robot.alpha) - robot.radius
+        bullet_y = robot.ypos + robot.radius * np.cos(robot.alpha) - robot.radius
+        bullet = Bullet(bullet_x, bullet_y, robot.alpha, bullet_radius, bullet_speed)
+        self.bullets.append(bullet)
+
+
+    def timerEvent(self, event):
+        # Move bullets
+        bullets_to_remove = []
+        for bullet in self.bullets:
+            bullet.move()
+
+            # Check collision with robots
+            for robot in self.pawns:
+                if self.checkBulletCollision(robot, bullet):
+                    # Apply damage to the robot
+                    robot.health -= 10
+                    bullets_to_remove.append(bullet)
+                    break
+
+            # Check collision with arena boundaries
+            if not self.isBulletInsideArena(bullet):
+                bullets_to_remove.append(bullet)
+
+        # Remove bullets outside the arena or hitting a robot
+        for bullet in bullets_to_remove:
+            self.bullets.remove(bullet)
+
+        # Update the widget to reflect the changes
+        self.update()
+
+    def checkBulletCollision(self, robot, bullet):
+        distance_squared = (robot.xpos - bullet.x - robot.radius)**2 + (robot.ypos - bullet.y - robot.radius)**2
+        return distance_squared <= (robot.radius + bullet.radius)**2
+
+    def isBulletInsideArena(self, bullet):
+        return (
+            0 <= bullet.x <= self.ArenaWidth * self.TileWidth and
+            0 <= bullet.y <= self.ArenaHeight * self.TileHeight
+        )
+
 
 
 def main():

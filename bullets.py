@@ -1,13 +1,15 @@
 import numpy as np
-import time
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QColor
 
-class Bullet():
-	def __init__(self, x , y, width, height):
-		self.xpos 	= xpos
-		self.ypos 	= ypos
-		self.width 	= width
-		self.height = height
-		self.speed 	= 50
-		self.damage = 10
+class Bullet:
+    def __init__(self, x, y, angle, radius, speed):
+        x = x
+        y = y
+        angle = angle
+        speed = 5
+        radius = 2
+
+    def move(self):
+        dx = self.speed * np.cos(self.angle)
+        dy = -self.speed * np.sin(self.angle)
+        self.x += dx
+        self.y += dy
