@@ -10,7 +10,6 @@ class Robot():
     #the size of the robot in px
     radius = 30
     #maximum accelerations
-
     a           = 2
     a_alpha     = 2
     A_max       = 100
@@ -19,11 +18,11 @@ class Robot():
     v_alpha     = 2
     #effects
     appliedEffects = {
-        'Slow': 0,
-        'Freeze': 0,
-        'Corrosion': 0,
-        'Collateral': 0,
-        'Speedup': 0
+        'Slow': 0, #slows the robot
+        'Freeze': 0, #makes shots more inaccurate
+        'Corrosion': 0, #increases taken damage
+        'Collateral': 0, #increases done damage
+        'Speedup': 0 #increases speed
     }
     #temporary
     target_x = 0
@@ -37,6 +36,9 @@ class Robot():
     cdRemoveEffect = 0
     cdAccelerate = 0
     cdDeccelerate = 0
+    #health
+    maxHealth = 100
+    health = 100
 
     def __init__(self, xpos, ypos, alpha, color, is_player):
 
@@ -82,3 +84,11 @@ class Robot():
             self.v -= self.a
             self.cdDeccelerate = time.time() + self.delayDeccelerate
 
+    def applyDamage(self, damage):
+        self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+
+    def applyHealing(self, healing):
+        if self.health + healing <= 100:
+            self.health = self.health + healing
+        else:
+            self.health = 100
