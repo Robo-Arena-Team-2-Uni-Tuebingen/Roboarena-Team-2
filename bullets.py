@@ -2,11 +2,11 @@ import numpy as np
 
 class Bullet:
     def __init__(self, x, y, angle, radius, speed):
-        x = x
-        y = y
-        angle = angle
-        speed = 5
-        radius = 2
+        self.x = x
+        self.y = y
+        self.angle = angle
+        self.speed = 5
+        self.radius = 2
 
     def move(self):
         dx = self.speed * np.cos(self.angle)
