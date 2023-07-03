@@ -510,7 +510,7 @@ Still undefined:
  - bullet shooting needs to be restricted by a cooldown, otherwise a new bullet can
    be drawn every 30ms (redrawing rate of the bullets)
 
-### Main Menu (by Niklas Wolf)
+#### Main Menu (by Niklas Wolf)
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/bd7ab753-9f61-4ea9-9a4b-6fce5d4fb3f7)
 
 - added the new class GameMenu, which contains the widget of the Main Menu
@@ -546,9 +546,3 @@ Still undefined:
 - returning to the main menu to the game is now connected to the "Quit"-Button of the pause menu, so you can choose a different map without restarting the whole application
 
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/b83c1718-b654-4b08-8d0b-704c0ea53415)
-
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/323d2ada-af57-442f-8e51-217e6d9f607f
-
-
-
-
