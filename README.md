@@ -408,6 +408,11 @@ Show the pause menu:
 ### Sprint 6 (20.06.2023 - 04.07.2023)
 
 #### New Maps
+- implemented a new map
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/c5da42d7-623f-4a11-b1d9-68f16b5dba17)
+- left and upper side indicate a bug in the map creation/drawing process, didn't get around to looking for that yet
+- noted it down as an issue (https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/issues/40)
 
 #### Finished Implementation of Status Effects (by Julian Häberle)
 - completely revamped the cooldown system, the old approach with the singleshot timers didn't work
@@ -438,7 +443,7 @@ Show the pause menu:
 - expanding this to a full circle check would completely block the robot everytime it hit a wall
 - this had a whole host of unintended consequences, from being able to move backwards into walls, over the currently non-player robots breaking completely, up to the robot getting permablocked in corners or on obstacles
 - tried additional iterations of this, but they got very complex very fast and demanded a lot of performance
-- abandoned this approach and began exploring in the opposite direction, with the simplest variant of collision detection I could think of
+- abandoned this approach and began exploring in the opposite direction, with the simplest variant of collision detection
 - the new approach is basically just "Can I go where I go?", merely checks if the new position is impassable or not and blocks the movement if it is
 - implementation of this was trivial with the remainders of the original approach, but the result is much more reliable
 
