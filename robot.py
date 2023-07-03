@@ -93,9 +93,10 @@ class Robot():
     def getV(self):
         return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
+    #applies up to 50% Corrosion (extra damage) based on the stack count of corrosion
     def applyDamage(self, damage):
         if time.time() > self.cdDamage:
-            self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
+            self.health = self.health - (damage * (200 + self.appliedEffects['Corrosion'])/200)
             self.cdDamage = time.time() + self.delayDamage
 
     def applyHealing(self, healing):

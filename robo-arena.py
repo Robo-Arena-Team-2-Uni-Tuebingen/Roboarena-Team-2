@@ -7,6 +7,7 @@ import tiles
 from ascii_layout import textToTiles, translateAscii
 import threads
 from pause_menu import PauseMenu
+import queue
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
@@ -143,6 +144,25 @@ class Arena(QFrame):
                     down = tiles.Tile()
                 context = [up, down, left, right]
                 self.ArenaLayout[x, y].chooseTexture(context)
+                
+                adjTiles = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+                            (x - 1, y), (x + 1, y),
+                            (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)]
+                
+                for coords in adjTiles.copy():
+                    if coords[0] < 0 or coords[1] < 0 or coords[0] > Arena.ArenaWidth or coords[1] > Arena.ArenaHeight or self.ArenaLayout[x, y].isImpassable:
+                        adjTiles.remove(coords)
+                
+                self.ArenaLayout[x, y].setAdjacencies(adjTiles)
+    
+    def findShortestPath(self, start, end):
+        Q = queue.SimpleQueue()
+        Q.put((start, 0))
+        while not Q.empty():
+            u = Q.get()
+            for edge in u.adjacencies:
+                
+
 
     def createRobotThreads(self):
         for robot in self.pawns:

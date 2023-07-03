@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QColor, QPixmap, QImage
 from PyQt5.QtCore import QRect, QTimer
+import numpy as np
 
 tileWidth = 16
 tileHeight = 16
@@ -35,6 +36,11 @@ class Tile():
         self.effect = ('', 0)
         self.isImpassable = False
         self.hasEffect = False
+        self.weight = np.inf
+        self.adjacencies = []
+
+    def setAdjacencies(self, adjTiles):
+        self.adjacencies = adjTiles
 
     def compare(self, contextTile):
         if contextTile.str == self.str:
@@ -51,10 +57,6 @@ class Tile():
         right = self.compare(context[1])
         up = self.compare(context[2])
         down = self.compare(context[3])
-        #upleft = self.compare(context[0][0])
-        #upright = self.compare(context[2][0])
-        #downleft = self.compare(context[0][2])
-        #downright = self.compare(context[2][2])
         
         #resolve whether the tile has a tile of the same type to the up or down
         if up and down:
@@ -102,6 +104,7 @@ class WaterTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 50)
         self.hasEffect = True
+        self.weight = 5
     
     def chooseTexture(self, context):
         return self.texture
@@ -114,6 +117,7 @@ class GrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 10)
         self.hasEffect = True
+        self.weight = 1
     
     def chooseTexture(self, context):
         return self.texture
@@ -126,6 +130,7 @@ class HighGrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 30)
         self.hasEffect = True
+        self.weight = 3
 
 class DirtTile(Tile):
     str = 'd'
@@ -134,6 +139,7 @@ class DirtTile(Tile):
         self.texture = textureDirtTile
         self.isImpassable = False
         self.hasEffect = False
+        self.weight = 0
 
 
 class SandTile(Tile):
@@ -144,6 +150,7 @@ class SandTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 5)
         self.hasEffect = True
+        self.weight = 1
 
 class SnowTile(Tile):
     str = 'i'
@@ -153,6 +160,7 @@ class SnowTile(Tile):
         self.isImpassable = False
         self.effect = ('Freeze', 20)
         self.hasEffect = True
+        self.weight = 8
 
 class SlimeTile(Tile):
     str = 'v'
@@ -162,6 +170,7 @@ class SlimeTile(Tile):
         self.isImpassable = False
         self.effect = ('Corrosion', 50)
         self.hasEffect = True
+        self.weight = 50
 
 class FieldTile(Tile):
     str = 'f'
@@ -171,6 +180,7 @@ class FieldTile(Tile):
         self.isImpassable = False
         self.effect = ('Collateral', 50)
         self.hasEffect = True
+        self.weight = 0
 
 class CobbleStoneTile(Tile):
     str = 'c'
@@ -180,3 +190,4 @@ class CobbleStoneTile(Tile):
         self.isImpassable = False
         self.effect = ('Speedup', 50)
         self.hasEffect = True
+        self.weight = 0
