@@ -162,8 +162,8 @@ class Arena(QFrame):
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.chooseMap()
-        self.createRobotThreads()
         self.initArena()
+        self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
         self.timer.start(500, self)  # Timer interval and object to call
