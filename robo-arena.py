@@ -55,7 +55,7 @@ class RoboArena(QMainWindow):
     
     def switchToMenu(self):
         self.resize(1200, 960)
-        self.game_running
+        self.game_running = False
         # Switch to the menu widget in the stacked widget
         self.stacked_widget.setCurrentWidget(self.game_menu)
         self.center()
