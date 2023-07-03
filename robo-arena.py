@@ -111,9 +111,9 @@ class Arena(QFrame):
         self.initArena()
         self.robotThreads = []
         self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
-                               Robot(800, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
+                               Robot(600, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
                                Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(200, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
+                               Robot(400, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
 
         self.createRobotThreads()
         # Create a timer to control the robot movement
@@ -185,15 +185,15 @@ class Arena(QFrame):
     
     #this method is responsible for painting the robot in the window
     def drawRobot(self, painter, robot):
-         #corrects the position of the robot to the upper left corner where the drawing is positioned
-         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
-         #calculates the point indicated by the angle on the circle of the robot
-         direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
-         painter.setBrush(robot.color)
-         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
-         painter.drawLine(centerRobot, direction)
-         painter.setBrush(robot.targetColor)
-         painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
+        #corrects the position of the robot to the upper left corner where the drawing is positioned
+        centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        #calculates the point indicated by the angle on the circle of the robot
+        direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
+        painter.setBrush(robot.color)
+        painter.drawEllipse(centerRobot, robot.radius, robot.radius)
+        painter.drawLine(centerRobot, direction)
+        painter.setBrush(robot.targetColor)
+        painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
 
     def logKeyPressEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
@@ -216,9 +216,10 @@ class Arena(QFrame):
         self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
     
     def getTileAtPos(self, x, y):
-        x = (x/Arena.TileWidth) % Arena.ArenaWidth
-        y = ((y - 240)/Arena.TileHeight) % Arena.ArenaHeight
-        return self.ArenaLayout[int(y) - 2, int(x) - 2] # absolutely clueless, why the result is shifted by 2 tiles in both directions
+        x = (x//Arena.TileWidth)
+        y = ((y - 240)//Arena.TileHeight)
+        return self.ArenaLayout[int(y), int(x)]
+    
 
 
 def main():
