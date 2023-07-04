@@ -173,7 +173,7 @@ class Arena(QFrame):
         self.ArenaLayout = textToTiles(self.arena_map)
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
-                if y - 1 > 0:
+                if y - 1 >= 0:
                     left = self.ArenaLayout[x, y - 1]
                 else:
                     left = tiles.Tile()
@@ -181,7 +181,7 @@ class Arena(QFrame):
                     right = self.ArenaLayout[x, y + 1]
                 else:
                     right = tiles.Tile()
-                if x - 1 > 0:
+                if x - 1 >= 0:
                     up = self.ArenaLayout[x - 1, y]
                 else:
                     up = tiles.Tile()
