@@ -10,7 +10,7 @@ class RobotThread(QThread):
 
     def __init__(self, robot: Robot, arena, is_player):
         super().__init__()
-        self.robot: Robot          = robot                 # robot class
+        self.robot: Robot   = robot                 # robot class
         self.is_player      = is_player             # check if robot is player to determine movement
         self.is_paused      = False
         self.target_x       = robot.xpos + 8          # x position + 0.5*tile
@@ -89,7 +89,7 @@ class RobotThread(QThread):
         else:
             cPos = cPos + target_vector
         
-        if not self.robot.is_player:
+        if not self.is_player:
             self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
 
         #check if next movement location is Impassable
@@ -98,7 +98,7 @@ class RobotThread(QThread):
         if not collision:
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
-        elif collision and not self.robot.is_player:
+        elif collision and not self.is_player:
             self.generateNewTargetPosition()
             self.robot.getAlpha(self.target_x, self.target_y)
 
@@ -114,7 +114,7 @@ class RobotThread(QThread):
 
         if not self.isTileAtPosImpassable(newTargetx, newTargety):
             self.target_x = max(8, min(newTargetx, self.arena_width*self.tile_width - 9))
-            self.target_y = max(240 + 8, min(newTargety, self.arena_height*self.tile_height - 9 + 240))
+            self.target_y = max(8, min(newTargety, self.arena_height*self.tile_height - 9))
 
             self.robot.target_x = self.target_x
             self.robot.target_y = self.target_y
@@ -147,10 +147,10 @@ class RobotThread(QThread):
 
         # Calculate the target position based on the new tile indices
         target_x = offset_x * self.tile_width + self.tile_width // 2
-        target_y = (offset_y * self.tile_height + self.tile_height // 2) + 240
+        target_y = (offset_y * self.tile_height + self.tile_height // 2)
 
         self.target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
-        self.target_y = max(240 + 8, min(target_y, self.arena_height*self.tile_height - 9 + 240))
+        self.target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
 
         self.robot.target_x = self.target_x
         self.robot.target_y = self.target_y

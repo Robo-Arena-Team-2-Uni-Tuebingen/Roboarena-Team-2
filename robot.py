@@ -44,9 +44,9 @@ class Robot():
     cdDamage = 0
     cdHealing = 0
 
-    def __init__(self, xpos, ypos, alpha, color, is_player):
+    def __init__(self, xpos, ypos, alpha, color, player_number):
 
-        self.is_player  = is_player
+        self.player_number  = player_number
         self.xpos       = xpos
         self.ypos       = ypos
         #angle the robot in degrees

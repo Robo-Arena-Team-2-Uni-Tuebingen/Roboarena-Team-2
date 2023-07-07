@@ -5,45 +5,62 @@ import sys
 from robot import Robot
 from bullets import Bullet
 import tiles
-from ascii_layout import textToTiles, translateAscii
+from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
+from game_menu import GameMenu
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
 from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent, QBrush
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout, QStackedWidget
 
 
 class RoboArena(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.resize(1200, 960)
+        self.setWindowTitle('RoboArena')
+        self.setObjectName("RoboArena")
+
         self.initUI()
 
     def initUI(self):
-        self.rarena = Arena(self)
-        self.rarena.setMouseTracking(True)
-        
-        self.pause         = PauseMenu(self)
-        self.pause_visible = False
-        
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.rarena)
-        main_layout.addWidget(self.pause)
-        main_layout.setContentsMargins(0, 0, 0, 0)
 
-        central_widget = QWidget()
-        central_widget.setLayout(main_layout)
-        central_widget.setMouseTracking(True)
-        self.setCentralWidget(central_widget)
+        self.game_running = False
 
-        self.pause.hide()
-        self.resize(1940, 1200)
+        self.game_menu = GameMenu()
+        self.game_menu.play_button.clicked.connect(self.switchToGame)
+
+        self.stacked_widget = QStackedWidget(self)
+        self.stacked_widget.addWidget(self.game_menu)
+
+        self.setCentralWidget(self.stacked_widget)
         self.center()
-        self.setWindowTitle('RoboArena')
         self.show()
+        
+        # Set the stacked widget as the main layout of the RoboArena
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.stacked_widget)
+        self.setLayout(layout)
 
+    def switchToGame(self):
+        self.resize(1200, 960)
+        self.passSpinBoxValues()
+        self.makeGameWidget()
+        self.game_running = True
+        self.stacked_widget.setCurrentWidget(self.game_widget)
+        self.center()
+    
+    def switchToMenu(self):
+        self.resize(1200, 960)
+        self.game_running = False
+        # Switch to the menu widget in the stacked widget
+        self.stacked_widget.setCurrentWidget(self.game_menu)
+        self.center()
+         
     # centers the window on the screen
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -52,7 +69,8 @@ class RoboArena(QMainWindow):
                   int((screen.height() - size.height()) / 2))
         
     def keyPressEvent(self, event):  #get key press to the threads
-        self.rarena.logKeyPressEvent(event)
+        if self.game_running:
+            self.rarena.logKeyPressEvent(event)
 
         if event.key() == Qt.Key_Escape:
             self.toggle_pause()
@@ -60,26 +78,55 @@ class RoboArena(QMainWindow):
             self.rarena.shootBullet()
 
     def keyReleaseEvent(self, event):
-        self.rarena.logKeyReleaseEvent(event)
+        if self.game_running:
+            self.rarena.logKeyReleaseEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
     
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
-        self.rarena.passMouseEvents(event)
+        if self.game_running:
+            self.rarena.passMouseEvents(event)
 
     def toggle_pause(self):
+        if self.game_running:
+            if self.pause_visible:
+                self.pause.hide()
+            else:
+                self.pause.show()
+            
+            self.pause_visible = not self.pause_visible
 
-        if self.pause_visible:
-            self.pause.hide()
-        else:
-            self.pause.show()
+    def makeGameWidget(self):
+
+        self.rarena = Arena(self)
+        self.rarena.setMouseTracking(True)
         
-        self.pause_visible = not self.pause_visible
+        self.pause         = PauseMenu(self)
+        self.pause.hide()
+        self.pause_visible = False
+        self.pause.quit_button.clicked.connect(self.switchToMenu)
+        
+        main_layout = QHBoxLayout()
+        main_layout.addWidget(self.rarena)
+        main_layout.addWidget(self.pause)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
+        self.game_widget = QWidget()
+        self.game_widget.setLayout(main_layout)
+        self.game_widget.setMouseTracking(True)
+
+        self.stacked_widget.addWidget(self.game_widget)
+        self.stacked_widget.setMouseTracking(True)
+
+    def passSpinBoxValues(self):
+        self.player_numbers = self.game_menu.player_number.value()
+        self.arena_number = self.game_menu.arena_number.value()
 
 class Arena(QFrame):
 
@@ -112,13 +159,14 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
+        self.player_numbers = parent.player_numbers
+        self.arena_number = parent.arena_number
+        self.chooseMap()
         self.initArena()
-        self.robotThreads = []
-        self.pawns = np.array([Robot(200, 400,  -np.pi/2, QColor(0xFF0000), is_player=True),
-                               Robot(600, 1000, -np.pi/2, QColor(0xFFA500), is_player=False),
-                               Robot(800, 400,  -np.pi/2, QColor(0x8A2BE2), is_player=False),
-                               Robot(400, 1000, -np.pi/2, QColor(0x00FFFF), is_player=False)])  #is_play flags the robots which should be controlled manually
-
         self.createRobotThreads()
         # Create a timer to control the robot movement
         self.timer = QBasicTimer()
@@ -127,10 +175,10 @@ class Arena(QFrame):
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
-        self.ArenaLayout = textToTiles("castlelayout.txt")
+        self.ArenaLayout = textToTiles(self.arena_map)
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
-                if y - 1 > 0:
+                if y - 1 >= 0:
                     left = self.ArenaLayout[x, y - 1]
                 else:
                     left = tiles.Tile()
@@ -138,7 +186,7 @@ class Arena(QFrame):
                     right = self.ArenaLayout[x, y + 1]
                 else:
                     right = tiles.Tile()
-                if x - 1 > 0:
+                if x - 1 >= 0:
                     up = self.ArenaLayout[x - 1, y]
                 else:
                     up = tiles.Tile()
@@ -151,8 +199,10 @@ class Arena(QFrame):
 
 
     def createRobotThreads(self):
+        self.robotThreads = []
+
         for robot in self.pawns:
-            is_player = robot.is_player
+            is_player = robot.player_number <= self.player_numbers
             thread = threads.RobotThread(robot, self, is_player)
             thread.positionChanged.connect(self.updateRobotPosition)
             self.robotThreads.append(thread)
@@ -259,7 +309,7 @@ class Arena(QFrame):
     
     def getTileAtPos(self, x, y):
         x = (x//Arena.TileWidth)
-        y = ((y - 240)//Arena.TileHeight)
+        y = (y//Arena.TileHeight)
         if x < 0:
             x = 0
         if x >= Arena.ArenaWidth:
@@ -269,7 +319,12 @@ class Arena(QFrame):
         if y >= Arena.ArenaHeight:
             y = Arena.ArenaHeight - 1
         return self.ArenaLayout[int(y), int(x)]
-
+    
+    def chooseMap(self):
+        if self.arena_number == 1:
+            self.arena_map = "castlelayout.txt"
+        else:
+            self.arena_map = "testlayout.txt"
 
     def shootBullet(self):
         robot = self.pawns[0]
@@ -314,8 +369,7 @@ class Arena(QFrame):
         return (
             0 <= bullet.x <= self.ArenaWidth * self.TileWidth and
             0 <= bullet.y <= self.ArenaHeight * self.TileHeight
-        )
-
+        )       
 
 
 def main():
