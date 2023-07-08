@@ -25,10 +25,7 @@ class Robot():
         'Collateral': 0, #increases done damage
         'Speedup': 0 #increases speed
     }
-    #temporary
-    target_x = 0
-    target_y = 0
-    targetColor = QColor(0xFFFFFF)
+    #status effects
     delayApplyEffect = 10
     delayRemoveEffect = 5
     delayAccelerate = 1
@@ -46,6 +43,11 @@ class Robot():
     cdHealing = 0
     #damage
     weapon = bullets.Weapon()
+    #pathing
+    path = []
+    target_x = 0
+    target_y = 0
+    targetColor = QColor(0xFFFFFF)
 
     def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
 

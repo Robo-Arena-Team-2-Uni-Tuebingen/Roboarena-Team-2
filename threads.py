@@ -141,6 +141,16 @@ class RobotThread(QThread):
             offset_y = random.randint(0, 59)
             if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
                 valid_tile = True
+        
+        # replace with function eventually
+        current_x = self.robot.xpos//self.tile_width
+        current_y = self.robot.ypos//self.tile_height
+        path = self.arena.getShortestPath((current_x, current_y), (offset_x, offset_y))
+        self.robot.path = path
+
+        if len(path) > 0:
+            target_x, target_y = path[0]
+            path.remove(0)
 
         # Calculate the target position based on the new tile indices
         target_x = offset_x * self.tile_width + self.tile_width // 2

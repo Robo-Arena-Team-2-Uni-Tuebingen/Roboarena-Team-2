@@ -9,6 +9,7 @@ from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
 from game_menu import GameMenu
+import networkx as nx
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
@@ -173,27 +174,67 @@ class Arena(QFrame):
     def initArena(self):
         # set default arena saved in .txt file "layout1"
         self.ArenaLayout = textToTiles(self.arena_map)
+        G = self.G
+        for x in range(self.ArenaWidth):
+            for y in range(self.ArenaHeight):
+                if not self.ArenaLayout[x, y].isImpassable:
+                    G.add_node((x, y))
+        
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 >= 0:
-                    left = self.ArenaLayout[x, y - 1]
-                else:
-                    left = tiles.Tile()
-                if y + 1 < self.ArenaHeight:
-                    right = self.ArenaLayout[x, y + 1]
-                else:
-                    right = tiles.Tile()
-                if x - 1 >= 0:
-                    up = self.ArenaLayout[x - 1, y]
+                    up = self.ArenaLayout[x, y - 1]
+                    if not up.isImpassable:
+                        G.add_edge((x, y), (x, y - 1), {'weight': up.weight})
                 else:
                     up = tiles.Tile()
-                if x + 1 < self.ArenaWidth:
-                    down = self.ArenaLayout[x + 1, y]
+                if y + 1 < self.ArenaHeight:
+                    down = self.ArenaLayout[x, y + 1]
+                    if not down.isImpassable:
+                        G.add_edge((x, y), (x, y + 1), {'weight': down.weight})
                 else:
                     down = tiles.Tile()
+                if x - 1 >= 0:
+                    left = self.ArenaLayout[x - 1, y]
+                    if not left.isImpassable:
+                        G.add_edge((x, y), (x - 1, y), {'weight': left.weight})
+                else:
+                    left = tiles.Tile()
+                if x + 1 < self.ArenaWidth:
+                    right = self.ArenaLayout[x + 1, y]
+                    if not right.isImpassable:
+                        G.add_edge((x, y), (x + 1, y), {'weight': right.weight})
+                else:
+                    right = tiles.Tile()
+                if y - 1 >= 0 and x - 1 >= 0:
+                    upperleft = self.ArenaLayout[x - 1, y - 1]
+                    if not upperleft.isImpassable:
+                        G.add_edge((x, y), (x - 1, y - 1), {'weight': upperleft.weight})
+                else:
+                    upperleft = tiles.Tile()
+                if y - 1 >= 0 and x + 1 < self.ArenaWidth:
+                    upperright = self.Arenalayout[x + 1, y - 1]
+                    if not upperright.isImpassable:
+                        G.add_edge((x, y), (x + 1, y - 1), {'weight': upperright.weight})
+                else:
+                    upperright = tiles.Tile()
+                if y + 1 < self.ArenaHeight and x - 1 >= 0:
+                    lowerleft = self.ArenaLayout[x - 1, y + 1]
+                    if not up.isImpassable:
+                        G.add_edge((x, y), (x - 1, y - 1), {'weight': lowerleft.weight})
+                else:
+                    lowerleft = tiles.Tile()
+                if y + 1 < self.ArenaHeight and x + 1 < self.ArenaWidth:
+                    lowerright = self.ArenaLayout[x + 1, y + 1]
+                    if not lowerright.isImpassable:
+                        G.add_edge((x, y), (x + 1, y + 1), {'weight': lowerright.weight})
+                else:
+                    lowerright = tiles.Tile()
                 context = [up, down, left, right]
                 self.ArenaLayout[x, y].chooseTexture(context)
 
+    def getShortestPath(self, source, target):
+        return nx.shortest_path(self.G, source, target, 'weight', 'bellman-ford')[0]
 
     def createRobotThreads(self):
         self.robotThreads = []
