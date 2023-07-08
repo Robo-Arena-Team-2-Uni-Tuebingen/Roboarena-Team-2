@@ -149,6 +149,7 @@ class RobotThread(QThread):
         self.robot.path = path
 
         if len(path) > 0:
+            print(path)
             target_x, target_y = path[0]
             path.remove(0)
 

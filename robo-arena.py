@@ -166,6 +166,7 @@ class Arena(QFrame):
                                Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
+        self.G = nx.DiGraph()
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
@@ -185,49 +186,57 @@ class Arena(QFrame):
                 if y - 1 >= 0:
                     up = self.ArenaLayout[x, y - 1]
                     if not up.isImpassable:
-                        G.add_edge((x, y), (x, y - 1), {'weight': up.weight})
+                        G.add_edge((x, y), (x, y - 1))
+                        G[(x, y)][(x, y - 1)]['weight'] = up.weight
                 else:
                     up = tiles.Tile()
                 if y + 1 < self.ArenaHeight:
                     down = self.ArenaLayout[x, y + 1]
                     if not down.isImpassable:
-                        G.add_edge((x, y), (x, y + 1), {'weight': down.weight})
+                        G.add_edge((x, y), (x, y + 1))
+                        G[(x, y)][(x, y + 1)]['weight'] = down.weight
                 else:
                     down = tiles.Tile()
                 if x - 1 >= 0:
                     left = self.ArenaLayout[x - 1, y]
                     if not left.isImpassable:
-                        G.add_edge((x, y), (x - 1, y), {'weight': left.weight})
+                        G.add_edge((x, y), (x - 1, y))
+                        G[(x, y)][(x - 1, y)]['weight'] = left.weight
                 else:
                     left = tiles.Tile()
                 if x + 1 < self.ArenaWidth:
                     right = self.ArenaLayout[x + 1, y]
                     if not right.isImpassable:
-                        G.add_edge((x, y), (x + 1, y), {'weight': right.weight})
+                        G.add_edge((x, y), (x + 1, y))
+                        G[(x, y)][(x + 1, y)]['weight'] = right.weight
                 else:
                     right = tiles.Tile()
                 if y - 1 >= 0 and x - 1 >= 0:
                     upperleft = self.ArenaLayout[x - 1, y - 1]
                     if not upperleft.isImpassable:
-                        G.add_edge((x, y), (x - 1, y - 1), {'weight': upperleft.weight})
-                else:
-                    upperleft = tiles.Tile()
-                if y - 1 >= 0 and x + 1 < self.ArenaWidth:
-                    upperright = self.Arenalayout[x + 1, y - 1]
-                    if not upperright.isImpassable:
-                        G.add_edge((x, y), (x + 1, y - 1), {'weight': upperright.weight})
+                        G.add_edge((x, y), (x - 1, y - 1))
+                        G[(x, y)][(x - 1, y - 1)]['weight'] = upperleft.weight
                 else:
                     upperright = tiles.Tile()
-                if y + 1 < self.ArenaHeight and x - 1 >= 0:
-                    lowerleft = self.ArenaLayout[x - 1, y + 1]
-                    if not up.isImpassable:
-                        G.add_edge((x, y), (x - 1, y - 1), {'weight': lowerleft.weight})
+                if y - 1 >= 0 and x + 1 < self.ArenaWidth:
+                    upperright = self.ArenaLayout[x + 1, y - 1]
+                    if not upperright.isImpassable:
+                        G.add_edge((x, y), (x + 1, y - 1))
+                        G[(x, y)][(x + 1, y - 1)]['weight'] = upperright.weight
                 else:
                     lowerleft = tiles.Tile()
+                if y + 1 < self.ArenaHeight and x - 1 >= 0:
+                    lowerleft = self.ArenaLayout[x - 1, y + 1]
+                    if not lowerleft.isImpassable:
+                        G.add_edge((x, y), (x - 1, y + 1))
+                        G[(x, y)][(x - 1, y + 1)]['weight'] = lowerleft.weight
+                else:
+                    lowerright = tiles.Tile()
                 if y + 1 < self.ArenaHeight and x + 1 < self.ArenaWidth:
                     lowerright = self.ArenaLayout[x + 1, y + 1]
                     if not lowerright.isImpassable:
-                        G.add_edge((x, y), (x + 1, y + 1), {'weight': lowerright.weight})
+                        G.add_edge((x, y), (x + 1, y + 1))
+                        G[(x, y)][(x + 1, y + 1)]['weight'] = lowerright.weight
                 else:
                     lowerright = tiles.Tile()
                 context = [up, down, left, right]

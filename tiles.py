@@ -105,7 +105,7 @@ class WaterTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 50)
         self.hasEffect = True
-        self.weight = 5
+        self.weight = 15
     
     def chooseTexture(self, context):
         return self.texture
@@ -118,7 +118,7 @@ class GrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 10)
         self.hasEffect = True
-        self.weight = 1
+        self.weight = 11
     
     def chooseTexture(self, context):
         return self.texture
@@ -131,7 +131,7 @@ class HighGrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 30)
         self.hasEffect = True
-        self.weight = 3
+        self.weight = 13
 
 class DirtTile(Tile):
     str = 'd'
@@ -140,7 +140,7 @@ class DirtTile(Tile):
         self.texture = textureDirtTile
         self.isImpassable = False
         self.hasEffect = False
-        self.weight = 0
+        self.weight = 10
 
 
 class SandTile(Tile):
@@ -151,7 +151,7 @@ class SandTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 5)
         self.hasEffect = True
-        self.weight = 0
+        self.weight = 10
 
 class SnowTile(Tile):
     str = 'i'
@@ -161,7 +161,7 @@ class SnowTile(Tile):
         self.isImpassable = False
         self.effect = ('Freeze', 20)
         self.hasEffect = True
-        self.weight = 8
+        self.weight = 18
 
 class SlimeTile(Tile):
     str = 'v'
@@ -171,7 +171,7 @@ class SlimeTile(Tile):
         self.isImpassable = False
         self.effect = ('Corrosion', 50)
         self.hasEffect = True
-        self.weight = 20
+        self.weight = 30
 
 class FieldTile(Tile):
     str = 'f'
@@ -181,7 +181,7 @@ class FieldTile(Tile):
         self.isImpassable = False
         self.effect = ('Collateral', 50)
         self.hasEffect = True
-        self.weight = -10
+        self.weight = 0
 
 class CobbleStoneTile(Tile):
     str = 'c'
@@ -191,4 +191,4 @@ class CobbleStoneTile(Tile):
         self.isImpassable = False
         self.effect = ('Speedup', 50)
         self.hasEffect = True
-        self.weight = -5
+        self.weight = 5
