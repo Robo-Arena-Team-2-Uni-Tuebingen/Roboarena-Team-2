@@ -167,10 +167,16 @@ class Arena(QFrame):
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.G = nx.DiGraph()
+        self.validTiles = []
+        self.targetPlayer = (0, 0)
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
         self.createBulletsThread()
+
+    
+    def updateTargetPlayer(self, newTarget):
+        self.targetPlayer = newTarget
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
@@ -178,100 +184,75 @@ class Arena(QFrame):
         G = self.G
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
-                #if not self.ArenaLayout[x, y].isImpassable:
-                    #print(self.ArenaLayout[x, y].isImpassable)
                 G.add_node((x, y))
+                if not self.ArenaLayout[x, y].isImpassable:
+                    self.validTiles.append((x, y))
         
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 >= 0:
                     up = self.ArenaLayout[x, y - 1]
-                    #if not up.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x, y - 1))
                     G[(x, y)][(x, y - 1)]['weight'] = up.weight
-                        #print(up.isImpassable)
                 else:
                     up = tiles.Tile()
 
                 if y + 1 < self.ArenaHeight:
                     down = self.ArenaLayout[x, y + 1]
-                    #if not down.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x, y + 1))
                     G[(x, y)][(x, y + 1)]['weight'] = down.weight
-                        #print(down.isImpassable)
                 else:
                     down = tiles.Tile()
 
                 if x - 1 >= 0:
                     left = self.ArenaLayout[x - 1, y]
-                    #if not left.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x - 1, y))
                     G[(x, y)][(x - 1, y)]['weight'] = left.weight
-                        #print(left.isImpassable)
                 else:
                     left = tiles.Tile()
 
                 if x + 1 < self.ArenaWidth:
                     right = self.ArenaLayout[x + 1, y]
-                    #if not right.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x + 1, y))
                     G[(x, y)][(x + 1, y)]['weight'] = right.weight
-                        #print(right.isImpassable)
                 else:
                     right = tiles.Tile()
 
                 if y - 1 >= 0 and x - 1 >= 0:
                     upperleft = self.ArenaLayout[x - 1, y - 1]
-                    #if not upperleft.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x - 1, y - 1))
                     G[(x, y)][(x - 1, y - 1)]['weight'] = upperleft.weight
-                        #print(upperleft.isImpassable)
                 else:
                         upperleft = tiles.Tile()
 
                 if y - 1 >= 0 and x + 1 < self.ArenaWidth:
                     upperright = self.ArenaLayout[x + 1, y - 1]
-                    #if not upperright.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x + 1, y - 1))
                     G[(x, y)][(x + 1, y - 1)]['weight'] = upperright.weight
-                        #print(upperright.isImpassable)
                 else:
                     upperright = tiles.Tile()
 
                 if y + 1 < self.ArenaHeight and x - 1 >= 0:
                     lowerleft = self.ArenaLayout[x - 1, y + 1]
-                    #if not lowerleft.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x - 1, y + 1))
                     G[(x, y)][(x - 1, y + 1)]['weight'] = lowerleft.weight
-                        #print(lowerleft.isImpassable)
                 else:
                     lowerleft = tiles.Tile()
 
                 if y + 1 < self.ArenaHeight and x + 1 < self.ArenaWidth:
                     lowerright = self.ArenaLayout[x + 1, y + 1]
-                    #if not lowerright.isImpassable and not self.ArenaLayout[x, y].isImpassable:
                     G.add_edge((x, y), (x + 1, y + 1))
                     G[(x, y)][(x + 1, y + 1)]['weight'] = lowerright.weight
-                        #print(lowerright.isImpassable)
                 else:
                     lowerright = tiles.Tile()
-                
-                if(self.hasNode((x, y)) and self.ArenaLayout[x,y].isImpassable):
-                    print((x, y))
-                #print(G)
 
                 context = [left, right, up, down]
                 self.ArenaLayout[x, y].chooseTexture(context)
-        #print(self.hasNode((24, 30)))
-        #print(self.ArenaLayout[55, 49])
-        #print(self.hasNode((50, 12)))
-        #print(self.ArenaLayout[50, 12])
-        #print(self.hasNode((18, 22)))
-        #print(self.ArenaLayout[18, 22])
+
+    def getRandomValidTile(self):
+        return self.validTiles[np.random.choice(len(self.validTiles))]
 
     def getShortestPath(self, source, target):
-        #print(source)
-        #print(target)
         return nx.bidirectional_dijkstra(self.G, source, target, 'weight')[1]
     
     def hasNode(self, node):

@@ -97,7 +97,7 @@ class RobotThread(QThread):
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
         elif collision and not self.is_player:
-            self.generateNewTargetPosition()
+            self.generateNewPath()
             self.robot.getAlpha(self.target_x, self.target_y)
 
         # Check if the robot has reached the target position
@@ -116,7 +116,8 @@ class RobotThread(QThread):
 
             self.robot.target_x = self.target_x
             self.robot.target_y = self.target_y
-
+            
+            self.arena.updateTargetPlayer((self.target_x//self.tile_width, self.target_y//self.tile_height))
             return True
 
         return False
@@ -133,32 +134,25 @@ class RobotThread(QThread):
         self.is_paused = True
 
     
-    def generateNewTargetPosition(self):
+    def generateNewPath(self):
         # temporary until better behaviour for robots is implemented
         # Generate random offsets to determine the neighboring tile
         valid_tile = False
         current_x = self.robot.xpos//self.tile_width
         current_y = self.robot.ypos//self.tile_height
-        if self.robot.player_number == 2:
-            print(current_x)
-            print(current_y)
-        while not valid_tile:
-            offset_x = random.randint(max(current_x - 10, 0), min(current_x + 10, 59))
-            offset_y = random.randint(max(current_y - 10, 0), min(current_y + 10, 59))
-            if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
-                valid_tile = True
+        #choose random
+        #goal_x, goal_y = self.arena.getRandomValidTile()
+        #follow player targets
+        goal_x, goal_y = self.arena.targetPlayer
         
         # replace with function eventually
         
         #print((current_x, current_y))
         #print((offset_x, offset_y))
-        self.path = self.arena.getShortestPath((current_x, current_y), (offset_x, offset_y))
+        self.path = self.arena.getShortestPath((current_x, current_y), (goal_x, goal_y))
         self.robot.path = self.path
 
         if len(self.path) > 0:
-            if self.robot.player_number == 2:
-                print(self.path)
-                print(self.path[0])
             target_x, target_y = self.path[0]
             self.path = self.path[1:]
 
@@ -171,24 +165,19 @@ class RobotThread(QThread):
 
         self.robot.target_x = self.target_x
         self.robot.target_y = self.target_y
-        if self.robot.player_number == 2:
-            print(target_x)
-            print(target_y)
 
     def advancePath(self):
         if len(self.path) > 0:
-            if self.robot.player_number == 2:
-                print(self.path[0])
+
             target_x, target_y = self.path[0]
             self.path = self.path[1:]
+
             target_x = target_x * self.tile_width + self.tile_width // 2
             target_y = target_y * self.tile_height + self.tile_height // 2
             target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
             target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
-            if self.robot.player_number == 2:
-                print(target_x)
-                print(target_y)
+
             return (target_x, target_y)
         else:
-            self.generateNewTargetPosition()
-            return (self.target_x, self.target_y)
+            self.generateNewPath()
+            return (self.robot.xpos, self.robot.ypos)
