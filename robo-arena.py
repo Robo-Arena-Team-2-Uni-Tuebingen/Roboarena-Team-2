@@ -3,7 +3,7 @@ from PyQt5 import QtGui
 import numpy as np
 import sys
 from robot import Robot
-from bullets import Bullet
+import bullets
 import tiles
 from ascii_layout import textToTiles
 import threads
@@ -74,8 +74,6 @@ class RoboArena(QMainWindow):
 
         if event.key() == Qt.Key_Escape:
             self.toggle_pause()
-        elif event.key() == Qt.Key_Space:
-            self.rarena.shootBullet()
 
     def keyReleaseEvent(self, event):
         if self.game_running:
@@ -97,7 +95,9 @@ class RoboArena(QMainWindow):
         if self.game_running:
             if self.pause_visible:
                 self.pause.hide()
+                self.rarena.unpause()
             else:
+                self.rarena.pause()
                 self.pause.show()
             
             self.pause_visible = not self.pause_visible
@@ -168,10 +168,7 @@ class Arena(QFrame):
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
-        # Create a timer to control the robot movement
-        self.timer = QBasicTimer()
-        self.timer.start(30, self)  # Timer interval and object to call
-        self.bullets = []  # Create an empty list for bullets
+        self.createBulletsThread()
 
     def initArena(self):
         # set default arena saved in .txt file "layout1"
@@ -208,6 +205,13 @@ class Arena(QFrame):
             self.robotThreads.append(thread)
             thread.start()
 
+    def createBulletsThread(self):
+        self.bulletsThread = bullets.BulletThread(self)
+        self.bulletsThread.start()
+
+    def passBulletsToThread(self, bullet):
+        self.bulletsThread.addBullet(bullet)
+
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
         self.update()
@@ -237,7 +241,7 @@ class Arena(QFrame):
             self.drawHealthBars(painter, robot)
 
         # Draw bullets
-        for bullet in self.bullets:
+        for bullet in self.bulletsThread.getBullets():
             self.drawBullet(painter, bullet)
 
 
@@ -326,51 +330,15 @@ class Arena(QFrame):
         else:
             self.arena_map = "testlayout.txt"
 
-    def shootBullet(self):
-        robot = self.pawns[0]
-        bullet_radius = 10
-        bullet_speed = 5
-        bullet_x = (robot.xpos - robot.radius) + robot.radius*np.cos(-robot.alpha) 
-        bullet_y = (robot.ypos - robot.radius) + robot.radius*np.sin(-robot.alpha)
-        bullet = Bullet(bullet_x, bullet_y, robot.alpha, bullet_radius, bullet_speed)
-        self.bullets.append(bullet)
+    def unpause(self):
+        for thread in self.robotThreads:
+            thread.unpauseRobots()
+        self.bulletsThread.unpauseBullets()
 
-
-    def timerEvent(self, event):
-        # Move bullets
-        bullets_to_remove = []
-        for bullet in self.bullets:
-            bullet.move()
-
-            # Check collision with robots
-            for robot in self.pawns:
-                if self.checkBulletCollision(robot, bullet):
-                    # Apply damage to the robot
-                    robot.health -= 10
-                    bullets_to_remove.append(bullet)
-                    break
-
-            # Check collision with arena boundaries
-            if not self.isBulletInsideArena(bullet):
-                bullets_to_remove.append(bullet)
-
-        # Remove bullets outside the arena or hitting a robot
-        for bullet in bullets_to_remove:
-            self.bullets.remove(bullet)
-
-        # Update the widget to reflect the changes
-        self.update()
-
-    def checkBulletCollision(self, robot, bullet):
-        distance_squared = (robot.xpos - bullet.x - robot.radius)**2 + (robot.ypos - bullet.y - robot.radius)**2
-        return distance_squared <= (robot.radius + bullet.radius)**2
-
-    def isBulletInsideArena(self, bullet):
-        return (
-            0 <= bullet.x <= self.ArenaWidth * self.TileWidth and
-            0 <= bullet.y <= self.ArenaHeight * self.TileHeight
-        )       
-
+    def pause(self):
+        for thread in self.robotThreads:
+            thread.pauseRobots()
+        self.bulletsThread.pauseBullets()
 
 def main():
 

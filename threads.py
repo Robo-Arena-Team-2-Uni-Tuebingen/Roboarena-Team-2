@@ -61,17 +61,12 @@ class RobotThread(QThread):
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
 
+            if eventDict[Qt.Key_Space]:
+                shot, bullet = self.robot.shoot()
+                if shot:
+                    self.arena.passBulletsToThread(bullet)
+
             self.setTarget(deltaTargetx, deltaTargety)
-
-        if eventDict[Qt.Key_Escape]:
-            
-            if self.is_paused:
-                self.unpauseRobots()
-
-            else: 
-                self.pauseRobots()
-
-        
 
     def processMouseEvent(self, x, y, pressedMouseButtons):
         self.Mouse_x = x

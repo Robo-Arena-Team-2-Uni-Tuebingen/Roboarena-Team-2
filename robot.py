@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import bullets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor
 
@@ -43,6 +44,8 @@ class Robot():
     delayHealing = 1
     cdDamage = 0
     cdHealing = 0
+    #damage
+    weapon = bullets.Weapon()
 
     def __init__(self, xpos, ypos, alpha, color, player_number):
 
@@ -110,3 +113,6 @@ class Robot():
             else:
                self.health = 100
             self.cdHealing = time.time() + self.delayHealing
+
+    def shoot(self):
+        return self.weapon.shoot(self.xpos, self.ypos, self.radius, self.alpha)
