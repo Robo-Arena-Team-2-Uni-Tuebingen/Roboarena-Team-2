@@ -11,12 +11,12 @@ class Robot():
     #the size of the robot in px
     radius = 30
     #maximum accelerations
-    a           = 2
-    a_alpha     = 2
-    A_max       = 100
-    A_alpha_max = 100
-    v           = 2
-    v_alpha     = 2
+    acceleration    = 2
+    a_alpha         = 2
+    speed_max       = 100
+    A_alpha_max     = 100
+    speed           = 2
+    v_alpha         = 2
     #effects
     appliedEffects = {
         'Slow': 0, #slows the robot
@@ -40,14 +40,14 @@ class Robot():
     #health
     maxHealth = 100
     health = 100
-    delayDamage = 1
+    delayDamage = 0.1
     delayHealing = 1
     cdDamage = 0
     cdHealing = 0
     #damage
     weapon = bullets.Weapon()
 
-    def __init__(self, xpos, ypos, alpha, color, player_number):
+    def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
 
         self.player_number  = player_number
         self.xpos       = xpos
@@ -55,9 +55,10 @@ class Robot():
         #angle the robot in degrees
         self.alpha      = alpha - 180
         self.color      = color
+        self.weapon     = weapon
 
 
-    #this function is supposed to get the angle from the robot to a specific point relative to the x-axis
+    #this function is supposed to get the angle from the robot to acceleration specific point relative to the x-axis
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
@@ -82,19 +83,19 @@ class Robot():
             self.cdRemoveEffect = time.time() + self.delayRemoveEffect
 
     def accelerate(self):
-        if self.v + self.a <= self.A_max and time.time() > self.cdAccelerate:
-            self.v += self.a
+        if self.speed + self.acceleration <= self.speed_max and time.time() > self.cdAccelerate:
+            self.speed += self.acceleration
             self.cdAccelerate = time.time() + self.delayAccelerate
 
     def deccelerate(self):
-        if self.v - self.a >= 0 and time.time() > self.cdDeccelerate:
-            self.v -= self.a
+        if self.speed - self.acceleration >= 0 and time.time() > self.cdDeccelerate:
+            self.speed -= self.acceleration
             self.cdDeccelerate = time.time() + self.delayDeccelerate
 
 
     #applies up to 50% Slow/Speedup based on the stack count of "Slow"
     def getV(self):
-        return self.v*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
+        return self.speed*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
     def collidesWithBullet(self, bullet):
         distance_squared = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
@@ -115,4 +116,4 @@ class Robot():
             self.cdHealing = time.time() + self.delayHealing
 
     def shoot(self):
-        return self.weapon.shoot(self.xpos, self.ypos, self.radius, self.alpha)
+        return self.weapon.shoot(self.xpos, self.ypos, self.radius, self.alpha, self.speed)

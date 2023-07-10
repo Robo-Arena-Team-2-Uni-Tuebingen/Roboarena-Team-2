@@ -159,7 +159,7 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1),
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.MachineGun()),
                                Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
                                Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
                                Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
@@ -327,6 +327,8 @@ class Arena(QFrame):
     def chooseMap(self):
         if self.arena_number == 1:
             self.arena_map = "castlelayout.txt"
+        elif self.arena_number == 2:
+            self.arena_map = "weapontestlayout.txt"
         else:
             self.arena_map = "testlayout.txt"
 

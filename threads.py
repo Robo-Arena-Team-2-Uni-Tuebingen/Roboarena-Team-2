@@ -30,11 +30,12 @@ class RobotThread(QThread):
         while True:
             if not self.is_paused:
                 self.moveRobotSmoothly()
-            self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
-            currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
-            if currentTile.hasEffect:
-                self.robot.applyEffect(currentTile.effect)
-            self.robot.tickDownEffects()
+                self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+                currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
+                if currentTile.hasEffect:
+                    self.robot.applyEffect(currentTile.effect)
+                self.robot.tickDownEffects()
+                
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
 
@@ -61,10 +62,11 @@ class RobotThread(QThread):
             if eventDict[Qt.Key_Q]:
                 self.robot.deccelerate()
 
-            if eventDict[Qt.Key_Space]:
+            if eventDict[Qt.Key_Space]:  
                 shot, bullet = self.robot.shoot()
                 if shot:
                     self.arena.passBulletsToThread(bullet)
+
 
             self.setTarget(deltaTargetx, deltaTargety)
 
