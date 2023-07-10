@@ -254,6 +254,7 @@ class Arena(QFrame):
 
     def getShortestPath(self, source, target):
         return nx.bidirectional_dijkstra(self.G, source, target, 'weight')[1]
+        #return nx.shortest_path(self.G, source, target, 'weight', 'bellman-ford')
     
     def hasNode(self, node):
         return self.G.has_node(node)
@@ -278,10 +279,6 @@ class Arena(QFrame):
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
         self.update()
-
-    #method that returns a random tile
-    def randomTile(self):
-        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStoneTile, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
 
     # paint all tiles of the arena
     def paintEvent(self, event):

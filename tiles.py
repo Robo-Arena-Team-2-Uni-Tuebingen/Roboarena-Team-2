@@ -36,7 +36,7 @@ class Tile():
         self.effect = ('', 0)
         self.isImpassable = False
         self.hasEffect = False
-        self.weight = 0
+        self.weight = 999999999
 
     def compare(self, contextTile):
         if contextTile.str == self.str:
@@ -92,7 +92,7 @@ class WallTile(Tile):
         self.texture = textureWallTile
         self.isImpassable = True
         self.hasEffect = False
-        self.weight = np.inf
+        self.weight = 999999999
     
     def chooseTexture(self, context):
         return self.texture
@@ -181,7 +181,7 @@ class FieldTile(Tile):
         self.isImpassable = False
         self.effect = ('Collateral', 50)
         self.hasEffect = True
-        self.weight = 0
+        self.weight = 5
 
 class CobbleStoneTile(Tile):
     str = 'c'
@@ -191,4 +191,4 @@ class CobbleStoneTile(Tile):
         self.isImpassable = False
         self.effect = ('Speedup', 50)
         self.hasEffect = True
-        self.weight = 5
+        self.weight = 8
