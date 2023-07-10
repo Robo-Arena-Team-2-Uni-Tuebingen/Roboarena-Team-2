@@ -63,8 +63,6 @@ class RobotThread(QThread):
 
             if eventDict[Qt.Key_Space]:
                 shot, bullet = self.robot.shoot()
-                print(shot)
-                print(bullet)
                 if shot:
                     self.arena.passBulletsToThread(bullet)
 
