@@ -1,6 +1,7 @@
 import typing
 import numpy as np
 import time
+import random
 from PyQt5.QtCore import QObject, QThread
 
 class Bullet:
@@ -67,33 +68,98 @@ class BulletThread(QThread):
     def getBullets(self):
         return self.bullets
 
-#abstract weapon class
+#weapon class, basically a pistol
 class Weapon:
-    def __init__(self) -> None:
-        self.type = 'projectile'    #attribute to indicate the type of projectile in case of further expansion
-        self.damage = 5             #damage of one projectile
-        self.radius = 2             #size of one projectile
-        self.speed = 5              #speed of one projectile
-        self.cycle = 0.05           #how fast projectiles can be fired (here one per 50ms)
-        self.cdcycle = 0            #cooldown on the cycle time
-        self.mag = 10               #magazine capacity
-        self.magMax = 10            #maximum magazine capacity
-        self.reload = 2             #how fast the magazine can be reloaded (here 2 seconds)
-        self.cdreload = 0           #cooldown on the reload time
+    type = ''                           
+    damage = 0                      #needs to be defined for each weapon
+    radius = 0                      #needs to be defined for each weapon
+    speed = 0                       #needs to be defined for each weapon
+    cycle = 0                       #needs to be defined for each weapon
+    cdcycle = 0
+    mag = 0                         #needs to be defined for each weapon
+    magMax = 0                      #needs to be defined for each weapon
+    reload = 0                      #needs to be defined for each weapon
+    cdreload = 0
+    recoil = 0                      #needs to be defined for each weapon
+    consecutive_shot_factor = 0     #needs to be defined for each weapon
+    speed_factor = 0                #needs to be defined for each weapon
+    last_shot = 0
+    consecutive_shots = 0  
+    recoil_duration = 0             #needs to be defined for each weapon
 
-    def shoot(self, x, y, radius, alpha):
+    def __init__(self) -> None:
+        self.type = 'projectile'                #attribute to indicate the type of projectile in case of further expansion, might be implemented as interface
+        self.damage = 5                         #damage of one projectile
+        self.radius = 2                         #size of one projectile
+        self.speed = 5                          #speed of one projectile
+        self.cycle = 0.2                        #how fast projectiles can be fired (here one per 50ms)
+        self.cdcycle = 0                        #cooldown on the cycle time
+        self.mag = 10                           #magazine capacity
+        self.magMax = 10                        #maximum magazine capacity
+        self.reload = 2                         #how fast the magazine can be reloaded (here 2 seconds)
+        self.cdreload = 0                       #cooldown on the reload time
+        self.recoil = 2                         #recoil as percentage of pi
+        self.consecutive_shot_factor = 0.08     #increase in recoil/spread when weapon keeps shooting
+        self.speed_factor = 0.02                #increase in recoil/spread when moving
+        self.last_shot = 0                      #time of the last shot
+        self.consecutive_shots = 0              #number of consecutive shots
+        self.recoil_duration = 0.2              #duration of the recoil effecting the weapon (together with cycle time)
+
+    def shoot(self, x, y, radius, alpha, speed):
         t = time.time()
         if self.cdreload < t and self.cdcycle < t:
             if self.mag > 0:
+                if self.last_shot + self.cycle + self.recoil_duration > t:
+                    if self.consecutive_shots < 10:
+                        self.consecutive_shots = self.consecutive_shots + 1
+                else:
+                    if self.consecutive_shots - 2 >= 0:
+                        self.consecutive_shots = self.consecutive_shots - 2
+
                 bullet_radius = self.radius
                 bullet_speed = self.speed
+
                 bullet_x = (x - radius) + radius*np.cos(-alpha) 
                 bullet_y = (y - radius) + radius*np.sin(-alpha)
-                bullet = Bullet(bullet_x, bullet_y, alpha, bullet_radius, bullet_speed, self.damage)
+
+                bullet_recoil = (self.consecutive_shot_factor * self.consecutive_shots + speed**2*self.speed_factor + self.recoil)*np.pi/100
+                bullet_alpha = alpha + random.uniform(-bullet_recoil, bullet_recoil)
+
+                bullet = Bullet(bullet_x, bullet_y, bullet_alpha, bullet_radius, bullet_speed, self.damage)
+
                 self.mag = self.mag - 1
                 self.cdcycle = t + self.cycle
+                self.last_shot = t
                 return True, bullet
             else:
                 self.mag = self.magMax
                 self.cdreload = t + self.reload
         return False, 0
+    
+class Revolver(Weapon):
+    def __init__(self) -> None:
+        self.damage = 10
+        self.radius = 4
+        self.speed = 8
+        self.cycle = 0.75
+        self.mag = 6
+        self.magMax = 6
+        self.reload = 6
+        self.recoil = 5
+        self.consecutive_shot_factor = 0.5
+        self.speed_factor = 0.03
+        self.recoil_duration = 0.3
+
+class MachineGun(Weapon):
+    def __init__(self) -> None:
+        self.damage = 5
+        self.radius = 2
+        self.speed = 10
+        self.cycle = 0.02
+        self.mag = 50
+        self.magMax = 50
+        self.reload = 20
+        self.recoil = 3
+        self.consecutive_shot_factor = 0.75
+        self.speed_factor = 0.04
+        self.recoil_duration = 0.1
