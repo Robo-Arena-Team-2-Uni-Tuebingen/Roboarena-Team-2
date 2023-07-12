@@ -112,7 +112,7 @@ class RobotThread(QThread):
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
         elif collision and not self.is_player:
-            path = self.generateNewPath()
+            path = self.generateNewPath(random=True)
             target_x, target_y = self.assignTargets(*path[0])
             self.target_x = target_x
             self.target_y = target_y
@@ -149,15 +149,16 @@ class RobotThread(QThread):
         self.is_paused = True
 
     
-    def generateNewPath(self):
+    def generateNewPath(self, random=False):
         # temporary until better behaviour for robots is implemented
         # Generate random offsets to determine the neighboring tile
         current_x = (self.robot.xpos - self.robot.radius)//self.tile_width
         current_y = (self.robot.ypos - self.robot.radius)//self.tile_height
-        #choose random
-        #goal_x, goal_y = self.arena.getRandomValidTile()
-        #follow player targets
-        goal_x, goal_y = self.arena.targetPlayer
+        
+        if random:
+            goal_x, goal_y = self.arena.getRandomValidTile()
+        else: #follow player targets
+            goal_x, goal_y = self.arena.targetPlayer
         
         path = self.arena.getShortestPath((current_x, current_y), (goal_x, goal_y))
         self.robot.path = path
