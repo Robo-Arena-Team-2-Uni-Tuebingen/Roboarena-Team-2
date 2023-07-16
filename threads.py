@@ -27,7 +27,7 @@ class RobotThread(QThread):
        
     
     def run(self):
-        while True:
+        while not self.robot.isRobotDead():
             if not self.is_paused:
                 self.moveRobotSmoothly()
                 self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
@@ -38,6 +38,7 @@ class RobotThread(QThread):
                 
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
+        self.arena.removeRobot(self.robot)
 
 
     def processKeyEvent(self, eventDict):

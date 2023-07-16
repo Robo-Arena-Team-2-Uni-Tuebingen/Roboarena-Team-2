@@ -119,9 +119,10 @@ class Weapon:
                 bullet_radius = self.radius
                 bullet_speed = self.speed
 
-                bullet_x = (x - radius) + radius*np.cos(-alpha) 
+                bullet_x = (x - radius) + radius*np.cos(-alpha)
                 bullet_y = (y - radius) + radius*np.sin(-alpha)
 
+                #calculates recoil
                 bullet_recoil = (self.consecutive_shot_factor * self.consecutive_shots + speed**2*self.speed_factor + self.recoil)*np.pi/100
                 bullet_alpha = alpha + random.uniform(-bullet_recoil, bullet_recoil)
 

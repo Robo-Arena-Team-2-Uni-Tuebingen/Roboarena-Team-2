@@ -205,6 +205,9 @@ class Arena(QFrame):
             self.robotThreads.append(thread)
             thread.start()
 
+    def removeRobot(self, robot):
+        self.pawns = np.delete(self.pawns, np.where(self.pawns == robot))
+
     def createBulletsThread(self):
         self.bulletsThread = bullets.BulletThread(self)
         self.bulletsThread.start()
