@@ -39,6 +39,7 @@ class RobotThread(QThread):
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
         self.arena.removeRobot(self.robot)
+        self.arena.spawnRobot()
 
 
     def processKeyEvent(self, eventDict):

@@ -30,6 +30,7 @@ class BulletThread(QThread):
 
     def run(self) -> None:
         while True:
+            self.pawns = self.arena.pawns
             if not self.is_paused:
                 for bullet in self.bullets.copy():
                     bullet.move()

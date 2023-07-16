@@ -159,7 +159,7 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.MachineGun()),
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.Weapon()),
                                Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
                                Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
                                Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
@@ -200,13 +200,26 @@ class Arena(QFrame):
 
         for robot in self.pawns:
             is_player = robot.player_number <= self.player_numbers
-            thread = threads.RobotThread(robot, self, is_player)
-            thread.positionChanged.connect(self.updateRobotPosition)
-            self.robotThreads.append(thread)
-            thread.start()
+            self.appendRobotThread(robot, is_player)
 
     def removeRobot(self, robot):
         self.pawns = np.delete(self.pawns, np.where(self.pawns == robot))
+
+    def addRobot(self, robot):
+        self.pawns = np.append(self.pawns, robot)
+        self.appendRobotThread(robot)
+    
+    def appendRobotThread(self, robot, is_player=False):
+        thread = threads.RobotThread(robot, self, is_player)
+        thread.positionChanged.connect(self.updateRobotPosition)
+        self.robotThreads.append(thread)
+        thread.start()
+
+    def spawnRobot(self):
+        #placeholder
+        color = tuple(np.random.choice(range(256), size=3))
+        robot = Robot(500, 500, random.random()*np.pi*2, QColor(*color), player_number=5, weapon=bullets.MachineGun())
+        self.addRobot(robot)
 
     def createBulletsThread(self):
         self.bulletsThread = bullets.BulletThread(self)
