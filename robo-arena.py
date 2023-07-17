@@ -7,6 +7,7 @@ import bullets
 import tiles
 from ascii_layout import textToTiles
 import threads
+import time
 from pause_menu import PauseMenu
 from game_menu import GameMenu
 from music_player import MusicPlayer 
@@ -175,6 +176,15 @@ class Arena(QFrame):
                                Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
+        self.points = 0
+        self.victorycondition = 1 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
+        self.time = time.time()
+        self.currentTime = time.time()
+        self.kills = 0
+        self.player_lives = 3 # can be varied
+        self.PointsToWin = 1000 # can be varied
+        self.SecondsToWin = 300 # can be varied
+        self.KillsToWin = 20 # can be varied
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
@@ -241,6 +251,46 @@ class Arena(QFrame):
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
         self.update()
+
+    def updatePointCounter(self, points):
+        self.points = self.points + points
+        if self.victorycondition == 1:
+            if self.points > self.PointsToWin:
+                self.win()
+
+    def updateTime(self):
+        self.currentTime = time.time()
+        if self.victorycondition == 2:
+            if self.time + self.SecondsToWin < self.currentTime:
+                self.win() 
+    
+    def updateKillCounter(self):
+        self.kills = self.kills + 1
+        if self.victorycondition == 3:
+            if self.KillsToWin < self.kills:
+                self.win()
+    
+    def respawnPlayer(self):
+        self.player_lives = self.player_lives - 1
+        if self.player_lives > 0:
+            robot = Robot(200, 200, 0, QColor(0xFF0000), player_number=1, weapon=bullets.Weapon())
+            self.addRobot(robot)
+        else:
+            self.lose()
+
+    def win(self):
+        #Placeholder, replace with screen later
+        print("You have won")
+        print("Kills: " & self.kills.__str__())
+        print("After " & (self.currentTime - self.time).__str__() & " seconds")
+        print("Points: " & self.points.__str__())
+
+    def lose(self):
+        #Placeholder, replace with screen later
+        print("You have lost")
+        print("Kills: " & self.kills.__str__())
+        print("After " & (self.currentTime - self.time).__str__() & " seconds")
+        print("Points: " & self.points.__str__())
 
     #method that returns a random tile
     def randomTile(self):

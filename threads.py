@@ -38,8 +38,12 @@ class RobotThread(QThread):
                 
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
-        self.arena.removeRobot(self.robot)
-        self.arena.spawnRobot()
+        if not self.is_player:
+            self.arena.removeRobot(self.robot)
+            self.arena.spawnRobot()
+            self.arena.spawnRobot()
+        else:
+            self.arena.respawnPlayer()
 
 
     def processKeyEvent(self, eventDict):
