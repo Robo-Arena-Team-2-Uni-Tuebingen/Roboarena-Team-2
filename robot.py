@@ -44,6 +44,7 @@ class Robot():
     delayHealing = 1
     cdDamage = 0
     cdHealing = 0
+    is_dead = False
     #damage
     weapon = bullets.Weapon()
 
@@ -106,6 +107,8 @@ class Robot():
         if time.time() > self.cdDamage:
             self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
             self.cdDamage = time.time() + self.delayDamage
+            if self.health <= 0:
+                self.is_dead = True
 
     def applyHealing(self, healing):
         if time.time() > self.cdHealing:
@@ -117,3 +120,6 @@ class Robot():
 
     def shoot(self):
         return self.weapon.shoot(self.xpos, self.ypos, self.radius, self.alpha, self.speed)
+    
+    def isRobotDead(self):
+        return self.is_dead
