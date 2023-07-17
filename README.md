@@ -556,3 +556,69 @@ Still undefined:
 - returning to the main menu to the game is now connected to the "Quit"-Button of the pause menu, so you can choose a different map without restarting the whole application
 
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/b83c1718-b654-4b08-8d0b-704c0ea53415)
+
+
+### Sprint 7 (04.07.2023 - 018.07.2023)
+
+#### Pathfinding (by Julian Häberle)
+- implemented rudimentary pathfinding using the networkx library
+- not fully functional as of now, still has major problems and will need to refactored/fixed at a later point
+- works with a djikstra algorithm, using weighted edges
+- weight of edges is determined by the tile they lead to, the weight leading to a standard tile without a status effect is 10, for tiles with benefitial status effects it's lower, for those with detrimental status effects it's lower
+- intended was to deliver a mechanic that allows the AI robots to path through the map without incurring too much negativ status effects and to make their paths a bit predictable (i.E. the robot is much more likely to go over a field of cobblestone tiles then through a field of water tiles right next to it)
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/74cfb3b4-3620-467b-89a8-996979ebe679)
+- the ´initArena´ function has been expanded to first add tuples of coordinates as nodes to a graph and afterwards to initialize the edges between the nodes
+- every tile in this sense is connected to the 8 tiles it surrounds
+- it doesn't matter whether the tile is impassable or not, impassable tiles merely have a weight 9999, which should (in theory) exceed the weight of the longest shortest path
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/7cf4fafc-6981-4d80-979d-d3be9679caf2)
+- paths are either generated to intercept the players movement or to a random valid tile (a tile that is not impassable) of the arena
+- robots will generate a random path if they collide with something, one of the major problems that I have not been able to get rid off yet
+
+- apart from this most changes are either helper functions or minor changes to existing functions that are not overly important
+
+#### Expanded Bulletsystem and Weapons (by Julian Häberle)
+- this is based off the bulletsystem Tom implemented in the last sprint
+- first I refactored the old system by extracting it from the Arena class and putting it into it's own thread
+- When a bullet is fired, it's passed from the thread of the robot who fired it, into Arena and from Arena into the bulletThread
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/a5410213-4972-4aa1-becb-78f13bd25f22)
+- the bulletthread iterates over a copy of the bullet list, and discards bullets that have either hit a robot/wall or leave the arena
+- on hit of a robot, the damage value of the bullet gets applied to the pawn
+- the collision check against pawns is just a check against the euclidean distance from the center of the robot
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/f87ed3a7-1963-4f69-b9b4-66363a374f43)
+- the `weapon` class is the basic class of all weapons
+- the `shoot` function is the function that fundamentally controls the weapons behaviour
+- it checks whether the weapon is currently being cycled (basically the firerate) or reloaded, then it checks whether the weapon has rounds in the magazine
+- based on the time since the last shot it is decided whether this shot is being treated as a consecutive shot
+- based on the number of consecutive shots and the current speed of the robot in addition to the usual recoil, a accuracy penalty is applied
+- this is done by adding a random factor drawn from a uniform distribution influenced by the accuracy penalty
+- once all this is done, the bullet object is constructed and passed back to the caller of the function
+
+![RoboArena-2023-07-17-12-49-39](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/a4d4e1e8-0ae2-48ff-a6cf-550c1e8ef614)
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b2cd371b-77b4-463d-aed6-1f1aeb93f755)
+- the two other variations of weapons currently implemented
+- the underlying principle is the same, only the initial parameters have been changed
+
+![RoboArena-2023-07-17-12-50-14](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/c196035d-6375-409d-b25c-b5fbfb77fc60)
+- Revolver
+
+![RoboArena-2023-07-17-12-51-19](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/eff56af2-bbce-43f8-ac30-cbfc83bf8c48)
+- Machinegun
+
+#### Spawn and Death Mechanics (by Julian Häberle)
+- Comparatively minor changes that enable us to handle spawning and killing robots
+- killing and spawning is associated with a couple of intermediate steps like setting up and starting threads as well as adding the robot objects to the relevant lists
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/6b09de41-510d-4368-9685-712aee81ea41)
+- main part of the changes, basically just a couple of functions that handle the start of the threads and the removal/addition to lists
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/e8805728-eb57-4d11-a142-11529cc2ad67)
+- applyDamage now sets a death flag as soon as the robots hp fall to zero or below
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/908ef8c4-6896-469a-b237-f86f1a26ebd9)
+- the Death flag is queried by the thread of the robot, the thread will exit its loop as soon as the flag is set and proceed to remove the robot as well as spawn another one
+
