@@ -17,12 +17,6 @@ class MusicPlayer():
         song = QMediaContent(QUrl.fromLocalFile(filename))
         self.music_player.setMedia(song)
 
-    def play(self):
-        self.music_player.play()
-
-    def pause(self):
-        self.music_player.pause()
-
     def set_volume(self, value):
         self.volume = value
         self.music_player.setVolume(self.volume)
@@ -33,6 +27,14 @@ class MusicPlayer():
             self.music_player.setPosition(0)
             self.music_player.play()
 
+    def playOrPauseMusic(self):
+        config = ConfigParser()
+        config.read("config.ini")
+        if config.getboolean("Settings", "Music"):
+            self.music_player.play()
+        else:
+            self.music_player.pause()
+
     def load_volume_from_file(self):
         config = ConfigParser()
         config.read("config.ini")
@@ -41,7 +43,8 @@ class MusicPlayer():
 
     def save_volume_to_file(self):
         config = ConfigParser()
-        config["Settings"] = {"Volume": str(self.volume)}
+        config.read("config.ini")
+        config.set("Settings", "Volume", str(self.volume))
         with open("config.ini", "w") as config_file:
             config.write(config_file)
 
