@@ -640,3 +640,41 @@ Still undefined:
 - changes to the run method in threads
 - upon a kill, two new robots will be spawned at random positions in the arena
 - robots will automatically turn towards the player and shoot at every opportunity, now matter whether it's possible to hit or not 
+
+#### Add music (by Niklas Wolf)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/075a8f9e-eddd-48bc-b4bd-c7142dfdf45f)
+- added the class `MusicPlayer` which gets a song and plays it in a loop
+- also possible to change the volume of the song
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/1816467c-6288-46e0-ba12-126194ef49ca)
+- current volume values get saved in a config file
+- don't have to change it every time you start the game and shares the value easily between the widgets
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/c778192d-bc59-4855-adbf-fb56ae81ec4e)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/9f395bf9-ce47-4044-aa46-8b88be6c5a48)
+- adding the `MusicPlayer` to the main window
+- connecting the slider of the `PauseMenu` to the music player and setting the slider to the current value of the volume
+- background music is at the moment Discord Amongst Operatives by TeknoAXE
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/e8354583-c0b3-49df-8790-10e0ed768dd9)
+- added a volume icon to the `PauseMenu`
+
+#### adding a menu for the settings (by Niklas Wolf)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/4759d005-b0b5-43ed-94b2-78f274728f37)
+- added a widget to show the settings menu
+- For now, the only settings are turning the music on and off and changing its volume like with the pause menu
+- the settings are also saved in the config file
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/4bbb12e4-9f89-474c-bd56-0e54e264198e)
+- the method `toggleMusic` changes the value if the music is playing in the config file
+- also changes the appearance of the button
+
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/2e2aec25-8705-45f0-aa3c-e2efea64ece7)
+- green "ON" if the music is playing
+  
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/95979231-e998-4564-9868-90796e31a4c8)
+- red "OFF" if music is paused
+
+
+
+  
