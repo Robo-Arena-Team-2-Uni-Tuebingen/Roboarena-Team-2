@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QFont, QCursor, QKeyEvent
+from PyQt5.QtGui import QFont, QCursor, QKeyEvent, QPixmap
 from PyQt5.QtCore import Qt, QRect, QEvent, QCoreApplication
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider
 
@@ -43,11 +43,19 @@ class PauseMenu(QWidget):
         self.quit_button.setObjectName("quit_button")
         self.quit_button.setText("Quit")
 
+        # icon for volume
+        self.volume_icon = QLabel(self)
+        self.volume_icon.setGeometry(QRect(120, 471, 40, 40))
+        self.volume_icon.setScaledContents(True)
+        volume_icon_image = QPixmap("backgrounds/volume-icon.png")  # Load the image
+        self.volume_icon.setPixmap(volume_icon_image)
+
         # slider to adjust the volume when in-game sounds get added
-        self.horizontalSlider = QSlider(self)
-        self.horizontalSlider.setGeometry(QRect(170, 480, 160, 22))
-        self.horizontalSlider.setOrientation(Qt.Horizontal)
-        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.volume_slider = QSlider(self)
+        self.volume_slider.setGeometry(QRect(170, 480, 160, 22))
+        self.volume_slider.setOrientation(Qt.Horizontal)
+        self.volume_slider.setObjectName("volumeSlider")
+        self.volume_slider.setRange(0, 100)
 
     # emulate pressing the ESC key
     def emulate_esc(self):
