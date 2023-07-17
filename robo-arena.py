@@ -9,6 +9,7 @@ from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
 from game_menu import GameMenu
+from music_player import MusicPlayer 
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
@@ -24,7 +25,7 @@ class RoboArena(QMainWindow):
         self.resize(1200, 960)
         self.setWindowTitle('RoboArena')
         self.setObjectName("RoboArena")
-
+        
         self.initUI()
 
     def initUI(self):
@@ -45,6 +46,11 @@ class RoboArena(QMainWindow):
         layout = QVBoxLayout(self)
         layout.addWidget(self.stacked_widget)
         self.setLayout(layout)
+
+        # play background music
+        self.music_player = MusicPlayer()
+        self.music_player.load_song("backgroundmusic/discord_amongst_operatives.mp3")
+        self.music_player.play()
 
     def switchToGame(self):
         self.resize(1200, 960)
@@ -111,6 +117,10 @@ class RoboArena(QMainWindow):
         self.pause.hide()
         self.pause_visible = False
         self.pause.quit_button.clicked.connect(self.switchToMenu)
+
+        # make the slider of the pause menu able to change the volume of the background muisc
+        self.pause.volume_slider.valueChanged.connect(self.music_player.set_volume)
+        self.pause.volume_slider.setValue(self.music_player.volume)
         
         main_layout = QHBoxLayout()
         main_layout.addWidget(self.rarena)
@@ -343,12 +353,10 @@ class Arena(QFrame):
         self.bulletsThread.pauseBullets()
 
 def main():
-
     app = QApplication(sys.argv)
     roboArena = RoboArena() 
     roboArena.show()
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()   
