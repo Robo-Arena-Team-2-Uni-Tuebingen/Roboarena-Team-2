@@ -9,6 +9,7 @@ from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
 from game_menu import GameMenu
+from settings_menu import SettingsMenu
 from music_player import MusicPlayer 
 
 import PyQt5.QtQuick
@@ -34,6 +35,7 @@ class RoboArena(QMainWindow):
 
         self.game_menu = GameMenu()
         self.game_menu.play_button.clicked.connect(self.switchToGame)
+        self.game_menu.settings_button.clicked.connect(self.switchToSettings)
 
         self.stacked_widget = QStackedWidget(self)
         self.stacked_widget.addWidget(self.game_menu)
@@ -50,7 +52,7 @@ class RoboArena(QMainWindow):
         # play background music
         self.music_player = MusicPlayer()
         self.music_player.load_song("backgroundmusic/discord_amongst_operatives.mp3")
-        self.music_player.play()
+        self.music_player.playOrPauseMusic()
 
     def switchToGame(self):
         self.resize(1200, 960)
@@ -65,6 +67,17 @@ class RoboArena(QMainWindow):
         self.game_running = False
         # Switch to the menu widget in the stacked widget
         self.stacked_widget.setCurrentWidget(self.game_menu)
+        self.center()
+
+    def switchToSettings(self):
+        self.resize(1200, 960)
+        self.settings = SettingsMenu()
+        self.settings.volume_slider.valueChanged.connect(self.music_player.set_volume)
+        self.settings.volume_slider.setValue(self.music_player.volume)
+        self.settings.music_button.clicked.connect(self.music_player.playOrPauseMusic)
+        self.settings.back_button.clicked.connect(self.switchToMenu)
+        self.stacked_widget.addWidget(self.settings)
+        self.stacked_widget.setCurrentWidget(self.settings)
         self.center()
          
     # centers the window on the screen
