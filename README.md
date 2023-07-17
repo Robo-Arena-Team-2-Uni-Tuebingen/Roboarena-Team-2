@@ -622,3 +622,21 @@ Still undefined:
 ![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/908ef8c4-6896-469a-b237-f86f1a26ebd9)
 - the Death flag is queried by the thread of the robot, the thread will exit its loop as soon as the flag is set and proceed to remove the robot as well as spawn another one
 
+#### Basic Game Loop (by Julian Häberle)
+- contains basic victory conditions and checks for them (victory by points, time, kills as well as survival, which is essentially no victory condition)
+- contains functionality to abort threads and return to the main menu upon win/loss
+- implemented basic behaviour for robots (look in the players direction and shoot)
+- implemented function to spawn enemy robots at valid positions throughout the arena
+- UI implementation is to follow in the future
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/82759282-2a93-4678-a7c0-5873bac8b496)
+- basic checks of the three victory conditions
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/56a02531-abef-4452-8624-88bab03c9f58)
+- basic functionality for respawning the player, winning, losing and ending all relevant threads in a controlled manner
+- the player can't be treated as other robots due to some codesmells that I'm going to get rid off in a future refactor
+
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/839aa840-1e45-4b21-845c-36f08947d36e)
+- changes to the run method in threads
+- upon a kill, two new robots will be spawned at random positions in the arena
+- robots will automatically turn towards the player and shoot at every opportunity, now matter whether it's possible to hit or not 

@@ -42,11 +42,12 @@ class Robot():
     health = 100
     delayDamage = 0.1
     delayHealing = 1
-    cdDamage = 0
+    cdDamage = time.time() + 3 # 3 second invulnerability after new spawn
     cdHealing = 0
     is_dead = False
     #damage
     weapon = bullets.Weapon()
+    points = 100 # temporary, should depend on weapon and behaviour
 
     def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
 

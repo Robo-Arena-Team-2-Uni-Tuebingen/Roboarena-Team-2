@@ -24,13 +24,23 @@ class RobotThread(QThread):
         self.arena_height   = arena.ArenaHeight
         self.Mouse_x = robot.xpos
         self.Mouse_y = robot.ypos
-       
-    
+
+        self.abort = False
+
     def run(self):
-        while not self.robot.isRobotDead():
+        self.msleep(10)
+        while (not self.robot.isRobotDead() or self.is_player) and not self.abort:
             if not self.is_paused:
+                if self.is_player and self.robot.isRobotDead():
+                    self.arena.respawnPlayer()
                 self.moveRobotSmoothly()
-                self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+                if self.is_player:
+                    self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
+                else:
+                    self.robot.getAlpha(*self.arena.getPlayerPosition())
+                    shot, bullet = self.robot.shoot()
+                    if shot:
+                        self.arena.passBulletsToThread(bullet)
                 currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
                 if currentTile.hasEffect:
                     self.robot.applyEffect(currentTile.effect)
@@ -38,9 +48,12 @@ class RobotThread(QThread):
                 
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
-        self.arena.removeRobot(self.robot)
-        self.arena.spawnRobot()
-
+        if not self.is_player and not self.abort:
+            self.arena.updateKillCounter()
+            self.arena.updatePointCounter(self.robot.points)
+            self.arena.removeRobot(self.robot)
+            self.arena.spawnRobot()
+            self.arena.spawnRobot()
 
     def processKeyEvent(self, eventDict):
         if self.is_player and (not self.is_paused):

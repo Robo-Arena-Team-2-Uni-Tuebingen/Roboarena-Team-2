@@ -22,6 +22,7 @@ class Bullet:
 class BulletThread(QThread):
     is_paused = False
     bullets: list[Bullet] = []
+    abort = False
 
     def __init__(self, arena) -> None:
         super().__init__()
@@ -29,7 +30,7 @@ class BulletThread(QThread):
         self.pawns = self.arena.pawns
 
     def run(self) -> None:
-        while True:
+        while not self.abort:
             self.pawns = self.arena.pawns
             if not self.is_paused:
                 for bullet in self.bullets.copy():
