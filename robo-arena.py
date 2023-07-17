@@ -167,13 +167,14 @@ class Arena(QFrame):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.parentObject = parent
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
         self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.Weapon()),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, weapon=bullets.Weapon()),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, weapon=bullets.MachineGun()),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, weapon=bullets.Revolver())])  #is_play flags the robots which should be controlled manually
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
@@ -214,6 +215,8 @@ class Arena(QFrame):
                 context = [up, down, left, right]
                 self.ArenaLayout[x, y].chooseTexture(context)
 
+    def getPlayerPosition(self):
+        return self.pawns[0].xpos, self.pawns[0].ypos
 
     def createRobotThreads(self):
         self.robotThreads = []
@@ -238,7 +241,8 @@ class Arena(QFrame):
     def spawnRobot(self):
         #placeholder
         color = tuple(np.random.choice(range(256), size=3))
-        robot = Robot(500, 500, random.random()*np.pi*2, QColor(*color), player_number=5, weapon=bullets.MachineGun())
+        x, y = self.getRandomValidPosition()
+        robot = Robot(x, y, random.random()*np.pi*2, QColor(*color), player_number=5, weapon=bullets.MachineGun())
         self.addRobot(robot)
 
     def createBulletsThread(self):
@@ -273,29 +277,42 @@ class Arena(QFrame):
     def respawnPlayer(self):
         self.player_lives = self.player_lives - 1
         if self.player_lives > 0:
-            robot = Robot(200, 200, 0, QColor(0xFF0000), player_number=1, weapon=bullets.Weapon())
-            self.addRobot(robot)
+            self.pawns[0].health = 100
         else:
             self.lose()
 
     def win(self):
         #Placeholder, replace with screen later
+        self.stopGame()
         print("You have won")
-        print("Kills: " & self.kills.__str__())
-        print("After " & (self.currentTime - self.time).__str__() & " seconds")
-        print("Points: " & self.points.__str__())
+        print("Kills: " + self.kills.__str__())
+        print("After " + (self.currentTime - self.time).__str__() + " seconds")
+        print("Points: " + self.points.__str__())
+        self.parentObject.switchToMenu()
 
     def lose(self):
         #Placeholder, replace with screen later
+        self.stopGame()
         print("You have lost")
-        print("Kills: " & self.kills.__str__())
-        print("After " & (self.currentTime - self.time).__str__() & " seconds")
-        print("Points: " & self.points.__str__())
+        print("Kills: " + self.kills.__str__())
+        print("After " + (self.currentTime - self.time).__str__() + " seconds")
+        print("Points: " + self.points.__str__())
+        self.parentObject.switchToMenu()
 
-    #method that returns a random tile
-    def randomTile(self):
-        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStoneTile, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
+    def stopGame(self):
+        for thread in self.robotThreads:
+            thread.abort = True
+        self.bulletsThread.abort = True
 
+    #temporary method to generate a random valid position to spawn a robot on
+    def getRandomValidPosition(self):
+        passable = True
+        while passable:
+            x = random.randint(1, 959)
+            y = random.randint(1, 959)
+            passable = self.getTileAtPos(x, y).isImpassable
+        return x, y
+        
     # paint all tiles of the arena
     def paintEvent(self, event):
 

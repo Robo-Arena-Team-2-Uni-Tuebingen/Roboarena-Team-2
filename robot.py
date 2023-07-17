@@ -47,6 +47,7 @@ class Robot():
     is_dead = False
     #damage
     weapon = bullets.Weapon()
+    points = 100 # temporary, should depend on weapon and behaviour
 
     def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
 
