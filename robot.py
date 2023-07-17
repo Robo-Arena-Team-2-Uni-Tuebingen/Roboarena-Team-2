@@ -25,10 +25,7 @@ class Robot():
         'Collateral': 0, #increases done damage
         'Speedup': 0 #increases speed
     }
-    #temporary
-    target_x = 0
-    target_y = 0
-    targetColor = QColor(0xFFFFFF)
+    #status effects
     delayApplyEffect = 10
     delayRemoveEffect = 5
     delayAccelerate = 1
@@ -46,12 +43,19 @@ class Robot():
     cdHealing = 0
     #damage
     weapon = bullets.Weapon()
+    #pathing
+    path = []
+    target_x = 0
+    target_y = 0
+    targetColor = QColor(0xFFFFFF)
 
     def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
 
         self.player_number  = player_number
         self.xpos       = xpos
+        self.target_x   = xpos
         self.ypos       = ypos
+        self.target_y   = ypos
         #angle the robot in degrees
         self.alpha      = alpha - 180
         self.color      = color
@@ -62,7 +66,11 @@ class Robot():
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
-        self.alpha = -np.arctan2(y - c_y, x - c_x) 
+        self.alpha = -np.arctan2(y - c_y, x - c_x)
+
+    def setTargets(self, x, y):
+        self.target_x = x
+        self.target_y = y
 
     def applyEffect(self, effect: tuple[str, int]):
         if self.appliedEffects[effect[0]] < 100 and time.time() > self.cdApplyEffect:

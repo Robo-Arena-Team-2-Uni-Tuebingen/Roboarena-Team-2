@@ -24,6 +24,7 @@ class RobotThread(QThread):
         self.arena_height   = arena.ArenaHeight
         self.Mouse_x = robot.xpos
         self.Mouse_y = robot.ypos
+        self.path = self.generateNewPath()
        
     
     def run(self):
@@ -76,7 +77,22 @@ class RobotThread(QThread):
 
     def moveRobotSmoothly(self):
         cPos = np.array([self.robot.xpos - self.robot.radius, self.robot.ypos - self.robot.radius])
-        target = np.array([self.target_x, self.target_y])
+        path = self.path
+        target_x = self.target_x
+        target_y = self.target_y
+
+        if np.abs(cPos[0] - target_x) < 32 and np.abs(cPos[1] - target_y) < 32 and not self.is_player:
+            if len(self.path) < 1:
+                path = self.generateNewPath()
+            
+            #print(self.path)
+            target_x, target_y = self.assignTargets(*path[0])
+            self.target_x = target_x
+            self.target_y = target_y
+            self.path = path[1:]
+            self.robot.setTargets(target_x, target_y)
+
+        target = np.array([target_x, target_y])
         target_vector = np.subtract(target, cPos)
         norm = np.linalg.norm(target_vector)
         if norm > 0:
@@ -96,15 +112,16 @@ class RobotThread(QThread):
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
         elif collision and not self.is_player:
-            self.generateNewTargetPosition()
+            path = self.generateNewPath(random=True)
+            target_x, target_y = self.assignTargets(*path[0])
+            self.target_x = target_x
+            self.target_y = target_y
+            self.path = path[1:]
+            self.robot.setTargets(target_x, target_y)
             self.robot.getAlpha(self.target_x, self.target_y)
 
         # Check if the robot has reached the target position
-        if cPos[0] - self.target_x < 1 and cPos[1] - self.target_y < 1 and not self.is_player:
-            self.generateNewTargetPosition()
-            self.robot.target_x = self.target_x
-            self.robot.target_y = self.target_y
-
+        
     def setTarget(self, x, y):
         newTargetx = self.target_x + x
         newTargety = self.target_y + y
@@ -113,9 +130,9 @@ class RobotThread(QThread):
             self.target_x = max(8, min(newTargetx, self.arena_width*self.tile_width - 9))
             self.target_y = max(8, min(newTargety, self.arena_height*self.tile_height - 9))
 
-            self.robot.target_x = self.target_x
-            self.robot.target_y = self.target_y
-
+            self.robot.setTargets(self.target_x, self.target_y)
+            
+            self.arena.updateTargetPlayer((self.target_x//self.tile_width, self.target_y//self.tile_height))
             return True
 
         return False
@@ -132,22 +149,25 @@ class RobotThread(QThread):
         self.is_paused = True
 
     
-    def generateNewTargetPosition(self):
+    def generateNewPath(self, random=False):
         # temporary until better behaviour for robots is implemented
         # Generate random offsets to determine the neighboring tile
-        valid_tile = False
-        while not valid_tile:
-            offset_x = random.randint(0, 59)
-            offset_y = random.randint(0, 59)
-            if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
-                valid_tile = True
+        current_x = (self.robot.xpos - self.robot.radius)//self.tile_width
+        current_y = (self.robot.ypos - self.robot.radius)//self.tile_height
+        
+        if random:
+            goal_x, goal_y = self.arena.getRandomValidTile()
+        else: #follow player targets
+            goal_x, goal_y = self.arena.targetPlayer
+        
+        path = self.arena.getShortestPath((current_x, current_y), (goal_x, goal_y))
+        self.robot.path = path
 
-        # Calculate the target position based on the new tile indices
-        target_x = offset_x * self.tile_width + self.tile_width // 2
-        target_y = (offset_y * self.tile_height + self.tile_height // 2)
-
-        self.target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
-        self.target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
-
-        self.robot.target_x = self.target_x
-        self.robot.target_y = self.target_y
+        return path
+    
+    def assignTargets(self, target_x, target_y):
+        target_x = target_x * self.tile_width + self.tile_width // 2
+        target_y = target_y * self.tile_height + self.tile_height // 2
+        target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
+        target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
+        return target_x, target_y

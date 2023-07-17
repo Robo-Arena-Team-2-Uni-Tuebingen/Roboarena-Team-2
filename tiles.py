@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QColor, QPixmap, QImage
 from PyQt5.QtCore import QRect, QTimer
+import numpy as np
 
 tileWidth = 16
 tileHeight = 16
@@ -35,6 +36,7 @@ class Tile():
         self.effect = ('', 0)
         self.isImpassable = False
         self.hasEffect = False
+        self.weight = 999999999
 
     def compare(self, contextTile):
         if contextTile.str == self.str:
@@ -90,6 +92,7 @@ class WallTile(Tile):
         self.texture = textureWallTile
         self.isImpassable = True
         self.hasEffect = False
+        self.weight = 999999999
     
     def chooseTexture(self, context):
         return self.texture
@@ -102,6 +105,7 @@ class WaterTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 50)
         self.hasEffect = True
+        self.weight = 15
     
     def chooseTexture(self, context):
         return self.texture
@@ -114,6 +118,7 @@ class GrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 10)
         self.hasEffect = True
+        self.weight = 11
     
     def chooseTexture(self, context):
         return self.texture
@@ -126,6 +131,7 @@ class HighGrassTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 30)
         self.hasEffect = True
+        self.weight = 13
 
 class DirtTile(Tile):
     str = 'd'
@@ -134,6 +140,7 @@ class DirtTile(Tile):
         self.texture = textureDirtTile
         self.isImpassable = False
         self.hasEffect = False
+        self.weight = 10
 
 
 class SandTile(Tile):
@@ -144,6 +151,7 @@ class SandTile(Tile):
         self.isImpassable = False
         self.effect = ('Slow', 5)
         self.hasEffect = True
+        self.weight = 10
 
 class SnowTile(Tile):
     str = 'i'
@@ -153,6 +161,7 @@ class SnowTile(Tile):
         self.isImpassable = False
         self.effect = ('Freeze', 20)
         self.hasEffect = True
+        self.weight = 18
 
 class SlimeTile(Tile):
     str = 'v'
@@ -162,6 +171,7 @@ class SlimeTile(Tile):
         self.isImpassable = False
         self.effect = ('Corrosion', 50)
         self.hasEffect = True
+        self.weight = 30
 
 class FieldTile(Tile):
     str = 'f'
@@ -171,6 +181,7 @@ class FieldTile(Tile):
         self.isImpassable = False
         self.effect = ('Collateral', 50)
         self.hasEffect = True
+        self.weight = 5
 
 class CobbleStoneTile(Tile):
     str = 'c'
@@ -180,3 +191,4 @@ class CobbleStoneTile(Tile):
         self.isImpassable = False
         self.effect = ('Speedup', 50)
         self.hasEffect = True
+        self.weight = 8

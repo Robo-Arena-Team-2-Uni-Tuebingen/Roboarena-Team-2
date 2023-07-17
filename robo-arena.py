@@ -9,6 +9,7 @@ from ascii_layout import textToTiles
 import threads
 from pause_menu import PauseMenu
 from game_menu import GameMenu
+import networkx as nx
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
@@ -159,41 +160,104 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.MachineGun()),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
+        self.pawns = np.array([Robot(200, 120,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.MachineGun()),
+                               Robot(600, 600, -np.pi/2, QColor(0xFFA500), player_number = 2),
+                               Robot(800, 120,  -np.pi/2, QColor(0x8A2BE2), player_number = 3),
+                               Robot(400, 600, -np.pi/2, QColor(0x00FFFF), player_number = 4)])  #is_play flags the robots which should be controlled manually
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
+        self.G = nx.DiGraph()
+        self.validTiles = []
+        self.targetPlayer = (0, 0)
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
         self.createBulletsThread()
 
+    
+    def updateTargetPlayer(self, newTarget):
+        self.targetPlayer = newTarget
+
     def initArena(self):
         # set default arena saved in .txt file "layout1"
         self.ArenaLayout = textToTiles(self.arena_map)
+        G = self.G
+        for x in range(self.ArenaWidth):
+            for y in range(self.ArenaHeight):
+                G.add_node((x, y))
+                if not self.ArenaLayout[x, y].isImpassable:
+                    self.validTiles.append((x, y))
+        
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 >= 0:
-                    left = self.ArenaLayout[x, y - 1]
-                else:
-                    left = tiles.Tile()
-                if y + 1 < self.ArenaHeight:
-                    right = self.ArenaLayout[x, y + 1]
-                else:
-                    right = tiles.Tile()
-                if x - 1 >= 0:
-                    up = self.ArenaLayout[x - 1, y]
+                    up = self.ArenaLayout[x, y - 1]
+                    G.add_edge((x, y), (x, y - 1))
+                    G[(x, y)][(x, y - 1)]['weight'] = up.weight
                 else:
                     up = tiles.Tile()
-                if x + 1 < self.ArenaWidth:
-                    down = self.ArenaLayout[x + 1, y]
+
+                if y + 1 < self.ArenaHeight:
+                    down = self.ArenaLayout[x, y + 1]
+                    G.add_edge((x, y), (x, y + 1))
+                    G[(x, y)][(x, y + 1)]['weight'] = down.weight
                 else:
                     down = tiles.Tile()
-                context = [up, down, left, right]
+
+                if x - 1 >= 0:
+                    left = self.ArenaLayout[x - 1, y]
+                    G.add_edge((x, y), (x - 1, y))
+                    G[(x, y)][(x - 1, y)]['weight'] = left.weight
+                else:
+                    left = tiles.Tile()
+
+                if x + 1 < self.ArenaWidth:
+                    right = self.ArenaLayout[x + 1, y]
+                    G.add_edge((x, y), (x + 1, y))
+                    G[(x, y)][(x + 1, y)]['weight'] = right.weight
+                else:
+                    right = tiles.Tile()
+
+                if y - 1 >= 0 and x - 1 >= 0:
+                    upperleft = self.ArenaLayout[x - 1, y - 1]
+                    G.add_edge((x, y), (x - 1, y - 1))
+                    G[(x, y)][(x - 1, y - 1)]['weight'] = upperleft.weight
+                else:
+                        upperleft = tiles.Tile()
+
+                if y - 1 >= 0 and x + 1 < self.ArenaWidth:
+                    upperright = self.ArenaLayout[x + 1, y - 1]
+                    G.add_edge((x, y), (x + 1, y - 1))
+                    G[(x, y)][(x + 1, y - 1)]['weight'] = upperright.weight
+                else:
+                    upperright = tiles.Tile()
+
+                if y + 1 < self.ArenaHeight and x - 1 >= 0:
+                    lowerleft = self.ArenaLayout[x - 1, y + 1]
+                    G.add_edge((x, y), (x - 1, y + 1))
+                    G[(x, y)][(x - 1, y + 1)]['weight'] = lowerleft.weight
+                else:
+                    lowerleft = tiles.Tile()
+
+                if y + 1 < self.ArenaHeight and x + 1 < self.ArenaWidth:
+                    lowerright = self.ArenaLayout[x + 1, y + 1]
+                    G.add_edge((x, y), (x + 1, y + 1))
+                    G[(x, y)][(x + 1, y + 1)]['weight'] = lowerright.weight
+                else:
+                    lowerright = tiles.Tile()
+
+                context = [left, right, up, down]
                 self.ArenaLayout[x, y].chooseTexture(context)
 
+    def getRandomValidTile(self):
+        return self.validTiles[np.random.choice(len(self.validTiles))]
+
+    def getShortestPath(self, source, target):
+        return nx.bidirectional_dijkstra(self.G, source, target, 'weight')[1]
+        #return nx.shortest_path(self.G, source, target, 'weight', 'bellman-ford')
+    
+    def hasNode(self, node):
+        return self.G.has_node(node)
 
     def createRobotThreads(self):
         self.robotThreads = []
@@ -215,10 +279,6 @@ class Arena(QFrame):
     def updateRobotPosition(self):
         #redraw the widget with updated robot positions
         self.update()
-
-    #method that returns a random tile
-    def randomTile(self):
-        return random.choice([tiles.GrassTile, tiles.HighGrassTile, tiles.DirtTile, tiles.SandTile, tiles.FieldTile, tiles.CobbleStoneTile, tiles.WaterTile, tiles.WallTile, tiles.SnowTile, tiles.SlimeTile])
 
     # paint all tiles of the arena
     def paintEvent(self, event):
