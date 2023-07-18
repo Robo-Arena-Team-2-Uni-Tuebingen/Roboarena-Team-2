@@ -675,6 +675,27 @@ Still undefined:
 ![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/95979231-e998-4564-9868-90796e31a4c8)
 - red "OFF" if music is paused
 
+#### Level System (by Tom Kühnle)
+- adding new parameters necessary for leveling in the robot class
 
+<img width="197" alt="Bildschirmfoto 2023-07-17 um 18 58 59" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/58ed851a-57d6-4835-be78-cfe2cee62a72">
 
-  
+- experimental functions for experience handling
+- if the player kills a robot, he will get experience (still needs refinement)
+- if the experience needed for a level-up is reached, the level of the
+  robot goes up by one
+- after level-up the experience needed is extended by 10%
+- functionality will be connected to the kill counter of Julian in the future
+
+<img width="531" alt="Bildschirmfoto 2023-07-17 um 21 20 27" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/8297483c-77c0-4d87-9b74-f68efd7d3bd3">
+
+- added experience bar with display of the actual level of a player
+- experience bar shows the amount of experience in relation to the experience
+  needed for a level-up
+- still needs to be connected to the actual state of the experience
+
+<img width="1019" alt="Bildschirmfoto 2023-07-17 um 21 23 32" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/faae0e21-22d9-47a8-b56e-ff2e97f5e348">
+
+Example of the experience bar in the pause menu:
+
+<img width="828" alt="Bildschirmfoto 2023-07-17 um 21 23 46" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/0991637f-c617-48dc-a196-5fb1f1a72b5c">
