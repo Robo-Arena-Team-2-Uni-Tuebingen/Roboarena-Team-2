@@ -703,5 +703,5 @@ Example of the experience bar in the pause menu:
 
 <img width="828" alt="Bildschirmfoto 2023-07-17 um 21 23 46" src="https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/0991637f-c617-48dc-a196-5fb1f1a72b5c">
 
--> everything still needs ro be refined for the case that there are more than one 
-   actual players
+-> everything still needs to be refined for the case that there is more than one 
+   actual player
