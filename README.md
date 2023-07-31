@@ -778,3 +778,16 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - behaviours and different stats for enemies might be realized/refined with an additional object tying into the robot class
 
 
+#### Victory/Defeat Screen (by Niklas Wolf)
+Designed a "Victory" ...
+![victory_screen](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/6d979bee-4b47-4ad4-b37d-58c7c96f4c75)
+
+... and a "Defeat" screen
+![defeat_screen](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/cc78563f-6e41-4f87-b834-33033918cfb6)
+
+
+- should be as a half-transparent layer over the arena
+- not implemented yet because of problems drawing it into the existing widget with a parent
+
+
+
