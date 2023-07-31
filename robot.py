@@ -1,10 +1,15 @@
 import numpy as np
 import time
 import bullets
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QColor
+from PyQt5.QtCore import QRect
+from PyQt5.QtGui import QColor, QImage
 
-
+heavy_gunner = QImage('heavy_gunner.png').scaled(60, 60)
+cannoneer = QImage('cannoneer.png').scaled(60, 60)
+assault = QImage('assault.png').scaled(60, 60)
+scout = QImage('scout.png').scaled(60, 60)
+sniper = QImage('sniper.png').scaled(60, 60)
+player = QImage('tech.png').scaled(60, 60)
 
 class Robot():
 
@@ -49,7 +54,7 @@ class Robot():
     weapon = bullets.Weapon()
     points = 100 # temporary, should depend on weapon and behaviour
 
-    def __init__(self, xpos, ypos, alpha, color, player_number, weapon=bullets.Weapon()):
+    def __init__(self, xpos, ypos, alpha, color, player_number, type):
 
         self.player_number  = player_number
         self.xpos       = xpos
@@ -57,14 +62,35 @@ class Robot():
         #angle the robot in degrees
         self.alpha      = alpha - 180
         self.color      = color
-        self.weapon     = weapon
+        self.type = type
+        if type == 'heavy_gunner':
+            self.image = heavy_gunner
+            self.weapon = bullets.MachineGun()
+        elif type == 'cannoneer':
+            self.image = cannoneer
+            self.weapon = bullets.Revolver()
+        elif type == 'assault':
+            self.image = assault
+            self.weapon = bullets.MachineGun()
+        elif type == 'scout':
+            self.image = scout
+            self.weapon = bullets.DualPistols()
+            self.speed = 3
+        elif type == 'sniper':
+            self.image = sniper
+            self.weapon = bullets.Sniperrifle()
+            self.speed = 1
+        elif type == 'player':
+            self.image = player
+            self.weapon = bullets.DualPistols()
+        
 
 
     #this function is supposed to get the angle from the robot to acceleration specific point relative to the x-axis
     def getAlpha(self, x, y):
         c_x = self.xpos-self.radius
         c_y = self.ypos-self.radius
-        self.alpha = -np.arctan2(y - c_y, x - c_x) 
+        self.alpha = -np.arctan2(y - c_y, x - c_x)
 
     def applyEffect(self, effect: tuple[str, int]):
         if self.appliedEffects[effect[0]] < 100 and time.time() > self.cdApplyEffect:
@@ -120,7 +146,21 @@ class Robot():
             self.cdHealing = time.time() + self.delayHealing
 
     def shoot(self):
-        return self.weapon.shoot(self.xpos, self.ypos, self.radius, self.alpha, self.speed)
+        offset_radius = 0
+        offset_angle = 0
+        if self.type == 'player':
+            offset_radius = 2
+            offset_angle = -0.55
+        if self.type == 'sniper':
+            offset_radius = 4
+            offset_angle = -0.45
+        if self.type == 'scout':
+            offset_radius = 2
+            offset_angle = 0.3
+        if self.type == 'heavy_gunner':
+            offset_radius = 2
+            offset_angle = -0.15
+        return self.weapon.shoot(self.xpos, self.ypos, self.radius, offset_radius, offset_angle, self.alpha, self.speed)
     
     def isRobotDead(self):
         return self.is_dead

@@ -88,6 +88,8 @@ class Weapon:
     last_shot = 0
     consecutive_shots = 0  
     recoil_duration = 0             #needs to be defined for each weapon
+    alternate = 1                   #needs to be set to -1 for dual-wield weapons
+    alternating = 1
 
     def __init__(self) -> None:
         self.type = 'projectile'                #attribute to indicate the type of projectile in case of further expansion, might be implemented as interface
@@ -106,8 +108,10 @@ class Weapon:
         self.last_shot = 0                      #time of the last shot
         self.consecutive_shots = 0              #number of consecutive shots
         self.recoil_duration = 0.2              #duration of the recoil effecting the weapon (together with cycle time)
+        self.alternate = 1                      #this attribute should be set for dual wield weapons
+        self.alternating = 1                    #this attribute tracks which weapon should be fired next (for dual-wield weapons)
 
-    def shoot(self, x, y, radius, alpha, speed):
+    def shoot(self, x, y, radius, offset_radius, offset_angle, alpha, speed):
         t = time.time()
         if self.cdreload < t and self.cdcycle < t:
             if self.mag > 0:
@@ -121,8 +125,9 @@ class Weapon:
                 bullet_radius = self.radius
                 bullet_speed = self.speed
 
-                bullet_x = (x - radius) + radius*np.cos(-alpha)
-                bullet_y = (y - radius) + radius*np.sin(-alpha)
+                bullet_x = (x - radius) + (radius+offset_radius)*np.cos(-alpha+(offset_angle*self.alternating))
+                bullet_y = (y - radius) + (radius+offset_radius)*np.sin(-alpha+(offset_angle*self.alternating))
+                self.alternating = self.alternating * self.alternate
 
                 #calculates recoil
                 bullet_recoil = (self.consecutive_shot_factor * self.consecutive_shots + speed**2*self.speed_factor + self.recoil)*np.pi/100
@@ -161,8 +166,37 @@ class MachineGun(Weapon):
         self.cycle = 0.02
         self.mag = 50
         self.magMax = 50
-        self.reload = 20
+        self.reload = 10
         self.recoil = 3
         self.consecutive_shot_factor = 0.75
         self.speed_factor = 0.04
         self.recoil_duration = 0.1
+
+class DualPistols(Weapon):
+    def __init__(self) -> None:
+        self.damage = 5
+        self.radius = 2
+        self.speed = 5
+        self.cycle = 0.1
+        self.mag = 20
+        self.magMax = 20
+        self.reload = 6
+        self.recoil = 4
+        self.consecutive_shot_factor = 0.08
+        self.speed_factor = 0.02
+        self.recoil_duration = 0.2
+        self.alternate = -1
+
+class Sniperrifle(Weapon):
+    def __init__(self) -> None:
+        self.damage = 15
+        self.radius = 3
+        self.speed = 10
+        self.cycle = 1
+        self.mag = 5
+        self.magMax = 5
+        self.reload = 8
+        self.recoil = 10
+        self.consecutive_shot_factor = 1
+        self.speed_factor = 0.5
+        self.recoil_duration = 1
