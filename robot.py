@@ -160,6 +160,9 @@ class Robot():
         if self.type == 'heavy_gunner':
             offset_radius = 2
             offset_angle = -0.15
+        if self.type == 'assault':
+            offset_radius = 2
+            offset_angle = 0.15
         return self.weapon.shoot(self.xpos, self.ypos, self.radius, offset_radius, offset_angle, self.alpha, self.speed)
     
     def isRobotDead(self):

@@ -196,7 +196,7 @@ class Sniperrifle(Weapon):
         self.mag = 5
         self.magMax = 5
         self.reload = 8
-        self.recoil = 10
+        self.recoil = 1
         self.consecutive_shot_factor = 1
         self.speed_factor = 0.5
         self.recoil_duration = 1
