@@ -24,7 +24,7 @@ class RoboArena(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.resize(1200, 960)
+        self.setFixedSize(1200, 960)
         self.setWindowTitle('RoboArena')
         self.setObjectName("RoboArena")
         

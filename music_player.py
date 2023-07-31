@@ -10,7 +10,7 @@ class MusicPlayer():
         self.music_player = QMediaPlayer()
         self.volume = 50
         self.load_volume_from_file()
-        self.music_player.setVolume(50)
+        self.music_player.setVolume(self.volume)
         self.music_player.mediaStatusChanged.connect(self.loop_song)
 
     def load_song(self, filename):
