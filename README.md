@@ -718,7 +718,7 @@ Example of the experience bar in the pause menu:
 ![tech](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/8c229874-977b-49f9-9ee5-264d1f35acfb)
 -model for the player
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/7587ab67-98da-43ed-a35c-fe7ddf29171e
+![tech](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/7587ab67-98da-43ed-a35c-fe7ddf29171e)
 
 
 ![assault](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/8905d3a3-14fb-483c-b200-551eb8a0139b)
@@ -728,7 +728,7 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - no special behaviour yet, no particular plans yet
 - standard enemy class
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/df0e787a-2107-4918-81c9-640b38b00394
+![assault](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/df0e787a-2107-4918-81c9-640b38b00394)
 
 
 ![cannoneer](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/06a271ce-82d4-427d-9048-b0c070cddb9c)
@@ -737,7 +737,7 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - no specialized behaviour yet, but is supposed to become a CC enemy, that forces the player into cover with suppressing fire
 - area denial enemy (maybe)
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/bb9aa530-3cd8-47aa-8184-a836964f50be
+![cannoneer](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/bb9aa530-3cd8-47aa-8184-a836964f50be)
 
 
 ![heavy_gunner](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/ad835f0a-811a-496a-96bd-0f918288c459)
@@ -746,7 +746,7 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - no specialized behaviour yet, may become an enemy that patrols a certain area of the map and tries to prevent the player from passing through
 - hunting/suppressing enemy
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/cae09ec6-4ccb-43cc-bb01-aa3123eb8cff
+![heavy_gunner](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/cae09ec6-4ccb-43cc-bb01-aa3123eb8cff)
 
 
 ![sniper](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/aaefcda3-7a45-487b-b7a7-4a70ba11e31e)
@@ -755,7 +755,7 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - no specialized behaviour yet, but is supposed to ambush the player and to do high damage accurately (still needs some work)
 - hunting enemy
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b4661a5b-a3e2-48c4-9e52-757a57171c62
+![sniper](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/b4661a5b-a3e2-48c4-9e52-757a57171c62)
 
 
 ![scout](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/13fe1d87-6a17-4260-b06f-52f14a980f6e)
@@ -764,7 +764,7 @@ https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464
 - no specialized behaviour yet, apart from the alternate fire of the dual pistols, is supposed to chase the player from cover
 - hunting enemy
 
-https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/ad928f68-ace8-409b-904d-f06e1f434d59
+![scout](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/ad928f68-ace8-409b-904d-f06e1f434d59)
 
 - the images for the different robots are loaded as pngs and scaled down
 - the images are drawn and transformed in the `drawRobot` function
