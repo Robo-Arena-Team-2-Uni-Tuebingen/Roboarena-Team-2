@@ -1,5 +1,4 @@
 import random
-from PyQt5 import QtGui
 import numpy as np
 import sys
 from robot import Robot
@@ -12,11 +11,12 @@ from pause_menu import PauseMenu
 from game_menu import GameMenu
 from settings_menu import SettingsMenu
 from music_player import MusicPlayer 
+from end_screen import EndScreen
 
 import PyQt5.QtQuick
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPointF
-from PyQt5.QtGui import QPainter, QColor, QKeyEvent, QMouseEvent, QBrush
-from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout, QStackedWidget
+from PyQt5.QtCore import Qt, QRect, QBasicTimer, pyqtSignal, QPointF
+from PyQt5.QtGui import QPainter, QColor, QFont, QKeyEvent, QMouseEvent, QBrush
+from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel, QPushButton
 
 
 class RoboArena(QMainWindow):
@@ -80,7 +80,25 @@ class RoboArena(QMainWindow):
         self.stacked_widget.addWidget(self.settings)
         self.stacked_widget.setCurrentWidget(self.settings)
         self.center()
-         
+
+    def switchToVictoryScreen(self, kills, time, points):
+        screenshot      = self.grab()
+        self.end_screen = EndScreen(screenshot)
+        self.end_screen.setupVictory(kills, time, points)
+        self.end_screen.quit_button.clicked.connect(self.switchToMenu)
+        self.end_screen.retry_button.clicked.connect(self.switchToGame)
+        self.stacked_widget.addWidget(self.end_screen)
+        self.stacked_widget.setCurrentWidget(self.end_screen)
+
+    def switchToDefeatScreen(self, kills, time, points):
+        screenshot      = self.grab()
+        self.end_screen = EndScreen(screenshot)
+        self.end_screen.setupDefeat(kills, time, points)
+        self.end_screen.quit_button.clicked.connect(self.switchToMenu)
+        self.end_screen.retry_button.clicked.connect(self.switchToGame)
+        self.stacked_widget.addWidget(self.end_screen)
+        self.stacked_widget.setCurrentWidget(self.end_screen)
+
     # centers the window on the screen
     def center(self):
         screen = QDesktopWidget().screenGeometry()
@@ -90,42 +108,44 @@ class RoboArena(QMainWindow):
         
     def keyPressEvent(self, event):  #get key press to the threads
         if self.game_running:
-            self.rarena.logKeyPressEvent(event)
+            self.arena.logKeyPressEvent(event)
 
         if event.key() == Qt.Key_Escape:
             self.toggle_pause()
 
     def keyReleaseEvent(self, event):
         if self.game_running:
-            self.rarena.logKeyReleaseEvent(event)
+            self.arena.logKeyReleaseEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         if self.game_running:
-            self.rarena.passMouseEvents(event)
+            self.arena.passMouseEvents(event)
     
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if self.game_running:
-            self.rarena.passMouseEvents(event)
+            self.arena.passMouseEvents(event)
     
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if self.game_running:
-            self.rarena.passMouseEvents(event)
+            self.arena.passMouseEvents(event)
 
     def toggle_pause(self):
         if self.game_running:
             if self.pause_visible:
                 self.pause.hide()
-                self.rarena.unpause()
+                self.arena.unpause()
             else:
-                self.rarena.pause()
+                self.arena.pause()
                 self.pause.show()
             
             self.pause_visible = not self.pause_visible
 
     def makeGameWidget(self):
 
-        self.rarena = Arena(self)
-        self.rarena.setMouseTracking(True)
+        self.arena = Arena(self)
+        self.arena.setMouseTracking(True)
+        self.arena.showVictory.connect(self.switchToVictoryScreen)
+        self.arena.showDefeat.connect(self.switchToDefeatScreen)
         
         self.pause         = PauseMenu(self)
         self.pause.hide()
@@ -137,7 +157,7 @@ class RoboArena(QMainWindow):
         self.pause.volume_slider.setValue(self.music_player.volume)
         
         main_layout = QHBoxLayout()
-        main_layout.addWidget(self.rarena)
+        main_layout.addWidget(self.arena)
         main_layout.addWidget(self.pause)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -177,6 +197,9 @@ class Arena(QFrame):
         Qt.MouseButton.LeftButton: False,
         Qt.MouseButton.RightButton: False
     }
+
+    showVictory = pyqtSignal(str, str, str)
+    showDefeat  = pyqtSignal(str, str, str)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -295,22 +318,20 @@ class Arena(QFrame):
             self.lose()
 
     def win(self):
-        #Placeholder, replace with screen later
         self.stopGame()
-        print("You have won")
-        print("Kills: " + self.kills.__str__())
-        print("After " + (self.currentTime - self.time).__str__() + " seconds")
-        print("Points: " + self.points.__str__())
-        self.parentObject.switchToMenu()
+        kills = self.kills.__str__()
+        time = (self.currentTime - self.time).__str__()
+        points = self.points.__str__()
+        # emits signal with stats, so parent can show the correct screen 
+        self.showVictory.emit(kills, time, points)
 
     def lose(self):
-        #Placeholder, replace with screen later
         self.stopGame()
-        print("You have lost")
-        print("Kills: " + self.kills.__str__())
-        print("After " + (self.currentTime - self.time).__str__() + " seconds")
-        print("Points: " + self.points.__str__())
-        self.parentObject.switchToMenu()
+        kills = self.kills.__str__()
+        time = (self.currentTime - self.time).__str__()
+        points = self.points.__str__()
+        # emits signal with stats, so parent can show the correct screen
+        self.showDefeat.emit(kills, time, points)
 
     def stopGame(self):
         for thread in self.robotThreads:
@@ -349,8 +370,6 @@ class Arena(QFrame):
         # Draw bullets
         for bullet in self.bulletsThread.getBullets():
             self.drawBullet(painter, bullet)
-
-
 
     # paint a single tile
     def drawTile(self, painter, x, y, tile):
