@@ -184,10 +184,12 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, weapon=bullets.Weapon()),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, weapon=bullets.Weapon()),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, weapon=bullets.MachineGun()),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, weapon=bullets.Revolver())])  #is_play flags the robots which should be controlled manually
+        #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='cannoneer')])
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
+                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
@@ -255,7 +257,8 @@ class Arena(QFrame):
         #placeholder
         color = tuple(np.random.choice(range(256), size=3))
         x, y = self.getRandomValidPosition()
-        robot = Robot(x, y, random.random()*np.pi*2, QColor(*color), player_number=5, weapon=bullets.MachineGun())
+        type = random.choice(['heavy_gunner', 'cannoneer', 'assault', 'scout', 'sniper'])
+        robot = Robot(x, y, random.random()*np.pi*2, QColor(*color), player_number=5, type=type)
         self.addRobot(robot)
 
     def createBulletsThread(self):
@@ -353,20 +356,19 @@ class Arena(QFrame):
 
 
     # paint a single tile
-    def drawTile(self, painter, x, y, tile):
+    def drawTile(self, painter : QPainter, x : int, y : int, tile : tiles.Tile):
         painter.drawImage(x, y, tile.texture)
     
     #this method is responsible for painting the robot in the window
-    def drawRobot(self, painter, robot):
+    def drawRobot(self, painter : QPainter, robot : Robot):
         #corrects the position of the robot to the upper left corner where the drawing is positioned
         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
-        #calculates the point indicated by the angle on the circle of the robot
-        direction = QPointF(robot.radius*np.cos(robot.alpha) + centerRobot.x(), -robot.radius*np.sin(robot.alpha) + centerRobot.y())
-        painter.setBrush(robot.color)
+        painter.translate(centerRobot)
+        painter.rotate(-robot.alpha*180/np.pi + 90)
+        painter.drawImage(-30, -30, robot.image)
+        painter.resetTransform()
+        #for debugging purposes, to be removed later
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
-        painter.drawLine(centerRobot, direction)
-        painter.setBrush(robot.targetColor)
-        painter.drawEllipse(QPointF(robot.target_x, robot.target_y), 5, 5)
 
     # draw the healthbars of the robots based on their current health    
     def drawHealthBars(self, painter, robot):

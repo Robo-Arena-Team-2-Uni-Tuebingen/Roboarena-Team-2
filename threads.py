@@ -26,7 +26,7 @@ class RobotThread(QThread):
         self.Mouse_y = robot.ypos
 
         self.abort = False
-
+    
     def run(self):
         self.msleep(10)
         while (not self.robot.isRobotDead() or self.is_player) and not self.abort:
