@@ -342,6 +342,35 @@ class Arena(QFrame):
             y = random.randint(1, 959)
             passable = self.getTileAtPos(x, y).isImpassable
         return x, y
+    
+    #this function checks iteratively whether a robot has line of sight to the player
+    #this function has cornercases where there's an impassable tile between the players centre and the robots centre
+    #this 'fuzziness' is intentional, to make it seem like the player can be seen if only a part of the robot shows behind a corner
+    def hasLineOfSightToPoint(self, r_x: int, r_y: int, p_x: int, p_y: int) -> bool:
+        stepsize = 10
+        #y = mx + c
+        m = (r_y - p_y)/(r_x - p_x)
+        #c = y - mx
+        c = r_y - m*r_x
+        length = np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
+        num_x_iteration = length/stepsize
+        x_stepsize = (max(p_x, r_x) - min(p_x, r_x))/num_x_iteration
+        x = min(p_x, r_x)
+        while x < max(p_x, r_x):
+            if self.getTileAtPos(x, m*x + c).isImpassable:
+                return False
+            else:
+                x = x + x_stepsize
+        return True
+    
+    def hasLineOfSightToPlayer(self, r_x: int, r_y: int) -> bool:
+        return self.hasLineOfSightToPoint(r_x, r_y, *self.getPlayerPosition())
+
+    #returns the distance to the player
+    def distanceToPlayer(self, r_x: int, r_y: int) -> float:
+        p_x, p_y = self.getPlayerPosition()
+        return np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
+
         
     # paint all tiles of the arena
     def paintEvent(self, event):
@@ -431,7 +460,7 @@ class Arena(QFrame):
             self.pressedMouseButtons[key] = event.buttons() & key
         self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
     
-    def getTileAtPos(self, x, y):
+    def getTileAtPos(self, x, y) -> tiles.Tile:
         x = (x//Arena.TileWidth)
         y = (y//Arena.TileHeight)
         if x < 0:

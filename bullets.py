@@ -187,7 +187,7 @@ class DualPistols(Weapon):
         self.recoil_duration = 0.2
         self.alternate = -1
 
-class Sniperrifle(Weapon):
+class SniperRifle(Weapon):
     def __init__(self) -> None:
         self.damage = 15
         self.radius = 3
@@ -200,3 +200,17 @@ class Sniperrifle(Weapon):
         self.consecutive_shot_factor = 1
         self.speed_factor = 0.5
         self.recoil_duration = 1
+
+class AssaultRifle(Weapon):
+    def __init__(self) -> None:
+        self.damage = 8
+        self.radius = 1
+        self.speed = 6
+        self.cycle = 0.05
+        self.mag = 24
+        self.magMax = 24
+        self.reload = 5
+        self.recoild = 2
+        self.consecutive_shot_factor = 0.5
+        self.speed_factor = 0.06
+        self.recoil_duration = 0.05

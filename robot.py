@@ -80,7 +80,7 @@ class Robot():
             self.health = 50
             self.radius = 20
             self.image = assault
-            self.weapon = bullets.MachineGun()
+            self.weapon = bullets.AssaultRifle()
         elif type == 'scout':
             self.speed = 3
             self.health = 30
@@ -92,7 +92,7 @@ class Robot():
             self.health = 20
             self.radius = 15
             self.image = sniper
-            self.weapon = bullets.Sniperrifle()
+            self.weapon = bullets.SniperRifle()
 
         elif type == 'player':
             self.image = player
@@ -134,7 +134,6 @@ class Robot():
             self.speed -= self.acceleration
             self.cdDeccelerate = time.time() + self.delayDeccelerate
 
-
     #applies up to 50% Slow/Speedup based on the stack count of "Slow"
     def getV(self):
         return self.speed*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
@@ -142,7 +141,6 @@ class Robot():
     def collidesWithBullet(self, bullet):
         distance_squared = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
         return distance_squared <= (self.radius + bullet.radius)**2
-
 
     def applyDamage(self, damage):
         if time.time() > self.cdDamage:
