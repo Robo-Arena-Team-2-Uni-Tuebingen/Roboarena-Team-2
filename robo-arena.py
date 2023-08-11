@@ -412,7 +412,7 @@ class Arena(QFrame):
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
 
     # draw the healthbars of the robots based on their current health    
-    def drawHealthBars(self, painter, robot):
+    def drawHealthBars(self, painter: QPainter, robot: Robot):
         barWidth  = 60
         barHeight = 4
         barMargin = 5
@@ -425,7 +425,7 @@ class Arena(QFrame):
         painter.drawRect(x, y, barWidth, barHeight)
 
         # Health
-        healthWidth = int(barWidth * max(0, robot.health / 100.0)) # health cannot go below 0
+        healthWidth = int(barWidth * max(0, robot.health / robot.maxHealth)) # health cannot go below 0
         healthColor = QColor(0, 255, 0)  # Green
         painter.setBrush(QBrush(healthColor))
         painter.drawRect(x, y, healthWidth, barHeight)

@@ -111,4 +111,23 @@ class Patroller(Behaviour):
             new_y = random.randint(y - self.patrol_radius, y + self.patrol_radius)
             return (new_x, new_y)
         return False
-    
+
+#This enemy is stationary and tries to engage the player at long range at every available chance
+class Cannoneer(Behaviour):
+    distance_threshold = 0
+    fire_threshold = 200
+    awareness_distance = 300
+    awareness_distance = 300
+    angle_change_cd = 5
+    target_change_cd = 0 #Stationary Enemy
+    reload_threshold = 0
+    initial_x = 0
+    initial_y = 0
+
+    def __init__(self, initial_x, initial_y) -> None:
+        super().__init__()
+        self.initial_x = initial_x
+        self.initial_y = initial_y
+
+    def getNewTarget(self, pos: (int, int), ppos: (int, int), distance: float, hasLineOfSight: bool, is_Damaged: bool) -> (int, int) | bool:
+        return (self.initial_x, self.initial_y)

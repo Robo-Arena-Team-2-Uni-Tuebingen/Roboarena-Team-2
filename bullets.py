@@ -144,7 +144,7 @@ class Weapon:
                 self.cdreload = t + self.reload
         return False, 0
     
-class Revolver(Weapon):
+class Cannon(Weapon):
     def __init__(self) -> None:
         self.damage = 10
         self.radius = 4

@@ -74,7 +74,7 @@ class Robot():
             self.health = 75
             self.radius = 25
             self.image = cannoneer
-            self.weapon = bullets.Revolver()
+            self.weapon = bullets.Cannon()
         elif type == 'assault':
             self.speed = 2
             self.health = 50
