@@ -475,11 +475,11 @@ class Arena(QFrame):
     
     def chooseMap(self):
         if self.arena_number == 1:
-            self.arena_map = "castlelayout.txt"
+            self.arena_map = "maps/castlelayout.txt"
         elif self.arena_number == 2:
-            self.arena_map = "weapontestlayout.txt"
+            self.arena_map = "maps/weapontestlayout.txt"
         else:
-            self.arena_map = "testlayout.txt"
+            self.arena_map = "maps/testlayout.txt"
 
     def unpause(self):
         for thread in self.robotThreads:

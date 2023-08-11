@@ -4,9 +4,9 @@ from PyQt5.QtCore import QRect, QTimer
 tileWidth = 16
 tileHeight = 16
 tilePath = '\openRPG_Tilesets_5.24.22'
-dungeon = QImage('dungeon.png')
-exterior = QImage('exterior.png')
-interior = QImage('interior.png')
+dungeon = QImage('assets/dungeon.png')
+exterior = QImage('assets/exterior.png')
+interior = QImage('assets/interior.png')
 
 def getTileRect(x, y):
     return QRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)

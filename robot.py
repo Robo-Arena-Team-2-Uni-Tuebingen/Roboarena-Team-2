@@ -4,12 +4,12 @@ import bullets
 from PyQt5.QtCore import QRect
 from PyQt5.QtGui import QColor, QImage
 
-heavy_gunner = QImage('heavy_gunner.png').scaled(60, 60)
-cannoneer = QImage('cannoneer.png').scaled(60, 60)
-assault = QImage('assault.png').scaled(60, 60)
-scout = QImage('scout.png').scaled(60, 60)
-sniper = QImage('sniper.png').scaled(60, 60)
-player = QImage('tech.png').scaled(60, 60)
+heavy_gunner = QImage('assets/heavy_gunner.png').scaled(60, 60)
+cannoneer = QImage('assets/cannoneer.png').scaled(60, 60)
+assault = QImage('assets/assault.png').scaled(60, 60)
+scout = QImage('assets/scout.png').scaled(60, 60)
+sniper = QImage('assets/sniper.png').scaled(60, 60)
+player = QImage('assets/tech.png').scaled(60, 60)
 
 class Robot():
 
