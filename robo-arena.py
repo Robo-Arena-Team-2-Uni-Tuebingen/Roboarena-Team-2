@@ -312,13 +312,6 @@ class Arena(QFrame):
         if self.victorycondition == 3:
             if self.KillsToWin < self.kills:
                 self.win()
-    
-    def respawnPlayer(self):
-        self.player_lives = self.player_lives - 1
-        if self.player_lives > 0:
-            self.pawns[0].health = 100
-        else:
-            self.lose()
 
     def win(self):
         self.stopGame()

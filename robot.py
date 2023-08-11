@@ -64,22 +64,36 @@ class Robot():
         self.color      = color
         self.type = type
         if type == 'heavy_gunner':
+            self.speed = 1
+            self.health = 75
+            self.radius = 25
             self.image = heavy_gunner
             self.weapon = bullets.MachineGun()
         elif type == 'cannoneer':
+            self.speed = 1
+            self.health = 75
+            self.radius = 25
             self.image = cannoneer
             self.weapon = bullets.Revolver()
         elif type == 'assault':
+            self.speed = 2
+            self.health = 50
+            self.radius = 20
             self.image = assault
             self.weapon = bullets.MachineGun()
         elif type == 'scout':
+            self.speed = 3
+            self.health = 30
+            self.radius = 15
             self.image = scout
             self.weapon = bullets.DualPistols()
-            self.speed = 3
         elif type == 'sniper':
+            self.speed = 1
+            self.health = 20
+            self.radius = 15
             self.image = sniper
             self.weapon = bullets.Sniperrifle()
-            self.speed = 1
+
         elif type == 'player':
             self.image = player
             self.weapon = bullets.DualPistols()
