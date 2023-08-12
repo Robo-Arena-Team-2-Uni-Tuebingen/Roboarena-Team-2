@@ -76,11 +76,11 @@ class Weapon:
     damage = 0                      #needs to be defined for each weapon
     radius = 0                      #needs to be defined for each weapon
     speed = 0                       #needs to be defined for each weapon
-    cycle = 0                       #needs to be defined for each weapon
+    time_to_cycle = 0                       #needs to be defined for each weapon
     cdcycle = 0
     mag = 0                         #needs to be defined for each weapon
     magMax = 0                      #needs to be defined for each weapon
-    reload = 0                      #needs to be defined for each weapon
+    time_to_reload = 0                      #needs to be defined for each weapon
     cdreload = 0
     recoil = 0                      #needs to be defined for each weapon
     consecutive_shot_factor = 0     #needs to be defined for each weapon
@@ -96,11 +96,11 @@ class Weapon:
         self.damage = 5                         #damage of one projectile
         self.radius = 2                         #size of one projectile
         self.speed = 5                          #speed of one projectile
-        self.cycle = 0.2                        #how fast projectiles can be fired (here one per 50ms)
+        self.time_to_cycle = 0.2                #how fast projectiles can be fired (here one per 50ms)
         self.cdcycle = 0                        #cooldown on the cycle time
         self.mag = 10                           #magazine capacity
         self.magMax = 10                        #maximum magazine capacity
-        self.reload = 2                         #how fast the magazine can be reloaded (here 2 seconds)
+        self.time_to_reload = 2                 #how fast the magazine can be reloaded (here 2 seconds)
         self.cdreload = 0                       #cooldown on the reload time
         self.recoil = 2                         #recoil as percentage of pi
         self.consecutive_shot_factor = 0.08     #increase in recoil/spread when weapon keeps shooting
@@ -115,7 +115,7 @@ class Weapon:
         t = time.time()
         if self.cdreload < t and self.cdcycle < t:
             if self.mag > 0:
-                if self.last_shot + self.cycle + self.recoil_duration > t:
+                if self.last_shot + self.time_to_cycle + self.recoil_duration > t:
                     if self.consecutive_shots < 10:
                         self.consecutive_shots = self.consecutive_shots + 1
                 else:
@@ -136,23 +136,30 @@ class Weapon:
                 bullet = Bullet(bullet_x, bullet_y, bullet_alpha, bullet_radius, bullet_speed, self.damage)
 
                 self.mag = self.mag - 1
-                self.cdcycle = t + self.cycle
+                self.cdcycle = t + self.time_to_cycle
                 self.last_shot = t
                 return True, bullet
             else:
                 self.mag = self.magMax
-                self.cdreload = t + self.reload
+                self.cdreload = t + self.time_to_reload
         return False, 0
+    
+    def reload(self) -> None:
+        self.mag = self.magMax
+        self.cdreload = time.time() + self.time_to_reload
+
+    def getAmmoLeft(self) -> float:
+        return self.mag*100/self.magMax
     
 class Cannon(Weapon):
     def __init__(self) -> None:
         self.damage = 10
         self.radius = 4
         self.speed = 8
-        self.cycle = 0.75
+        self.time_to_cycle = 0.75
         self.mag = 6
         self.magMax = 6
-        self.reload = 6
+        self.time_to_reload = 6
         self.recoil = 5
         self.consecutive_shot_factor = 0.5
         self.speed_factor = 0.03
@@ -163,10 +170,10 @@ class MachineGun(Weapon):
         self.damage = 5
         self.radius = 2
         self.speed = 10
-        self.cycle = 0.02
+        self.time_to_cycle = 0.02
         self.mag = 50
         self.magMax = 50
-        self.reload = 10
+        self.time_to_reload = 10
         self.recoil = 3
         self.consecutive_shot_factor = 0.75
         self.speed_factor = 0.04
@@ -177,10 +184,10 @@ class DualPistols(Weapon):
         self.damage = 5
         self.radius = 2
         self.speed = 5
-        self.cycle = 0.1
+        self.time_to_cycle = 0.1
         self.mag = 20
         self.magMax = 20
-        self.reload = 6
+        self.time_to_reload = 6
         self.recoil = 4
         self.consecutive_shot_factor = 0.08
         self.speed_factor = 0.02
@@ -192,10 +199,10 @@ class SniperRifle(Weapon):
         self.damage = 15
         self.radius = 3
         self.speed = 10
-        self.cycle = 1
+        self.time_to_cycle = 1
         self.mag = 5
         self.magMax = 5
-        self.reload = 8
+        self.time_to_reload = 8
         self.recoil = 1
         self.consecutive_shot_factor = 1
         self.speed_factor = 0.5
@@ -206,10 +213,10 @@ class AssaultRifle(Weapon):
         self.damage = 8
         self.radius = 1
         self.speed = 6
-        self.cycle = 0.05
+        self.time_to_cycle = 0.05
         self.mag = 24
         self.magMax = 24
-        self.reload = 5
+        self.time_to_reload = 5
         self.recoild = 2
         self.consecutive_shot_factor = 0.5
         self.speed_factor = 0.06

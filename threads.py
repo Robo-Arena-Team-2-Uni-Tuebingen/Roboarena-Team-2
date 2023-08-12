@@ -41,10 +41,15 @@ class RobotThread(QThread):
                 if self.is_player:
                     self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
                 else:
-                    self.robot.getAlpha(*self.arena.getPlayerPosition())
-                    shot, bullet = self.robot.shoot()
-                    if shot:
-                        self.arena.passBulletsToThread(bullet)
+                    self.robot.behave(self.arena.hasLineOfSightToPlayer(self.robot.xpos, self.robot.ypos),
+                                      self.arena.hasLineOfSightToPlayerTarget(self.robot.xpos, self.robot.ypos),
+                                      self.arena.getPlayerPosition(), self.arena.getPlayerTarget())
+                    self.target_x = self.robot.target_x
+                    self.target_y = self.robot.target_y
+                    if(self.robot.openFire(self.arena.hasLineOfSightToPlayer(self.robot.xpos, self.robot.ypos), self.arena.getPlayerPosition())):
+                        shot, bullet = self.robot.shoot()
+                        if shot:
+                            self.arena.passBulletsToThread(bullet)
                 currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
                 if currentTile.hasEffect:
                     self.robot.applyEffect(currentTile.effect)
@@ -79,7 +84,7 @@ class RobotThread(QThread):
                 self.robot.accelerate()
         
             if eventDict[Qt.Key_Q]:
-                self.robot.deccelerate()
+                self.robot.decelerate()
 
             if eventDict[Qt.Key_Space]:  
                 shot, bullet = self.robot.shoot()
@@ -104,9 +109,6 @@ class RobotThread(QThread):
             cPos = target
         else:
             cPos = cPos + target_vector
-        
-        if not self.is_player:
-            self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
 
         #check if next movement location is Impassable
         collision = self.isTileAtPosImpassable(cPos[0], cPos[1])
@@ -114,15 +116,6 @@ class RobotThread(QThread):
         if not collision:
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
-        elif collision and not self.is_player:
-            self.generateNewTargetPosition()
-            self.robot.getAlpha(self.target_x, self.target_y)
-
-        # Check if the robot has reached the target position
-        if cPos[0] - self.target_x < 1 and cPos[1] - self.target_y < 1 and not self.is_player:
-            self.generateNewTargetPosition()
-            self.robot.target_x = self.target_x
-            self.robot.target_y = self.target_y
 
     def setTarget(self, x, y):
         newTargetx = self.target_x + x
@@ -149,24 +142,3 @@ class RobotThread(QThread):
 
     def pauseRobots(self):
         self.is_paused = True
-
-    
-    def generateNewTargetPosition(self):
-        # temporary until better behaviour for robots is implemented
-        # Generate random offsets to determine the neighboring tile
-        valid_tile = False
-        while not valid_tile:
-            offset_x = random.randint(0, 59)
-            offset_y = random.randint(0, 59)
-            if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
-                valid_tile = True
-
-        # Calculate the target position based on the new tile indices
-        target_x = offset_x * self.tile_width + self.tile_width // 2
-        target_y = (offset_y * self.tile_height + self.tile_height // 2)
-
-        self.target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
-        self.target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
-
-        self.robot.target_x = self.target_x
-        self.robot.target_y = self.target_y

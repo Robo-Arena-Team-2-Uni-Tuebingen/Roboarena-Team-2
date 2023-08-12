@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import bullets
+import behaviour
 from PyQt5.QtCore import QRect
 from PyQt5.QtGui import QColor, QImage
 
@@ -16,12 +17,9 @@ class Robot():
     #the size of the robot in px
     radius = 30
     #maximum accelerations
-    acceleration    = 2
-    a_alpha         = 2
-    speed_max       = 100
-    A_alpha_max     = 100
-    speed           = 2
-    v_alpha         = 2
+    acceleration    = 1
+    speed_max       = 10
+    speed           = 3
     #effects
     appliedEffects = {
         'Slow': 0, #slows the robot
@@ -63,42 +61,88 @@ class Robot():
         self.alpha      = alpha - 180
         self.color      = color
         self.type = type
+        #high health/slow speed/patroller
         if type == 'heavy_gunner':
-            self.speed = 1
+            self.speed = 0.5
             self.health = 75
             self.radius = 25
             self.image = heavy_gunner
             self.weapon = bullets.MachineGun()
+            self.behaviour : behaviour.Behaviour = behaviour.Patrolling(xpos, ypos)
+        #high health/no speed/stationary gunner
         elif type == 'cannoneer':
-            self.speed = 1
+            self.speed = 0
             self.health = 75
             self.radius = 25
             self.image = cannoneer
             self.weapon = bullets.Cannon()
+            self.behaviour : behaviour.Behaviour = behaviour.Stationary(xpos, ypos)
+        #normal health/normal speed/chases upon contact
         elif type == 'assault':
-            self.speed = 2
+            self.speed = 1
             self.health = 50
             self.radius = 20
             self.image = assault
             self.weapon = bullets.AssaultRifle()
+            self.behaviour : behaviour.Behaviour = behaviour.Standard(xpos, ypos)
+        #low health/high speed/chaser
         elif type == 'scout':
             self.speed = 3
+            self.speed_max = 6
+            self.acceleration = 1
             self.health = 30
             self.radius = 15
             self.image = scout
             self.weapon = bullets.DualPistols()
+            self.behaviour : behaviour.Behaviour = behaviour.Scouting(xpos, ypos)
+        #low health/low speed/long range damage dealer
         elif type == 'sniper':
-            self.speed = 1
+            self.speed = 0.25
             self.health = 20
             self.radius = 15
             self.image = sniper
             self.weapon = bullets.SniperRifle()
+            self.behaviour : behaviour.Behaviour = behaviour.Sniping(xpos, ypos)
 
         elif type == 'player':
             self.image = player
             self.weapon = bullets.DualPistols()
         
+    def behave(self, hasLineOfSight: bool, hasLineOfSightToTarget: bool, ppos: (int, int), pTarget: (int, int)) -> None:
+        pos = (self.xpos, self.ypos)
+        x, y = ppos
+        a, b = pTarget
+        distanceToPlayer = np.sqrt((self.xpos - x)**2 + (self.ypos - y)**2)
+        distanceToTarget = np.sqrt((self.xpos - a)**2 + (self.ypos - b)**2)
 
+        #sets the angle to a random point or the players centre when aware of the player
+        angle = self.behaviour.getAngle(ppos, hasLineOfSight, distanceToPlayer)
+        if not isinstance(angle, bool):
+            self.getAlpha(*angle)
+        
+        #checks whether the behaviour is scouting or not to pass the proper parameter
+        if isinstance(self.behaviour, behaviour.Scouting):
+            newTarget = self.behaviour.getNewTarget(pos, pTarget, distanceToPlayer, hasLineOfSightToTarget)
+        else:
+            newTarget = self.behaviour.getNewTarget(pos, ppos, distanceToPlayer, hasLineOfSight)
+        if not isinstance(newTarget, bool):
+            self.target_x, self.target_y = newTarget
+        
+        #checks conditions for acceleration/deceleration
+        if self.behaviour.accelerate(self.speed, distanceToTarget, hasLineOfSightToTarget):
+            self.accelerate()
+        if self.behaviour.decelerate(self.speed, distanceToTarget, hasLineOfSightToTarget):
+            self.decelerate()
+
+        #reload the weapon if conditions are fulfilled
+        if self.behaviour.reload(self.weapon.getAmmoLeft()):
+            self.weapon.reload()
+    
+    #decide whether the robot should open fire
+    def openFire(self, hasLineOfSight: bool, ppos: (int, int)) -> bool:
+        x, y = ppos
+        distanceToPlayer = np.sqrt((self.xpos - x)**2 + (self.ypos - y)**2)
+        return self.behaviour.openFire(hasLineOfSight, distanceToPlayer)
 
     #this function is supposed to get the angle from the robot to acceleration specific point relative to the x-axis
     def getAlpha(self, x, y):
@@ -106,6 +150,7 @@ class Robot():
         c_y = self.ypos-self.radius
         self.alpha = -np.arctan2(y - c_y, x - c_x)
 
+    #apply a status effect to the robot
     def applyEffect(self, effect: tuple[str, int]):
         if self.appliedEffects[effect[0]] < 100 and time.time() > self.cdApplyEffect:
             if self.appliedEffects[effect[0]] + effect[1] > 100:
@@ -114,6 +159,7 @@ class Robot():
                 self.appliedEffects[effect[0]] = self.appliedEffects[effect[0]] + effect[1]
             self.cdApplyEffect = time.time() + self.delayApplyEffect
 
+    #time status effects down
     def tickDownEffects(self):
         if time.time() > self.cdRemoveEffect:
             for key in self.appliedEffects:
@@ -123,13 +169,15 @@ class Robot():
                     else:
                         self.appliedEffects[key] = self.appliedEffects[key] - 10
             self.cdRemoveEffect = time.time() + self.delayRemoveEffect
-
+    
+    #speed the robot up
     def accelerate(self):
         if self.speed + self.acceleration <= self.speed_max and time.time() > self.cdAccelerate:
             self.speed += self.acceleration
             self.cdAccelerate = time.time() + self.delayAccelerate
 
-    def deccelerate(self):
+    #slow the robot down
+    def decelerate(self):
         if self.speed - self.acceleration >= 0 and time.time() > self.cdDeccelerate:
             self.speed -= self.acceleration
             self.cdDeccelerate = time.time() + self.delayDeccelerate
