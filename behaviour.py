@@ -103,8 +103,8 @@ class Standard(Behaviour):
         x, y = pos
         cur_time = time.time()
         #print(hasLineOfSight)
-        print(distance)
-        print(distance < self.distance_threshold)
+        #print(distance)
+        #print(distance < self.distance_threshold)
         if self.time_until_target_change < cur_time:
             self.time_until_target_change = cur_time + self.target_change_cd
             if distance < self.distance_threshold and hasLineOfSight:
@@ -132,8 +132,6 @@ class Patrolling(Behaviour):
         if self.time_until_target_change < cur_time:
             self.time_until_target_change = cur_time + self.target_change_cd
             x, y = pos
-            new_x = random.randint(int(x - self.patrol_radius), int(x + self.patrol_radius))
-            new_y = random.randint(int(y - self.patrol_radius), int(y + self.patrol_radius))
             return self.generateRandomPoint(x, y, self.patrol_radius)
         return False
 
@@ -178,8 +176,6 @@ class Sniping(Behaviour):
                 return (new_x, new_y)
             else:
                 self.target = False
-                new_x = random.randint(int(x - self.patrol_radius), int(x + self.patrol_radius))
-                new_y = random.randint(int(y - self.patrol_radius), int(y + self.patrol_radius))
                 return self.generateRandomPoint(x, y, self.patrol_radius)
         elif self.firing:
             self.time_until_target_change = cur_time + self.target_change_cd
