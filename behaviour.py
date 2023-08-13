@@ -4,6 +4,7 @@ import numpy as np
 
 class Behaviour():
     distance_threshold = 0          #needs to be defined for each behaviour, threshold to follow the player
+    minimum_distance = 60            #minimum distance kept to prevent clipping into the player
     fire_threshold = 0              #needs to be defined for each behaviour, threshold to open fire at the player
     awareness_threshold = 0         #needs to be defined for each behaviour, threshold to be aware of the player
     awareness_distance = 0          #needs to be defined for each behaviour, threshold for random awareness
@@ -40,9 +41,6 @@ class Behaviour():
     def getAngle(self, pos: (int, int), hasLineOfSight: bool, distance: float):
         x, y = pos
         cur_time = time.time()
-        #print(hasLineOfSight)
-        #print(distance)
-        #print(distance < self.awareness_threshold)
         if distance < self.awareness_threshold and hasLineOfSight:
                 self.time_last_contact = cur_time
                 self.angle = True
@@ -102,14 +100,13 @@ class Standard(Behaviour):
     def getNewTarget(self, pos: (int, int), ppos: (int, int), distance: float, hasLineOfSight: bool):
         x, y = pos
         cur_time = time.time()
-        #print(hasLineOfSight)
-        #print(distance)
-        #print(distance < self.distance_threshold)
         if self.time_until_target_change < cur_time:
             self.time_until_target_change = cur_time + self.target_change_cd
-            if distance < self.distance_threshold and hasLineOfSight:
+            if distance < self.distance_threshold and distance > self.minimum_distance and hasLineOfSight:
                 self.target = True
                 return ppos
+            elif distance < self.minimum_distance:
+                return pos
             else:
                 self.target = False
                 return self.generateRandomPoint(x, y, self.patrol_radius)
@@ -129,10 +126,13 @@ class Patrolling(Behaviour):
     #new target is chosen independent from the players action
     def getNewTarget(self, pos: (int, int), ppos: (int, int), distance: float, hasLineOfSight: bool):
         cur_time = time.time()
-        if self.time_until_target_change < cur_time:
+        if self.time_until_target_change < cur_time and distance > self.minimum_distance:
             self.time_until_target_change = cur_time + self.target_change_cd
             x, y = pos
             return self.generateRandomPoint(x, y, self.patrol_radius)
+        #hold position if distance is smaller than the minimum distance
+        elif distance < self.minimum_distance:
+            return pos
         return False
 
 #This enemy is stationary and tries to engage the player at long range at every available chance
@@ -166,7 +166,7 @@ class Sniping(Behaviour):
         cur_time = time.time()
         if self.time_until_target_change < cur_time and not self.firing:
             self.time_until_target_change = cur_time + self.target_change_cd
-            if distance < self.distance_threshold and hasLineOfSight:
+            if distance < self.distance_threshold and distance > self.minimum_distance and hasLineOfSight:
                 self.target = True
                 a, b = ppos
                 l = np.sqrt((x - a)**2 + (y - b)**2)
@@ -183,7 +183,6 @@ class Sniping(Behaviour):
         return False
     
     def openFire(self, hasLineOfSight: bool, distance: float) -> bool:
-        print(self.firing)
         if distance < self.fire_threshold and hasLineOfSight and self.angle:
             self.firing = True
             return True
@@ -210,9 +209,11 @@ class Scouting(Behaviour):
         cur_time = time.time()
         if self.time_until_target_change < cur_time:
             self.time_until_target_change = cur_time + self.target_change_cd
-            if distanceToTarget < self.distance_threshold and hasLineOfSight:
+            if distanceToTarget < self.distance_threshold and distance > self.minimum_distance and hasLineOfSight:
                 self.target = True
                 return ppos
+            elif distance < self.minimum_distance:
+                return pos
             else:
                 rand = random.randint(0, 20)
                 self.target = False
@@ -230,11 +231,11 @@ class Scouting(Behaviour):
         accThreshold3Dist = 200
 
         if hasLineOfSight:
-            if speed < accThreshold1Speed and distance < accThreshold1Dist:
+            if speed <= accThreshold1Speed and distance < accThreshold1Dist:
                 return True
-            elif speed < accThreshold2Speed and distance < accThreshold2Dist:
+            elif speed <= accThreshold2Speed and distance < accThreshold2Dist:
                 return True
-            elif speed < accThreshold3Speed and distance < accThreshold3Dist:
+            elif speed <= accThreshold3Speed and distance < accThreshold3Dist:
                 return True
         return False
     
@@ -247,10 +248,10 @@ class Scouting(Behaviour):
         decThreshold3Dist = 250
 
         if hasLineOfSight:
-            if speed > decThreshold1Speed and distance > decThreshold1Dist:
+            if speed >= decThreshold1Speed and distance > decThreshold1Dist:
                 return True
-            elif speed > decThreshold2Speed and distance > decThreshold2Dist:
+            elif speed >= decThreshold2Speed and distance > decThreshold2Dist:
                 return True
-            elif speed > decThreshold3Speed and distance > decThreshold3Dist:
+            elif speed >= decThreshold3Speed and distance > decThreshold3Dist:
                 return True
         return False

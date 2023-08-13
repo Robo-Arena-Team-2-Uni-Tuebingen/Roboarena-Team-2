@@ -60,7 +60,7 @@ class Robot():
         #angle the robot in degrees
         self.alpha      = alpha - 180
         self.color      = color
-        self.type = type
+        self.type       = type
         #high health/slow speed/patroller
         if type == 'heavy_gunner':
             self.speed = 0.5
@@ -204,6 +204,10 @@ class Robot():
             else:
                self.health = 100
             self.cdHealing = time.time() + self.delayHealing
+    
+    def revive(self):
+        self.health = 100
+        self.is_dead = False
 
     def shoot(self):
         offset_radius = 0

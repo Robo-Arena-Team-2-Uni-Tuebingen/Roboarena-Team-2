@@ -207,13 +207,13 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(600, 600,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-                               Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 2, type ='scout')])
-        #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-        #                       Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
-        #                       Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
-        #                       Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
-        #                       Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
+        #self.pawns = np.array([Robot(600, 600,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
+        #                       Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 2, type ='scout')])
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
+                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
@@ -223,8 +223,8 @@ class Arena(QFrame):
         self.kills = 0
         self.player_lives = 3 # can be varied
         self.PointsToWin = 1000 # can be varied
-        self.SecondsToWin = 300 # can be varied
-        self.KillsToWin = 20 # can be varied
+        self.SecondsToWin = 60 # can be varied
+        self.KillsToWin = 5 # can be varied
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
@@ -351,14 +351,17 @@ class Arena(QFrame):
     #this function has cornercases where there's an impassable tile between the players centre and the robots centre
     #this 'fuzziness' is intentional, to make it seem like the player can be seen if only a part of the robot shows behind a corner
     def hasLineOfSightToPoint(self, r_x: int, r_y: int, p_x: int, p_y: int) -> bool:
+        #stepsize of iterative check
         stepsize = 10
         #y = mx + c
         m = (r_y - p_y)/(r_x - p_x)
         #c = y - mx
         c = r_y - m*r_x
+        #calculating the number of required steps to traverse the line from (r_x, r_y) to (p_x, p_y)
         length = np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
         num_x_iteration = length/stepsize
         x_stepsize = (max(p_x, r_x) - min(p_x, r_x))/num_x_iteration
+        #pick the smaller x value and traverse to the larger x value
         x = min(p_x, r_x)
         while x < max(p_x, r_x):
             if self.getTileAtPos(x, m*x + c).isImpassable:
