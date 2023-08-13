@@ -32,13 +32,12 @@ class RobotThread(QThread):
         while (not self.robot.isRobotDead() or self.is_player) and not self.abort:
             if not self.is_paused:
                 if self.is_player and self.robot.isRobotDead():
-                    print(self.arena.player_lives)
                     self.arena.player_lives = self.arena.player_lives - 1
-                    print(self.arena.player_lives)
                     if self.arena.player_lives > 0:
                         self.robot.revive()
                     else:
                         self.arena.lose()
+                self.arena.updateTime()
                 self.moveRobotSmoothly()
                 if self.is_player:
                     self.robot.getAlpha(self.Mouse_x, self.Mouse_y)

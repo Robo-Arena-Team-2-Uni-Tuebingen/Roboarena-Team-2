@@ -207,21 +207,21 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        #self.pawns = np.array([Robot(600, 600,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-        #                       Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 2, type ='scout')])
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
-                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
+        #self.pawns = np.array([Robot(600, 600,  -np.pi/2, player_number = 1, type ='player'),
+        #                       Robot(200, 200,  -np.pi/2, player_number = 2, type ='scout')])
+        self.pawns = np.array([Robot(200, 200, -np.pi/2, 1, type ='player'),
+                               Robot(600, 800, -np.pi/2, 2, type = 'assault'),
+                               Robot(800, 200, -np.pi/2, 3, type = 'heavy_gunner'),
+                               Robot(400, 800, -np.pi/2, 4, type = 'sniper'),
+                               Robot(400, 400, 0, 5, type='scout')])
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
-        self.victorycondition = 1 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
-        self.time = time.time()
+        self.victorycondition = 3 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
+        self.starttime = time.time()
         self.currentTime = time.time()
         self.kills = 0
-        self.player_lives = 3 # can be varied
+        self.player_lives = 2 # can be varied
         self.PointsToWin = 1000 # can be varied
         self.SecondsToWin = 60 # can be varied
         self.KillsToWin = 5 # can be varied
@@ -280,12 +280,11 @@ class Arena(QFrame):
         self.robotThreads.append(thread)
         thread.start()
 
+    #spawns a robot at a random valid position
     def spawnRobot(self):
-        #placeholder
-        color = tuple(np.random.choice(range(256), size=3))
         x, y = self.getRandomValidPosition()
         type = random.choice(['heavy_gunner', 'cannoneer', 'assault', 'scout', 'sniper'])
-        robot = Robot(x, y, random.random()*np.pi*2, QColor(*color), player_number=5, type=type)
+        robot = Robot(x, y, random.random()*np.pi*2, 5, type=type)
         self.addRobot(robot)
 
     def createBulletsThread(self):
@@ -306,9 +305,9 @@ class Arena(QFrame):
                 self.win()
 
     def updateTime(self):
-        self.currentTime = time.time()
+        self.currentTime = int(time.time())
         if self.victorycondition == 2:
-            if self.time + self.SecondsToWin < self.currentTime:
+            if self.starttime + self.SecondsToWin < self.currentTime:
                 self.win() 
     
     def updateKillCounter(self):
@@ -320,7 +319,7 @@ class Arena(QFrame):
     def win(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.time).__str__()
+        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen 
         self.showVictory.emit(kills, time, points)
@@ -328,11 +327,12 @@ class Arena(QFrame):
     def lose(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.time).__str__()
+        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen
         self.showDefeat.emit(kills, time, points)
 
+    #method to end the respective threads in a controlled manner by setting the abort flag
     def stopGame(self):
         for thread in self.robotThreads:
             thread.abort = True
@@ -340,11 +340,11 @@ class Arena(QFrame):
 
     #temporary method to generate a random valid position to spawn a robot on
     def getRandomValidPosition(self):
-        passable = True
-        while passable:
+        Impassable = True
+        while Impassable:
             x = random.randint(1, 959)
             y = random.randint(1, 959)
-            passable = self.getTileAtPos(x, y).isImpassable
+            Impassable = self.getTileAtPos(x, y).isImpassable
         return x, y
     
     #this function checks iteratively whether a robot has line of sight to the player
@@ -354,7 +354,8 @@ class Arena(QFrame):
         #stepsize of iterative check
         stepsize = 10
         #y = mx + c
-        m = (r_y - p_y)/(r_x - p_x)
+        #we add 0.0001 to prevent a divide by zero error with a negligible margin of error
+        m = (r_y - p_y)/((r_x - p_x) + 0.0001)
         #c = y - mx
         c = r_y - m*r_x
         #calculating the number of required steps to traverse the line from (r_x, r_y) to (p_x, p_y)

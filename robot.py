@@ -52,14 +52,13 @@ class Robot():
     weapon = bullets.Weapon()
     points = 100 # temporary, should depend on weapon and behaviour
 
-    def __init__(self, xpos, ypos, alpha, color, player_number, type):
+    def __init__(self, xpos, ypos, alpha, player_number, type):
 
         self.player_number  = player_number
         self.xpos       = xpos
         self.ypos       = ypos
         #angle the robot in degrees
         self.alpha      = alpha - 180
-        self.color      = color
         self.type       = type
         #high health/slow speed/patroller
         if type == 'heavy_gunner':
@@ -106,7 +105,7 @@ class Robot():
 
         elif type == 'player':
             self.image = player
-            self.weapon = bullets.DualPistols()
+            self.weapon = bullets.AssaultRifle()
         
     def behave(self, hasLineOfSight: bool, hasLineOfSightToTarget: bool, ppos: (int, int), pTarget: (int, int)) -> None:
         pos = (self.xpos, self.ypos)

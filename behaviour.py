@@ -51,6 +51,7 @@ class Behaviour():
             return self.generateRandomPoint(x, y, self.awareness_distance)
         return False
     
+    #generates a random point within the boundaries of the arena, the point is not guaranteed to be reachable, upperbound and lowerbound need to be changed for changing map sizes
     def generateRandomPoint(self, x, y, z):
         new_x = min(self.upperbound, max(self.lowerbound, random.randint(int(x - z), int(x + z))))
         new_y = random.randint(int(y - z), int(y + z))
@@ -192,16 +193,17 @@ class Sniping(Behaviour):
 
 #This enemy is supposed to scout for the player and tries to intercept the player at the players target
 class Scouting(Behaviour):
-    distance_threshold = 400
+    distance_threshold = 1000
     fire_threshold = 80
     awareness_threshold = 300
     awareness_distance = 200
     angle_change_cd = 0.03
-    target_change_cd = 0.03
+    target_change_cd = 1
     reload_threshold = 25
     accelerate = False
     decelerate = False
 
+    #enemy is supposed to traverse the map at random and lock onto the player once line of sight is established
     def getNewTarget(self, pos: (int, int), ppos: (int, int), distance: float, hasLineOfSight: bool):
         x, y = pos
         a, b = ppos
