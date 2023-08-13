@@ -12,6 +12,7 @@ from game_menu import GameMenu
 from settings_menu import SettingsMenu
 from music_player import MusicPlayer 
 from end_screen import EndScreen
+from stats import Stats
 
 import PyQt5.QtQuick
 from PyQt5.QtCore import Qt, QRect, QBasicTimer, pyqtSignal, QPointF
@@ -81,18 +82,28 @@ class RoboArena(QMainWindow):
         self.stacked_widget.setCurrentWidget(self.settings)
         self.center()
 
-    def switchToVictoryScreen(self, kills, time, points):
+    def switchToVictoryScreen(self, kills, points):
         screenshot      = self.grab()
         self.end_screen = EndScreen(screenshot)
+
+        minutes = self.stats.time_counter // 60
+        seconds = self.stats.time_counter % 60
+        time   = f"{minutes:02d}:{seconds:02d}"
+
         self.end_screen.setupVictory(kills, time, points)
         self.end_screen.quit_button.clicked.connect(self.switchToMenu)
         self.end_screen.retry_button.clicked.connect(self.switchToGame)
         self.stacked_widget.addWidget(self.end_screen)
         self.stacked_widget.setCurrentWidget(self.end_screen)
 
-    def switchToDefeatScreen(self, kills, time, points):
+    def switchToDefeatScreen(self, kills, points):
         screenshot      = self.grab()
         self.end_screen = EndScreen(screenshot)
+
+        minutes = self.stats.time_counter // 60
+        seconds = self.stats.time_counter % 60
+        time   = f"{minutes:02d}:{seconds:02d}"
+
         self.end_screen.setupDefeat(kills, time, points)
         self.end_screen.quit_button.clicked.connect(self.switchToMenu)
         self.end_screen.retry_button.clicked.connect(self.switchToGame)
@@ -132,11 +143,15 @@ class RoboArena(QMainWindow):
     def toggle_pause(self):
         if self.game_running:
             if self.pause_visible:
-                self.pause.hide()
                 self.arena.unpause()
+                self.pause.hide()
+                self.stats.show()
+                self.stats.control_timer()
             else:
                 self.arena.pause()
+                self.stats.hide()
                 self.pause.show()
+                self.stats.control_timer()
             
             self.pause_visible = not self.pause_visible
 
@@ -152,6 +167,8 @@ class RoboArena(QMainWindow):
         self.arena.setMouseTracking(True)
         self.arena.showVictory.connect(self.switchToVictoryScreen)
         self.arena.showDefeat.connect(self.switchToDefeatScreen)
+
+        self.stats = Stats(self.game_widget)
         
         self.pause = PauseMenu(self.game_widget)
         self.pause.hide()
@@ -195,8 +212,8 @@ class Arena(QFrame):
         Qt.MouseButton.RightButton: False
     }
 
-    showVictory = pyqtSignal(str, str, str)
-    showDefeat  = pyqtSignal(str, str, str)
+    showVictory = pyqtSignal(str, str)
+    showDefeat  = pyqtSignal(str, str)
 
     def __init__(self, parent, player_numbers, arena_number):
         super().__init__(parent)
@@ -329,7 +346,7 @@ class Arena(QFrame):
         time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen 
-        self.showVictory.emit(kills, time, points)
+        self.showVictory.emit(kills, points)
 
     def lose(self):
         self.stopGame()
@@ -337,7 +354,7 @@ class Arena(QFrame):
         time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen
-        self.showDefeat.emit(kills, time, points)
+        self.showDefeat.emit(kills, points)
 
     #method to end the respective threads in a controlled manner by setting the abort flag
     def stopGame(self):
