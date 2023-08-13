@@ -142,12 +142,18 @@ class RoboArena(QMainWindow):
 
     def makeGameWidget(self):
 
-        self.arena = Arena(self)
+        self.setMouseTracking(True)
+
+        self.game_widget = QWidget(self)
+        self.game_widget.setMouseTracking(True)
+        self.game_widget.setObjectName("gameWidget")
+
+        self.arena = Arena(self.game_widget, self.player_numbers, self.arena_number)
         self.arena.setMouseTracking(True)
         self.arena.showVictory.connect(self.switchToVictoryScreen)
         self.arena.showDefeat.connect(self.switchToDefeatScreen)
         
-        self.pause         = PauseMenu(self)
+        self.pause = PauseMenu(self.game_widget)
         self.pause.hide()
         self.pause_visible = False
         self.pause.quit_button.clicked.connect(self.switchToMenu)
@@ -156,15 +162,6 @@ class RoboArena(QMainWindow):
         self.pause.volume_slider.valueChanged.connect(self.music_player.set_volume)
         self.pause.volume_slider.setValue(self.music_player.volume)
         
-        main_layout = QHBoxLayout()
-        main_layout.addWidget(self.arena)
-        main_layout.addWidget(self.pause)
-        main_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.game_widget = QWidget()
-        self.game_widget.setLayout(main_layout)
-        self.game_widget.setMouseTracking(True)
-
         self.stacked_widget.addWidget(self.game_widget)
         self.stacked_widget.setMouseTracking(True)
 
@@ -201,21 +198,19 @@ class Arena(QFrame):
     showVictory = pyqtSignal(str, str, str)
     showDefeat  = pyqtSignal(str, str, str)
 
-    def __init__(self, parent):
+    def __init__(self, parent, player_numbers, arena_number):
         super().__init__(parent)
-        self.parentObject = parent
-        parent.setMouseTracking(True)
+        self.setGeometry(QRect(0, 0, 960, 960))
         self.setMouseTracking(True)
 
-        self.pawns = np.array([Robot(600, 600,  -np.pi/2, player_number = 1, type ='player'),
-                               Robot(200, 200,  -np.pi/2, player_number = 2, type ='scout')])
-        #self.pawns = np.array([Robot(200, 200, -np.pi/2, 1, type ='player'),
-        #                       Robot(600, 800, -np.pi/2, 2, type = 'assault'),
-        #                       Robot(800, 200, -np.pi/2, 3, type = 'heavy_gunner'),
-        #                       Robot(400, 800, -np.pi/2, 4, type = 'sniper'),
-        #                       Robot(400, 400, 0, 5, type='scout')])
-        self.player_numbers = parent.player_numbers
-        self.arena_number = parent.arena_number
+        #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='cannoneer')])
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
+                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
+                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
+                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
+                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
+        self.player_numbers = player_numbers
+        self.arena_number = arena_number
         self.points = 0
         self.victorycondition = 3 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
         self.starttime = time.time()
