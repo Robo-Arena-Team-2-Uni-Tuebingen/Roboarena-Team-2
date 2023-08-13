@@ -223,7 +223,7 @@ class Scouting(Behaviour):
         else:
             return False
 
-    #speed the robot up depending on how close it is
+    #speed the robot up depending on how close it is to the player
     def accelerate(self, speed: int, distance: float, hasLineOfSight: bool) -> bool:
         accThreshold1Speed = 4
         accThreshold2Speed = 5
@@ -241,6 +241,7 @@ class Scouting(Behaviour):
                 return True
         return False
     
+    #slow the robot down depending on how far it is from the player
     def decelerate(self, speed: int, distance: float, hasLineOfSight: bool) -> bool:
         decThreshold1Speed = 4
         decThreshold2Speed = 5

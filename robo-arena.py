@@ -233,6 +233,7 @@ class Arena(QFrame):
     def initArena(self):
         # set default arena saved in .txt file "layout1"
         self.ArenaLayout = textToTiles(self.arena_map)
+        #this loop passes the direct neighbours of each tile to it, enabling it to choose the appropriate texture
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 >= 0:
@@ -274,6 +275,7 @@ class Arena(QFrame):
         self.pawns = np.append(self.pawns, robot)
         self.appendRobotThread(robot)
     
+    #appends a new thread and starts it
     def appendRobotThread(self, robot, is_player=False):
         thread = threads.RobotThread(robot, self, is_player)
         thread.positionChanged.connect(self.updateRobotPosition)
@@ -377,7 +379,6 @@ class Arena(QFrame):
     def hasLineOfSightToPlayerTarget(self, r_x: int, r_y: int) -> bool:
         return self.hasLineOfSightToPoint(r_x, r_y, *self.getPlayerTarget())
 
-    #returns the distance to the player
     def distanceToPlayer(self, r_x: int, r_y: int) -> float:
         p_x, p_y = self.getPlayerPosition()
         return np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
@@ -450,18 +451,18 @@ class Arena(QFrame):
         painter.setBrush(Qt.black)
         painter.drawEllipse(QPointF(bullet.x, bullet.y), bullet.radius, bullet.radius)
 
-
+    #these functions log press and release events into a dictionary
     def logKeyPressEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
             self.PressedKeys[event.key()] = True
             self.passKeyEvents(self.PressedKeys)
-            
-        
+              
     def logKeyReleaseEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
             self.PressedKeys[event.key()] = False
             self.passKeyEvents(self.PressedKeys)
 
+    #these functions pass the dictionary of key events and the relevant mouse events along to the threads
     def passKeyEvents(self, eventDict):
         for thread in self.robotThreads:
             thread.processKeyEvent(eventDict)
@@ -471,6 +472,7 @@ class Arena(QFrame):
             self.pressedMouseButtons[key] = event.buttons() & key
         self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
     
+    #this function translates a position on the map to the respective tile
     def getTileAtPos(self, x, y) -> tiles.Tile:
         x = (x//Arena.TileWidth)
         y = (y//Arena.TileHeight)
@@ -492,6 +494,7 @@ class Arena(QFrame):
         else:
             self.arena_map = "maps/testlayout.txt"
 
+    #sets/unsets the flags responsible for pausing the threads
     def unpause(self):
         for thread in self.robotThreads:
             thread.unpauseRobots()

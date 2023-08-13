@@ -2,6 +2,7 @@ import numpy as np
 import time
 import bullets
 import behaviour
+import random
 from PyQt5.QtCore import QRect
 from PyQt5.QtGui import QColor, QImage
 
@@ -68,6 +69,7 @@ class Robot():
             self.image = heavy_gunner
             self.weapon = bullets.MachineGun()
             self.behaviour : behaviour.Behaviour = behaviour.Patrolling(xpos, ypos)
+            self.points = 75 + random.randint(-10, 10)
         #high health/no speed/stationary gunner
         elif type == 'cannoneer':
             self.speed = 0
@@ -76,6 +78,7 @@ class Robot():
             self.image = cannoneer
             self.weapon = bullets.Cannon()
             self.behaviour : behaviour.Behaviour = behaviour.Stationary(xpos, ypos)
+            self.points = 75 + random.randint(-10, 10)
         #normal health/normal speed/chases upon contact
         elif type == 'assault':
             self.speed = 1
@@ -84,6 +87,7 @@ class Robot():
             self.image = assault
             self.weapon = bullets.AssaultRifle()
             self.behaviour : behaviour.Behaviour = behaviour.Standard(xpos, ypos)
+            self.points = 50 + random.randint(-10, 10)
         #low health/high speed/chaser
         elif type == 'scout':
             self.speed = 3
@@ -94,6 +98,7 @@ class Robot():
             self.image = scout
             self.weapon = bullets.DualPistols()
             self.behaviour : behaviour.Behaviour = behaviour.Scouting(xpos, ypos)
+            self.points = 30 + random.randint(-10, 10)
         #low health/low speed/long range damage dealer
         elif type == 'sniper':
             self.speed = 0.25
@@ -102,11 +107,13 @@ class Robot():
             self.image = sniper
             self.weapon = bullets.SniperRifle()
             self.behaviour : behaviour.Behaviour = behaviour.Sniping(xpos, ypos)
+            self.points = 20 + random.randint(-10, 10)
 
         elif type == 'player':
             self.image = player
             self.weapon = bullets.AssaultRifle()
-        
+
+    #handles basic decision making for target, alpha, acceleration, deceleration and reloading 
     def behave(self, hasLineOfSight: bool, hasLineOfSightToTarget: bool, ppos: (int, int), pTarget: (int, int)) -> None:
         pos = (self.xpos, self.ypos)
         x, y = ppos
@@ -142,6 +149,10 @@ class Robot():
         x, y = ppos
         distanceToPlayer = np.sqrt((self.xpos - x)**2 + (self.ypos - y)**2)
         return self.behaviour.openFire(hasLineOfSight, distanceToPlayer)
+    
+    #this function returns the target of the robot
+    def getTarget(self):
+        return self.target_x, self.target_y
 
     #this function is supposed to get the angle from the robot to acceleration specific point relative to the x-axis
     def getAlpha(self, x, y):
@@ -185,10 +196,12 @@ class Robot():
     def getV(self):
         return self.speed*(200 - self.appliedEffects['Slow'] + self.appliedEffects['Speedup'])/200
 
-    def collidesWithBullet(self, bullet):
-        distance_squared = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
+    #checks whether a bullet hits the robot or not
+    def collidesWithBullet(self, bullet : bullets.Bullet) -> bool:
+        distance_squared: float = (bullet.xpos - self.xpos)**2 + (bullet.ypos - self.ypos)**2
         return distance_squared <= (self.radius + bullet.radius)**2
 
+    #applies up to 50% extra damage based on the stack count of "Corrosion"
     def applyDamage(self, damage):
         if time.time() > self.cdDamage:
             self.health = self.health - (damage * (200 - self.appliedEffects['Corrosion'])/200)
@@ -196,6 +209,7 @@ class Robot():
             if self.health <= 0:
                 self.is_dead = True
 
+    #unused currently, but implemented for later use with item pickups
     def applyHealing(self, healing):
         if time.time() > self.cdHealing:
             if self.health + healing <= 100:
@@ -204,10 +218,13 @@ class Robot():
                self.health = 100
             self.cdHealing = time.time() + self.delayHealing
     
+    #'revives' the player and adds a 3 second invulnerability
     def revive(self):
         self.health = 100
         self.is_dead = False
+        self.cdDamage = time.time() + 3
 
+    #handles the firing of a bullet and the associated offsets for player and enemy models, so that bullets may spawn at the correct location of the model
     def shoot(self):
         offset_radius = 0
         offset_angle = 0
