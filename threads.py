@@ -125,11 +125,13 @@ class RobotThread(QThread):
         #multiplies normalized target vector with the speed of the robot (which is influenced by status effects)
         if norm > 0:
             new_target_vector = self.robot.getV()*(target_vector/norm)
+        else:
+            new_target_vector = target_vector
         #prevents overshooting the target when the adjusted target_vector is longer than the actual vector to the target
         if np.linalg.norm(target_vector) < np.linalg.norm(new_target_vector):
             cPos = target
         else:
-            cPos = cPos + target_vector
+            cPos = cPos + new_target_vector
 
         #check if next movement location is Impassable
         collision = self.isTileAtPosImpassable(cPos[0], cPos[1])
