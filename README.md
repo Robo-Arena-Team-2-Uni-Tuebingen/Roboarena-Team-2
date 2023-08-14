@@ -789,7 +789,7 @@ Designed a "Victory" ...
 - should be as a half-transparent layer over the arena
 - not implemented yet because of problems drawing it into the existing widget with a parent
 
-### Sprint 8 (01.08.2023 - 15.08.2023)
+### Sprint 9 (01.08.2023 - 15.08.2023)
 
 #### Behaviour (by Julian Häberle)
 - the `Behaviour` class controls the basic decision making of the enemies
@@ -829,3 +829,32 @@ Designed a "Victory" ...
 - the scout charges the player as soon as it has a line of sight and accelerates the closer it gets to the player
 
 - apart from the behaviour and the associated code, the behaviour branch contains a clean-up of assets and maps, some minor refactors and a lot of added commentary
+
+#### Display stats (by Niklas Wolf)
+![stats-screen](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/fbd4decb-86b1-4127-8de8-7cfaaac70445)
+
+- stats showing the played time, health, points, kills, the weapon with ammunition and if the weapon is reloading, and the values of the active effects
+  
+![stats-screen](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/f02feedf-3dbc-48ce-abef-0db86913af7e)
+- changing the stats by emitting a signal if the values change and connecting it to the update function
+- problems by taking signals of nested classes, especially if they aren't a QObject
+  - the classes called the other classes had to take the values and emit them as signals
+
+![timer-function](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/2bf48d58-b5cb-4c1d-95bb-5c56a8e4dfbc)
+- implementation of the timer
+- increasing the counter every 1000ms by reacting to the timer signal
+  
+#### Implementation of win/lose screen (by Niklas Wolf)
+![image](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/e5b2fd73-7b79-4365-a253-6e7fe893d595)
+
+- calling the end screen and passing the last picture of the game as a screenshot, so it looks like an overlay but avoids the problem of the threads
+![defeat](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/5a6c5305-ff50-4c2c-8a6e-a66b2be3827b)
+
+#### Improving the design of the pause and game menu (by Niklas Wolf)
+- know now better how to handle the labels, buttons and backgrounds in the widgets, so I reworked the menus I did at the beginning
+
+Pause menu:
+![pause-menu](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/b090d2ef-0ed5-45c4-b49f-51c2327d40ef)
+
+Game Menu:
+![game-menu](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/a7f7e984-c5cf-4aa0-b62a-063c880ed0d5)
