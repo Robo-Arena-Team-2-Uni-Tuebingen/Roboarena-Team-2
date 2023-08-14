@@ -536,6 +536,8 @@ class Arena(QFrame):
             self.arena_map = "maps/castlelayout.txt"
         elif self.arena_number == 2:
             self.arena_map = "maps/weapontestlayout.txt"
+        elif self.arena_number == 3:
+            self.arena_map = "maps/bunkermap.txt"
         else:
             self.arena_map = "maps/testlayout.txt"
 
