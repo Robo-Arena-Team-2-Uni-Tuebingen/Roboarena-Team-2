@@ -15,7 +15,7 @@ from end_screen import EndScreen
 from stats import Stats
 
 import PyQt5.QtQuick
-from PyQt5.QtCore import Qt, QRect, QBasicTimer, pyqtSignal, QPointF
+from PyQt5.QtCore import Qt, QRect, QBasicTimer, pyqtSignal, QPointF, QTimer
 from PyQt5.QtGui import QPainter, QColor, QFont, QKeyEvent, QMouseEvent, QBrush
 from PyQt5.QtWidgets import QMainWindow, QWidget, QFrame, QDesktopWidget, QApplication, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel, QPushButton
 
@@ -238,9 +238,12 @@ class Arena(QFrame):
         self.player_numbers = player_numbers
         self.arena_number = arena_number
         self.points = 0
-        self.victorycondition = 3 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
-        self.starttime = time.time()
-        self.currentTime = time.time()
+        self.victorycondition = 2 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
+        self.timer = QTimer(self)
+        self.timer.start(1000)
+        self.timer.timeout.connect(self.updateTimer)
+        self.time_counter = 0
+        self.is_running = False
         self.kills = 0
         self.player_lives = 2 # can be varied
         self.PointsToWin = 1000 # can be varied
@@ -331,8 +334,14 @@ class Arena(QFrame):
     def updateKillCounter(self):
         self.kills = self.kills + 1
         self.killsUpdated.emit(self.kills)
+        if self.victorycondition == 2:
+            if self.KillsToWin <= self.kills:
+                self.win()
+
+    def updateTimer(self):
+        self.time_counter += 1
         if self.victorycondition == 3:
-            if self.KillsToWin < self.kills:
+            if self.time_counter >= self.SecondsToWin:
                 self.win()
 
     def playerKill(self):
