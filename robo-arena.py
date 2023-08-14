@@ -207,23 +207,24 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='cannoneer')])
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
-                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
+        self.pawns = np.array([Robot(600, 600,  -np.pi/2, player_number = 1, type ='player'),
+                               Robot(200, 200,  -np.pi/2, player_number = 2, type ='scout')])
+        #self.pawns = np.array([Robot(200, 200, -np.pi/2, 1, type ='player'),
+        #                       Robot(600, 800, -np.pi/2, 2, type = 'assault'),
+        #                       Robot(800, 200, -np.pi/2, 3, type = 'heavy_gunner'),
+        #                       Robot(400, 800, -np.pi/2, 4, type = 'sniper'),
+        #                       Robot(400, 400, 0, 5, type='scout')])
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
-        self.victorycondition = 1 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
-        self.time = time.time()
+        self.victorycondition = 3 # 1: Victory by points, 2: Victory by Kills, 3: Victory by Time, 4: Survival
+        self.starttime = time.time()
         self.currentTime = time.time()
         self.kills = 0
-        self.player_lives = 3 # can be varied
+        self.player_lives = 2 # can be varied
         self.PointsToWin = 1000 # can be varied
-        self.SecondsToWin = 300 # can be varied
-        self.KillsToWin = 20 # can be varied
+        self.SecondsToWin = 60 # can be varied
+        self.KillsToWin = 5 # can be varied
         self.chooseMap()
         self.initArena()
         self.createRobotThreads()
@@ -232,6 +233,7 @@ class Arena(QFrame):
     def initArena(self):
         # set default arena saved in .txt file "layout1"
         self.ArenaLayout = textToTiles(self.arena_map)
+        #this loop passes the direct neighbours of each tile to it, enabling it to choose the appropriate texture
         for x in range(self.ArenaWidth):
             for y in range(self.ArenaHeight):
                 if y - 1 >= 0:
@@ -255,6 +257,9 @@ class Arena(QFrame):
 
     def getPlayerPosition(self):
         return self.pawns[0].xpos, self.pawns[0].ypos
+    
+    def getPlayerTarget(self):
+        return self.pawns[0].target_x, self.pawns[0].target_y
 
     def createRobotThreads(self):
         self.robotThreads = []
@@ -270,18 +275,18 @@ class Arena(QFrame):
         self.pawns = np.append(self.pawns, robot)
         self.appendRobotThread(robot)
     
+    #appends a new thread and starts it
     def appendRobotThread(self, robot, is_player=False):
         thread = threads.RobotThread(robot, self, is_player)
         thread.positionChanged.connect(self.updateRobotPosition)
         self.robotThreads.append(thread)
         thread.start()
 
+    #spawns a robot at a random valid position
     def spawnRobot(self):
-        #placeholder
-        color = tuple(np.random.choice(range(256), size=3))
         x, y = self.getRandomValidPosition()
         type = random.choice(['heavy_gunner', 'cannoneer', 'assault', 'scout', 'sniper'])
-        robot = Robot(x, y, random.random()*np.pi*2, QColor(*color), player_number=5, type=type)
+        robot = Robot(x, y, random.random()*np.pi*2, 5, type=type)
         self.addRobot(robot)
 
     def createBulletsThread(self):
@@ -302,9 +307,9 @@ class Arena(QFrame):
                 self.win()
 
     def updateTime(self):
-        self.currentTime = time.time()
+        self.currentTime = int(time.time())
         if self.victorycondition == 2:
-            if self.time + self.SecondsToWin < self.currentTime:
+            if self.starttime + self.SecondsToWin < self.currentTime:
                 self.win() 
     
     def updateKillCounter(self):
@@ -312,18 +317,21 @@ class Arena(QFrame):
         if self.victorycondition == 3:
             if self.KillsToWin < self.kills:
                 self.win()
-    
-    def respawnPlayer(self):
+
+    def playerKill(self):
         self.player_lives = self.player_lives - 1
+        #100 points deducted for dying
+        self.updatePointCounter(-100)
         if self.player_lives > 0:
-            self.pawns[0].health = 100
+            return True
         else:
             self.lose()
+            return False
 
     def win(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.time).__str__()
+        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen 
         self.showVictory.emit(kills, time, points)
@@ -331,11 +339,12 @@ class Arena(QFrame):
     def lose(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.time).__str__()
+        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen
         self.showDefeat.emit(kills, time, points)
 
+    #method to end the respective threads in a controlled manner by setting the abort flag
     def stopGame(self):
         for thread in self.robotThreads:
             thread.abort = True
@@ -343,12 +352,47 @@ class Arena(QFrame):
 
     #temporary method to generate a random valid position to spawn a robot on
     def getRandomValidPosition(self):
-        passable = True
-        while passable:
+        Impassable = True
+        while Impassable:
             x = random.randint(1, 959)
             y = random.randint(1, 959)
-            passable = self.getTileAtPos(x, y).isImpassable
+            Impassable = self.getTileAtPos(x, y).isImpassable
         return x, y
+    
+    #this function checks iteratively whether a robot has line of sight to the player
+    #this function has cornercases where there's an impassable tile between the players centre and the robots centre
+    #this 'fuzziness' is intentional, to make it seem like the player can be seen if only a part of the robot shows behind a corner
+    def hasLineOfSightToPoint(self, r_x: int, r_y: int, p_x: int, p_y: int) -> bool:
+        #stepsize of iterative check
+        stepsize = 10
+        #y = mx + c
+        #we add 0.0001 to prevent a divide by zero error with a negligible margin of error
+        m = (r_y - p_y)/((r_x - p_x) + 0.0001)
+        #c = y - mx
+        c = r_y - m*r_x
+        #calculating the number of required steps to traverse the line from (r_x, r_y) to (p_x, p_y)
+        length = np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
+        num_x_iteration = length/stepsize
+        x_stepsize = (max(p_x, r_x) - min(p_x, r_x))/num_x_iteration
+        #pick the smaller x value and traverse to the larger x value
+        x = min(p_x, r_x)
+        while x < max(p_x, r_x):
+            if self.getTileAtPos(x, m*x + c).isImpassable:
+                return False
+            else:
+                x = x + x_stepsize
+        return True
+    
+    def hasLineOfSightToPlayer(self, r_x: int, r_y: int) -> bool:
+        return self.hasLineOfSightToPoint(r_x, r_y, *self.getPlayerPosition())
+    
+    def hasLineOfSightToPlayerTarget(self, r_x: int, r_y: int) -> bool:
+        return self.hasLineOfSightToPoint(r_x, r_y, *self.getPlayerTarget())
+
+    def distanceToPlayer(self, r_x: int, r_y: int) -> float:
+        p_x, p_y = self.getPlayerPosition()
+        return np.sqrt((p_x - r_x)**2 + (p_y - r_y)**2)
+
         
     # paint all tiles of the arena
     def paintEvent(self, event):
@@ -370,6 +414,8 @@ class Arena(QFrame):
             self.drawRobot(painter, robot)
             self.drawHealthBars(painter, robot)
 
+        self.drawPlayerTarget(painter)
+
         # Draw bullets
         for bullet in self.bulletsThread.getBullets():
             self.drawBullet(painter, bullet)
@@ -378,19 +424,27 @@ class Arena(QFrame):
     def drawTile(self, painter : QPainter, x : int, y : int, tile : tiles.Tile):
         painter.drawImage(x, y, tile.texture)
     
+    def drawPlayerTarget(self, painter: QPainter):
+        target = QPointF(self.pawns[0].target_x, self.pawns[0].target_y)
+        painter.setBrush(QColor(0xF5F000))
+        painter.drawEllipse(target, 5, 5)
+
     #this method is responsible for painting the robot in the window
     def drawRobot(self, painter : QPainter, robot : Robot):
         #corrects the position of the robot to the upper left corner where the drawing is positioned
         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        #translate origin of the coordinate system to the center of the robot
         painter.translate(centerRobot)
+        #rotate by alpha + offset
         painter.rotate(-robot.alpha*180/np.pi + 90)
         painter.drawImage(-30, -30, robot.image)
+        #reset the transformation matrices
         painter.resetTransform()
-        #for debugging purposes, to be removed later
-        painter.drawEllipse(centerRobot, robot.radius, robot.radius)
+        #for debugging purposes
+        #painter.drawEllipse(centerRobot, robot.radius, robot.radius)
 
     # draw the healthbars of the robots based on their current health    
-    def drawHealthBars(self, painter, robot):
+    def drawHealthBars(self, painter: QPainter, robot: Robot):
         barWidth  = 60
         barHeight = 4
         barMargin = 5
@@ -403,7 +457,7 @@ class Arena(QFrame):
         painter.drawRect(x, y, barWidth, barHeight)
 
         # Health
-        healthWidth = int(barWidth * max(0, robot.health / 100.0)) # health cannot go below 0
+        healthWidth = int(barWidth * max(0, robot.health / robot.maxHealth)) # health cannot go below 0
         healthColor = QColor(0, 255, 0)  # Green
         painter.setBrush(QBrush(healthColor))
         painter.drawRect(x, y, healthWidth, barHeight)
@@ -417,18 +471,18 @@ class Arena(QFrame):
         painter.setBrush(Qt.black)
         painter.drawEllipse(QPointF(bullet.x, bullet.y), bullet.radius, bullet.radius)
 
-
+    #these functions log press and release events into a dictionary
     def logKeyPressEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
             self.PressedKeys[event.key()] = True
             self.passKeyEvents(self.PressedKeys)
-            
-        
+              
     def logKeyReleaseEvent(self, event):
         if self.PressedKeys.__contains__(event.key()):
             self.PressedKeys[event.key()] = False
             self.passKeyEvents(self.PressedKeys)
 
+    #these functions pass the dictionary of key events and the relevant mouse events along to the threads
     def passKeyEvents(self, eventDict):
         for thread in self.robotThreads:
             thread.processKeyEvent(eventDict)
@@ -438,7 +492,8 @@ class Arena(QFrame):
             self.pressedMouseButtons[key] = event.buttons() & key
         self.robotThreads[0].processMouseEvent(event.x(), event.y(), self.pressedMouseButtons)
     
-    def getTileAtPos(self, x, y):
+    #this function translates a position on the map to the respective tile
+    def getTileAtPos(self, x, y) -> tiles.Tile:
         x = (x//Arena.TileWidth)
         y = (y//Arena.TileHeight)
         if x < 0:
@@ -453,12 +508,13 @@ class Arena(QFrame):
     
     def chooseMap(self):
         if self.arena_number == 1:
-            self.arena_map = "castlelayout.txt"
+            self.arena_map = "maps/castlelayout.txt"
         elif self.arena_number == 2:
-            self.arena_map = "weapontestlayout.txt"
+            self.arena_map = "maps/weapontestlayout.txt"
         else:
-            self.arena_map = "testlayout.txt"
+            self.arena_map = "maps/testlayout.txt"
 
+    #sets/unsets the flags responsible for pausing the threads
     def unpause(self):
         for thread in self.robotThreads:
             thread.unpauseRobots()

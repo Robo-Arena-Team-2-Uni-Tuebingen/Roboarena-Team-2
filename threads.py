@@ -28,26 +28,44 @@ class RobotThread(QThread):
         self.abort = False
     
     def run(self):
+        #this sleep is necessary to ensure that all threads have started until they interact with each other
         self.msleep(10)
+        #for enemies this loop will run until they die, for the player this loop will run as long as they have lives
         while (not self.robot.isRobotDead() or self.is_player) and not self.abort:
             if not self.is_paused:
+                #handles respawns and loss condition
                 if self.is_player and self.robot.isRobotDead():
-                    self.arena.respawnPlayer()
+                    if self.arena.playerKill():
+                        self.robot.revive()
+                #update the time-wincondition
+                self.arena.updateTime()
+                #vector-based movement of the robot
                 self.moveRobotSmoothly()
                 if self.is_player:
                     self.robot.getAlpha(self.Mouse_x, self.Mouse_y)
-                else:
-                    self.robot.getAlpha(*self.arena.getPlayerPosition())
-                    shot, bullet = self.robot.shoot()
-                    if shot:
-                        self.arena.passBulletsToThread(bullet)
+                else: 
+                    loSPlayer = self.arena.hasLineOfSightToPlayer(self.robot.xpos, self.robot.ypos)
+                    loSPlayerTarget = self.arena.hasLineOfSightToPlayerTarget(self.robot.xpos, self.robot.ypos)
+                    playerpos = self.arena.getPlayerPosition()
+                    playertarget = self.arena.getPlayerTarget()
+                    #this function sets the new alpha and target of the robot, for the scout it also handles acceleration and deceleration
+                    self.robot.behave(loSPlayer, loSPlayerTarget, playerpos, playertarget)
+                    #update the target from inside the robot
+                    self.target_x, self.target_y = self.robot.getTarget()
+                    #determines whether the enemy opens fire or not
+                    if(self.robot.openFire(loSPlayer, playerpos)):
+                        shot, bullet = self.robot.shoot()
+                        if shot:
+                            self.arena.passBulletsToThread(bullet)
+                #gets the tile from the arena class and applies a status effect
                 currentTile = self.arena.getTileAtPos(self.robot.xpos, self.robot.ypos)
                 if currentTile.hasEffect:
                     self.robot.applyEffect(currentTile.effect)
                 self.robot.tickDownEffects()
-                
+            #trigger update of the GUI
             self.positionChanged.emit(self.robot.xpos, self.robot.ypos)
             self.msleep(30)
+        #afterloop tasks for enemies
         if not self.is_player and not self.abort:
             self.arena.updateKillCounter()
             self.arena.updatePointCounter(self.robot.points)
@@ -55,6 +73,7 @@ class RobotThread(QThread):
             self.arena.spawnRobot()
             self.arena.spawnRobot()
 
+    #processing of key events, only relevant for the thread that contains the player
     def processKeyEvent(self, eventDict):
         if self.is_player and (not self.is_paused):
             deltaTargetx = 0
@@ -75,51 +94,49 @@ class RobotThread(QThread):
                 self.robot.accelerate()
         
             if eventDict[Qt.Key_Q]:
-                self.robot.deccelerate()
+                self.robot.decelerate()
 
             if eventDict[Qt.Key_Space]:  
                 shot, bullet = self.robot.shoot()
                 if shot:
                     self.arena.passBulletsToThread(bullet)
-
-
             self.setTarget(deltaTargetx, deltaTargety)
 
+    #processes mouse events, which is currently just an update to the position
     def processMouseEvent(self, x, y, pressedMouseButtons):
         self.Mouse_x = x
         self.Mouse_y = y
 
+    #responsible for moving the robot along a vector towards a target
     def moveRobotSmoothly(self):
+        #gets the centerposition of the robot as an np array
         cPos = np.array([self.robot.xpos - self.robot.radius, self.robot.ypos - self.robot.radius])
+        #gets the targetposition as a np array
         target = np.array([self.target_x, self.target_y])
+        #subtracts center from target
         target_vector = np.subtract(target, cPos)
+        #normalizes the vector to the target
         norm = np.linalg.norm(target_vector)
+        #multiplies normalized target vector with the speed of the robot (which is influenced by status effects)
         if norm > 0:
-            target_vector = self.robot.getV()*(target_vector/norm)
-        if np.linalg.norm(np.subtract(target, cPos)) < np.linalg.norm(target_vector):
+            new_target_vector = self.robot.getV()*(target_vector/norm)
+        else:
+            new_target_vector = target_vector
+        #prevents overshooting the target when the adjusted target_vector is longer than the actual vector to the target
+        if np.linalg.norm(target_vector) < np.linalg.norm(new_target_vector):
             cPos = target
         else:
-            cPos = cPos + target_vector
-        
-        if not self.is_player:
-            self.robot.getAlpha(cPos[0] + self.robot.radius, cPos[1] + self.robot.radius)
+            cPos = cPos + new_target_vector
 
         #check if next movement location is Impassable
         collision = self.isTileAtPosImpassable(cPos[0], cPos[1])
 
+        #adjusts the position to the upper left corner
         if not collision:
             self.robot.xpos = cPos[0] + self.robot.radius
             self.robot.ypos = cPos[1] + self.robot.radius
-        elif collision and not self.is_player:
-            self.generateNewTargetPosition()
-            self.robot.getAlpha(self.target_x, self.target_y)
 
-        # Check if the robot has reached the target position
-        if cPos[0] - self.target_x < 1 and cPos[1] - self.target_y < 1 and not self.is_player:
-            self.generateNewTargetPosition()
-            self.robot.target_x = self.target_x
-            self.robot.target_y = self.target_y
-
+    #sets the new target determined by the keypress events for the player and ensures it stays within passable area and boundaries
     def setTarget(self, x, y):
         newTargetx = self.target_x + x
         newTargety = self.target_y + y
@@ -139,30 +156,8 @@ class RobotThread(QThread):
         tile = self.arena.getTileAtPos(x, y)        
         return tile.isImpassable
 
- 
     def unpauseRobots(self):
         self.is_paused = False
 
     def pauseRobots(self):
         self.is_paused = True
-
-    
-    def generateNewTargetPosition(self):
-        # temporary until better behaviour for robots is implemented
-        # Generate random offsets to determine the neighboring tile
-        valid_tile = False
-        while not valid_tile:
-            offset_x = random.randint(0, 59)
-            offset_y = random.randint(0, 59)
-            if not self.arena.ArenaLayout[offset_x, offset_y].isImpassable:
-                valid_tile = True
-
-        # Calculate the target position based on the new tile indices
-        target_x = offset_x * self.tile_width + self.tile_width // 2
-        target_y = (offset_y * self.tile_height + self.tile_height // 2)
-
-        self.target_x = max(8, min(target_x, self.arena_width*self.tile_width - 9))
-        self.target_y = max(8, min(target_y, self.arena_height*self.tile_height - 9))
-
-        self.robot.target_x = self.target_x
-        self.robot.target_y = self.target_y

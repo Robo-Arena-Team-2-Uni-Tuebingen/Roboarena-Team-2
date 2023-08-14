@@ -4,9 +4,9 @@ from PyQt5.QtCore import QRect, QTimer
 tileWidth = 16
 tileHeight = 16
 tilePath = '\openRPG_Tilesets_5.24.22'
-dungeon = QImage('dungeon.png')
-exterior = QImage('exterior.png')
-interior = QImage('interior.png')
+dungeon = QImage('assets/dungeon.png')
+exterior = QImage('assets/exterior.png')
+interior = QImage('assets/interior.png')
 
 def getTileRect(x, y):
     return QRect(x*tileWidth, y*tileHeight, tileWidth, tileHeight)
@@ -29,13 +29,14 @@ textureCobbleStoneTile = exterior.copy(getBigTileRect(9, 5))
 class Tile():
     str = ''
     def __init__(self):
-        self.str = Tile.str
-        self.width = tileWidth
-        self.height = tileHeight
-        self.effect = ('', 0)
-        self.isImpassable = False
-        self.hasEffect = False
+        self.str = Tile.str         #string, indicates the tile type
+        self.width = tileWidth      #int, represents width
+        self.height = tileHeight    #int, represents height
+        self.effect = ('', 0)       #tuple of string and int, represents the effect and its intensity
+        self.isImpassable = False   #whether the tile is impassable or not
+        self.hasEffect = False      #whether the tile has an effect or not
 
+    #compares tile strings
     def compare(self, contextTile):
         if contextTile.str == self.str:
             return True
