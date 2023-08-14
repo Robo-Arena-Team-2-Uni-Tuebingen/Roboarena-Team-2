@@ -207,13 +207,13 @@ class Arena(QFrame):
         parent.setMouseTracking(True)
         self.setMouseTracking(True)
 
-        #self.pawns = np.array([Robot(600, 600,  -np.pi/2, player_number = 1, type ='player'),
-        #                       Robot(200, 200,  -np.pi/2, player_number = 2, type ='scout')])
-        self.pawns = np.array([Robot(200, 200, -np.pi/2, 1, type ='player'),
-                               Robot(600, 800, -np.pi/2, 2, type = 'assault'),
-                               Robot(800, 200, -np.pi/2, 3, type = 'heavy_gunner'),
-                               Robot(400, 800, -np.pi/2, 4, type = 'sniper'),
-                               Robot(400, 400, 0, 5, type='scout')])
+        self.pawns = np.array([Robot(600, 600,  -np.pi/2, player_number = 1, type ='player'),
+                               Robot(200, 200,  -np.pi/2, player_number = 2, type ='scout')])
+        #self.pawns = np.array([Robot(200, 200, -np.pi/2, 1, type ='player'),
+        #                       Robot(600, 800, -np.pi/2, 2, type = 'assault'),
+        #                       Robot(800, 200, -np.pi/2, 3, type = 'heavy_gunner'),
+        #                       Robot(400, 800, -np.pi/2, 4, type = 'sniper'),
+        #                       Robot(400, 400, 0, 5, type='scout')])
         self.player_numbers = parent.player_numbers
         self.arena_number = parent.arena_number
         self.points = 0
@@ -416,9 +416,12 @@ class Arena(QFrame):
     def drawRobot(self, painter : QPainter, robot : Robot):
         #corrects the position of the robot to the upper left corner where the drawing is positioned
         centerRobot = QPointF(robot.xpos - robot.radius, robot.ypos - robot.radius)
+        #translate origin of the coordinate system to the center of the robot
         painter.translate(centerRobot)
+        #rotate by alpha + offset
         painter.rotate(-robot.alpha*180/np.pi + 90)
         painter.drawImage(-30, -30, robot.image)
+        #reset the transformation matrices
         painter.resetTransform()
         #for debugging purposes, to be removed later
         painter.drawEllipse(centerRobot, robot.radius, robot.radius)
