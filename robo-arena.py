@@ -169,6 +169,9 @@ class RoboArena(QMainWindow):
         self.arena.showDefeat.connect(self.switchToDefeatScreen)
 
         self.stats = Stats(self.game_widget)
+        self.arena.killsUpdated.connect(self.stats.update_kills)
+        self.arena.pointsUpdated.connect(self.stats.update_points)
+        self.arena.playerHealth.connect(self.stats.update_health)
         
         self.pause = PauseMenu(self.game_widget)
         self.pause.hide()
@@ -212,8 +215,11 @@ class Arena(QFrame):
         Qt.MouseButton.RightButton: False
     }
 
-    showVictory = pyqtSignal(str, str)
-    showDefeat  = pyqtSignal(str, str)
+    showVictory  = pyqtSignal(str, str)
+    showDefeat   = pyqtSignal(str, str)
+    killsUpdated = pyqtSignal(int)
+    pointsUpdated = pyqtSignal(int)
+    playerHealth = pyqtSignal(float, float)
 
     def __init__(self, parent, player_numbers, arena_number):
         super().__init__(parent)
@@ -221,11 +227,11 @@ class Arena(QFrame):
         self.setMouseTracking(True)
 
         #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='cannoneer')])
-        self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='player'),
-                               Robot(600, 800, -np.pi/2, QColor(0xFFA500), player_number = 2, type = 'assault'),
-                               Robot(800, 200,  -np.pi/2, QColor(0x8A2BE2), player_number = 3, type = 'heavy_gunner'),
-                               Robot(400, 800, -np.pi/2, QColor(0x00FFFF), player_number = 4, type = 'sniper'),
-                               Robot(400, 400, 0, QColor(0xFFFFFF), 5, type='scout')])
+        self.pawns = np.array([Robot(200, 200,  -np.pi/2, player_number = 1, type ='player'),
+                               Robot(600, 800, -np.pi/2,  player_number = 2, type = 'assault'),
+                               Robot(800, 200,  -np.pi/2, player_number = 3, type = 'heavy_gunner'),
+                               Robot(400, 800, -np.pi/2, player_number = 4, type = 'sniper'),
+                               Robot(400, 400, 0, 5, type='scout')])
         self.player_numbers = player_numbers
         self.arena_number = arena_number
         self.points = 0
@@ -314,18 +320,14 @@ class Arena(QFrame):
 
     def updatePointCounter(self, points):
         self.points = self.points + points
+        self.pointsUpdated.emit(self.points)
         if self.victorycondition == 1:
             if self.points > self.PointsToWin:
                 self.win()
-
-    def updateTime(self):
-        self.currentTime = int(time.time())
-        if self.victorycondition == 2:
-            if self.starttime + self.SecondsToWin < self.currentTime:
-                self.win() 
     
     def updateKillCounter(self):
         self.kills = self.kills + 1
+        self.killsUpdated.emit(self.kills)
         if self.victorycondition == 3:
             if self.KillsToWin < self.kills:
                 self.win()
@@ -343,7 +345,6 @@ class Arena(QFrame):
     def win(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen 
         self.showVictory.emit(kills, points)
@@ -351,7 +352,6 @@ class Arena(QFrame):
     def lose(self):
         self.stopGame()
         kills = self.kills.__str__()
-        time = (self.currentTime - self.starttime).__str__()
         points = self.points.__str__()
         # emits signal with stats, so parent can show the correct screen
         self.showDefeat.emit(kills, points)
@@ -464,12 +464,19 @@ class Arena(QFrame):
         x = int(robot.xpos - 60)
         y = int(robot.ypos - barMargin - 60)
 
+        health = robot.health
+        max_health = robot.maxHealth
+
+        # emit health of player robots for health
+        if robot.player_number == 1:
+            self.playerHealth.emit(health, max_health)
+
         # Background
         painter.setBrush(QBrush(Qt.lightGray))
         painter.drawRect(x, y, barWidth, barHeight)
 
         # Health
-        healthWidth = int(barWidth * max(0, robot.health / robot.maxHealth)) # health cannot go below 0
+        healthWidth = int(barWidth * max(0, health / max_health)) # health cannot go below 0
         healthColor = QColor(0, 255, 0)  # Green
         painter.setBrush(QBrush(healthColor))
         painter.drawRect(x, y, healthWidth, barHeight)

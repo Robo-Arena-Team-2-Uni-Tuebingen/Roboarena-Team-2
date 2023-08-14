@@ -63,7 +63,7 @@ class Stats(QWidget):
         self.effects_label.setText("Effects:")
 
         self.hp = QLabel(self)
-        self.hp.setGeometry(QRect(130, 100, 100, 25))
+        self.hp.setGeometry(QRect(0, 100, 240, 25))
         font = QFont()
         font.setFamily("OCR A Extended")
         font.setPointSize(18)
@@ -140,6 +140,15 @@ class Stats(QWidget):
         minutes = self.time_counter // 60
         seconds = self.time_counter % 60
         self.timer_label.setText(f"{minutes:02d}:{seconds:02d}")
+
+    def update_kills(self, kills):
+        self.kills.setText(kills.__str__())
+
+    def update_points(self, points):
+        self.points.setText(points.__str__())
+
+    def update_health(self, health, max_health):
+        self.hp.setText(f"{health}/{max_health}")
 
 if __name__ == "__main__":
     import sys

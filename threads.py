@@ -37,8 +37,6 @@ class RobotThread(QThread):
                 if self.is_player and self.robot.isRobotDead():
                     if self.arena.playerKill():
                         self.robot.revive()
-                #update the time-wincondition
-                self.arena.updateTime()
                 #vector-based movement of the robot
                 self.moveRobotSmoothly()
                 if self.is_player:
