@@ -172,6 +172,7 @@ class RoboArena(QMainWindow):
         self.arena.killsUpdated.connect(self.stats.update_kills)
         self.arena.pointsUpdated.connect(self.stats.update_points)
         self.arena.playerHealth.connect(self.stats.update_health)
+        self.arena.activeEffects.connect(self.stats.update_effects)
         
         self.pause = PauseMenu(self.game_widget)
         self.pause.hide()
@@ -220,6 +221,7 @@ class Arena(QFrame):
     killsUpdated = pyqtSignal(int)
     pointsUpdated = pyqtSignal(int)
     playerHealth = pyqtSignal(float, float)
+    activeEffects = pyqtSignal(int, int, int, int, int)
 
     def __init__(self, parent, player_numbers, arena_number):
         super().__init__(parent)
@@ -425,6 +427,8 @@ class Arena(QFrame):
         for robot in self.pawns:
             self.drawRobot(painter, robot)
             self.drawHealthBars(painter, robot)
+            # pass values of player robot regularly
+            self.passValues(robot)
 
         self.drawPlayerTarget(painter)
 
@@ -464,19 +468,12 @@ class Arena(QFrame):
         x = int(robot.xpos - 60)
         y = int(robot.ypos - barMargin - 60)
 
-        health = robot.health
-        max_health = robot.maxHealth
-
-        # emit health of player robots for health
-        if robot.player_number == 1:
-            self.playerHealth.emit(health, max_health)
-
         # Background
         painter.setBrush(QBrush(Qt.lightGray))
         painter.drawRect(x, y, barWidth, barHeight)
 
         # Health
-        healthWidth = int(barWidth * max(0, health / max_health)) # health cannot go below 0
+        healthWidth = int(barWidth * max(0, robot.health / robot.maxHealth)) # health cannot go below 0
         healthColor = QColor(0, 255, 0)  # Green
         painter.setBrush(QBrush(healthColor))
         painter.drawRect(x, y, healthWidth, barHeight)
@@ -489,6 +486,13 @@ class Arena(QFrame):
     def drawBullet(self, painter, bullet):
         painter.setBrush(Qt.black)
         painter.drawEllipse(QPointF(bullet.x, bullet.y), bullet.radius, bullet.radius)
+
+    def passValues(self, robot: Robot):
+        if robot.player_number <= self.player_numbers:
+            self.playerHealth.emit(robot.health, robot.maxHealth)
+            effects = robot.appliedEffects
+            self.activeEffects.emit(effects['Slow'], effects['Speedup'], effects['Freeze'],
+                                    effects['Corrosion'], effects['Collateral'])
 
     #these functions log press and release events into a dictionary
     def logKeyPressEvent(self, event):
