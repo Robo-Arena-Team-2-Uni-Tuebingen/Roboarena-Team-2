@@ -404,6 +404,8 @@ class Arena(QFrame):
             self.drawRobot(painter, robot)
             self.drawHealthBars(painter, robot)
 
+        self.drawPlayerTarget(painter)
+
         # Draw bullets
         for bullet in self.bulletsThread.getBullets():
             self.drawBullet(painter, bullet)
@@ -412,6 +414,11 @@ class Arena(QFrame):
     def drawTile(self, painter : QPainter, x : int, y : int, tile : tiles.Tile):
         painter.drawImage(x, y, tile.texture)
     
+    def drawPlayerTarget(self, painter: QPainter):
+        target = QPointF(self.pawns[0].target_x, self.pawns[0].target_y)
+        painter.setBrush(QColor(0xF5F000))
+        painter.drawEllipse(target, 5, 5)
+
     #this method is responsible for painting the robot in the window
     def drawRobot(self, painter : QPainter, robot : Robot):
         #corrects the position of the robot to the upper left corner where the drawing is positioned
@@ -423,8 +430,8 @@ class Arena(QFrame):
         painter.drawImage(-30, -30, robot.image)
         #reset the transformation matrices
         painter.resetTransform()
-        #for debugging purposes, to be removed later
-        painter.drawEllipse(centerRobot, robot.radius, robot.radius)
+        #for debugging purposes
+        #painter.drawEllipse(centerRobot, robot.radius, robot.radius)
 
     # draw the healthbars of the robots based on their current health    
     def drawHealthBars(self, painter: QPainter, robot: Robot):
