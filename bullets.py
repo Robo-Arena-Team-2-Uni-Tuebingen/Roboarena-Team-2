@@ -170,6 +170,10 @@ class Weapon:
     def getAmmoLeft(self) -> float:
         return self.mag*100/self.magMax
     
+    #returns true if the weapon is reloading
+    def isReloading(self) -> bool:
+        return self.cdreload > time.time()
+    
 class Cannon(Weapon):
     def __init__(self) -> None:
         self.damage = 10

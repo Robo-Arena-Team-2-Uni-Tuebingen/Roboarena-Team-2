@@ -202,6 +202,7 @@ class Scouting(Behaviour):
     reload_threshold = 25
     accelerate = False
     decelerate = False
+    minimum_distance = 100
 
     #enemy is supposed to traverse the map at random and lock onto the player once line of sight is established
     def getNewTarget(self, pos: (int, int), ppos: (int, int), distance: float, hasLineOfSight: bool):
