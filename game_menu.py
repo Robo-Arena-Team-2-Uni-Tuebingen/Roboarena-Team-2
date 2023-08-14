@@ -79,10 +79,11 @@ class GameMenu(QWidget):
         self.arena_number.setObjectName("arena_number")
         
         self.play_button = QPushButton(self)
-        self.play_button.setGeometry(QRect(460, 430, 280, 60))
+        self.play_button.setGeometry(QRect(490, 430, 220, 60))
         font = QFont()
-        font.setPointSize(24)
-        font.setStrikeOut(False)
+        font.setFamily("OCR A Extended")
+        font.setPointSize(28)
+        font.setWeight(50)
         self.play_button.setFont(font)
         self.play_button.setStyleSheet("background-color: #9e9c89;\n"
 									   "color: #ea1603;")
@@ -90,7 +91,7 @@ class GameMenu(QWidget):
         self.play_button.setText("Play")
         
         self.settings_button = QPushButton(self)
-        self.settings_button.setGeometry(QRect(460, 555, 280, 60))
+        self.settings_button.setGeometry(QRect(490, 555, 220, 60))
         self.settings_button.setFont(font)
         self.settings_button.setStyleSheet("background-color: #9e9c89;\n"
 									       "color: #ea1603;")
@@ -98,7 +99,7 @@ class GameMenu(QWidget):
         self.settings_button.setText("Settings")
         
         self.quit_button = QPushButton(self)
-        self.quit_button.setGeometry(QRect(460, 680, 280, 60))
+        self.quit_button.setGeometry(QRect(490, 680, 220, 60))
         self.quit_button.setFont(font)
         self.quit_button.setStyleSheet("background-color: #9e9c89;\n"
 									   "color: #ea1603;")
