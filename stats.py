@@ -12,7 +12,7 @@ class Stats(QWidget):
 
         self.background = QLabel(self)
         self.background.setGeometry(QRect(0, 0, self.width(), self.height()))
-        self.background.setStyleSheet("background-color: rgb(165, 165, 165);")
+        self.background.setStyleSheet("background-color: #9e9c89;")
         
         self.timer_label = QLabel(self)
         self.timer_label.setGeometry(QRect(120, 0, 120, 60))
