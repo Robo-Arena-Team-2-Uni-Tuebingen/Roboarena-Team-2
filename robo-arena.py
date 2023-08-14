@@ -230,7 +230,6 @@ class Arena(QFrame):
         self.setGeometry(QRect(0, 0, 960, 960))
         self.setMouseTracking(True)
 
-        #self.pawns = np.array([Robot(200, 200,  -np.pi/2, QColor(0xFF0000), player_number = 1, type ='cannoneer')])
         self.pawns = np.array([Robot(200, 200,  -np.pi/2, player_number = 1, type ='player'),
                                Robot(600, 800, -np.pi/2,  player_number = 2, type = 'assault'),
                                Robot(800, 200,  -np.pi/2, player_number = 3, type = 'heavy_gunner'),

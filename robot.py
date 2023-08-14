@@ -111,7 +111,7 @@ class Robot():
 
         elif type == 'player':
             self.image = player
-            self.weapon = bullets.AssaultRifle()
+            self.weapon = bullets.DualPistols()
 
     #handles basic decision making for target, alpha, acceleration, deceleration and reloading 
     def behave(self, hasLineOfSight: bool, hasLineOfSightToTarget: bool, ppos: (int, int), pTarget: (int, int)) -> None:
