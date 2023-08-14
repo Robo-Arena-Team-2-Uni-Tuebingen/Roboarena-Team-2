@@ -173,6 +173,7 @@ class RoboArena(QMainWindow):
         self.arena.pointsUpdated.connect(self.stats.update_points)
         self.arena.playerHealth.connect(self.stats.update_health)
         self.arena.activeEffects.connect(self.stats.update_effects)
+        self.arena.actualAmmo.connect(self.stats.update_ammo)
         
         self.pause = PauseMenu(self.game_widget)
         self.pause.hide()
@@ -216,12 +217,13 @@ class Arena(QFrame):
         Qt.MouseButton.RightButton: False
     }
 
-    showVictory  = pyqtSignal(str, str)
-    showDefeat   = pyqtSignal(str, str)
-    killsUpdated = pyqtSignal(int)
+    showVictory   = pyqtSignal(str, str)
+    showDefeat    = pyqtSignal(str, str)
+    killsUpdated  = pyqtSignal(int)
     pointsUpdated = pyqtSignal(int)
-    playerHealth = pyqtSignal(float, float)
+    playerHealth  = pyqtSignal(float, float)
     activeEffects = pyqtSignal(int, int, int, int, int)
+    actualAmmo    = pyqtSignal(int, int, bool)
 
     def __init__(self, parent, player_numbers, arena_number):
         super().__init__(parent)
@@ -493,6 +495,7 @@ class Arena(QFrame):
             effects = robot.appliedEffects
             self.activeEffects.emit(effects['Slow'], effects['Speedup'], effects['Freeze'],
                                     effects['Corrosion'], effects['Collateral'])
+            self.actualAmmo.emit(robot.weapon.mag, robot.weapon.magMax, robot.weapon.isReloading())
 
     #these functions log press and release events into a dictionary
     def logKeyPressEvent(self, event):
