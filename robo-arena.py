@@ -234,7 +234,7 @@ class Arena(QFrame):
                                Robot(600, 800, -np.pi/2,  player_number = 2, type = 'assault'),
                                Robot(800, 200,  -np.pi/2, player_number = 3, type = 'heavy_gunner'),
                                Robot(400, 800, -np.pi/2, player_number = 4, type = 'sniper'),
-                               Robot(400, 400, 0, 5, type='scout')])
+                               Robot(500, 500, 0, 5, type='scout')])
         self.player_numbers = player_numbers
         self.arena_number = arena_number
         self.points = 0
@@ -535,7 +535,7 @@ class Arena(QFrame):
         if self.arena_number == 1:
             self.arena_map = "maps/castlelayout.txt"
         elif self.arena_number == 2:
-            self.arena_map = "maps/weapontestlayout.txt"
+            self.arena_map = "maps/circleOfDoom.txt"
         elif self.arena_number == 3:
             self.arena_map = "maps/bunkermap.txt"
         else:

@@ -75,7 +75,7 @@ class GameMenu(QWidget):
 									       "color: #ea1603;")
         self.arena_number.setAlignment(Qt.AlignCenter)
         self.arena_number.setMinimum(1)
-        self.arena_number.setMaximum(5)
+        self.arena_number.setMaximum(3)
         self.arena_number.setObjectName("arena_number")
         
         self.play_button = QPushButton(self)
