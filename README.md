@@ -789,5 +789,43 @@ Designed a "Victory" ...
 - should be as a half-transparent layer over the arena
 - not implemented yet because of problems drawing it into the existing widget with a parent
 
+### Sprint 8 (01.08.2023 - 15.08.2023)
 
+#### Behaviour (by Julian Häberle)
+- the `Behaviour` class controls the basic decision making of the enemies
+- enemies mainly make their decision based on two factors, distance to the player and whether there's an unobstructed line of sight to the player
+- more complex behaviour is currently a little complicated to implement because we lack the pathfinding ability
+- the behaviour object is added to the robot, originally it was intended to be able to swap behaviours in one robot in one game based on how long it has been since the robot has "seen" the player
+- for example, a standard behaviour might switch to a patrolling behaviour or a scouting behaviour after a certain time of no contact
+- due to lack of time this was not implemented
+- five behaviours overall were implemented: Standard, Patrolling, Stationary, Sniping and Scouting
+- `getAngle` and `openFire` functions work the same for every behaviour
+- `getAngle` decides whether the robot looks at a random point within it's `awareness_distance` or whether it looks at the player
+- this depends on the `awareness_threshold` and whether or not the robot has a line of sight
+- the `openFire` Function works much the same way
+- the robot opens fire if the distance to the player is lower than the `fire_threshold`, the line of sight is unobstructed and the angle points at the player (the bool for whether the angle points at the player is set in `getAngle`
+- additionally there are a `accelerate`, a `decelerate` and a `reload` function
+- `accelerate` and `decelerate` are only used by the `scouting` behaviour and are configured for just the scout
+- `reload` decides whether the robot reloads based on an ammo threshold defined in each behaviour
 
+![grafik](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/67464857/e398af0b-7682-4f1a-b17b-91a5387ab337)
+- the `hasLineOfSightToPoint` function calculates a line equation and then iteratively traverses the line from one point to the other
+- should one iteration meet an impassable tile, it returns False, otherwise it returns true
+
+- Standard behaviour is assigned to the standard enemy
+- it moves to random points within a certain `patrol_radius` until the player enters it's `distance_threshold`
+
+- Patrolling behaviour is assigned to the heavy_gunner enemy
+- the enemy moves to random points within its `patrol_radius` around it's initial position, it does not follow the player
+
+- Stationary behaviour is assigned to the cannoneer
+- the cannoneer doesn't move and instact acts like a gun turret
+
+- Sniping behaviour is assinged to the sniper
+- the sniper tries to back away from the player once the player enters the `distance_threshold`
+- upon firing the sniper ceases movement until it stops firing
+
+- Scouting behaviour is assigned to the scout
+- the scout charges the player as soon as it has a line of sight and accelerates the closer it gets to the player
+
+- apart from the behaviour and the associated code, the behaviour branch contains a clean-up of assets and maps, some minor refactors and a lot of added commentary
