@@ -318,6 +318,16 @@ class Arena(QFrame):
             if self.KillsToWin < self.kills:
                 self.win()
 
+    def playerKill(self):
+        self.player_lives = self.player_lives - 1
+        #100 points deducted for dying
+        self.updatePointCounter(-100)
+        if self.player_lives > 0:
+            return True
+        else:
+            self.lose()
+            return False
+
     def win(self):
         self.stopGame()
         kills = self.kills.__str__()

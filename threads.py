@@ -35,13 +35,8 @@ class RobotThread(QThread):
             if not self.is_paused:
                 #handles respawns and loss condition
                 if self.is_player and self.robot.isRobotDead():
-                    self.arena.player_lives = self.arena.player_lives - 1
-                    #100 points deducted for dying
-                    self.arena.updatePointCounter(-100)
-                    if self.arena.player_lives > 0:
+                    if self.arena.playerKill():
                         self.robot.revive()
-                    else:
-                        self.arena.lose()
                 #update the time-wincondition
                 self.arena.updateTime()
                 #vector-based movement of the robot
