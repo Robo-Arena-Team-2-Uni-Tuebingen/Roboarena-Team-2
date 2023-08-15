@@ -858,3 +858,12 @@ Pause menu:
 
 Game Menu:
 ![game-menu](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/83218599/a7f7e984-c5cf-4aa0-b62a-063c880ed0d5)
+
+#### New Map and PP Presentation
+
+New Map:
+![map2](https://github.com/Robo-Arena-Team-2-Uni-Tuebingen/Roboarena-Team-2/assets/104011823/7bbaca8e-d8f1-4a19-a77f-e02c29228fae)
+
+- Creating power point presentation
+
+
